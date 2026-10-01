@@ -10,12 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy dependency specifications
 COPY requirements.txt requirements-dev.txt ./
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies including dev requirements for CI/testing
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
-# Copy application source code
+# Copy application source code and migrations
 COPY app ./app
-COPY pyproject.toml ./
+COPY alembic ./alembic
+COPY tests ./tests
+COPY alembic.ini pyproject.toml ./
 
 EXPOSE 8000
 
