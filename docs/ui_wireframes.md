@@ -392,3 +392,212 @@ The application shell utilizes a modern **responsive 2-column layout** with a fi
   - **Inline Validation**: Red border and error helper text when required fields (`title`, `description`, `required_skills`) are blank.
   - **Skill Autocomplete Suggestions**: Dropdown suggestions matching ESCO skill taxonomy standard.
 
+---
+
+## 4. Phase 3 Screen Wireframe Specifications
+
+### 4.1 Screen 1: Candidate Profile (Page & Drawer View)
+
+- **Layout Architecture**: 2-Column Split View (Left Column: PDF Viewer, Right Column: Candidate Attributes, Parsed Experience, and AI Match Score Panel) or Slide-over Drawer (`Sheet` width `780px`).
+- **Visual Blueprint**:
+```
++----------------------------------------------------------------------------------------------------+
+| Candidate Profile: Alex Mercer                                                                [X]  |
+| Applied for: Senior Backend Engineer  •  Stage: [ AI Screening & Review ▼ ]  •  Score: [ 88.5% ]   |
++----------------------------------------------------------------------------------------------------+
+| LEFT COLUMN: ORIGINAL PDF CV                 | RIGHT COLUMN: PARSED DATA & AI MATCH SCORE          |
+| +------------------------------------------+ | +-------------------------------------------------+ |
+| | Toolbar: [-] [+] [Zoom: 100%] [⬇️ Download]| | | CANDIDATE SUMMARY & CONTACT                     | |
+| +------------------------------------------+ | | 📧 alex.mercer@example.com  📞 +1-555-0199       | |
+| |                                          | | | 📍 San Francisco, CA        📅 Applied: 2d ago  | |
+| |  ALEX MERCER                             | | +-------------------------------------------------+ |
+| |  Senior Software Engineer                | | | AI MATCH SCORE BREAKDOWN                        | |
+| |                                          | | | [ Overall Fit Score: 88.5 / 100 ]               | |
+| |  EXPERIENCE                              | | |                                                 | |
+| |  TechCorp Inc (2021-Present)             | | | Skill Overlap (40%):   [========---] 90.0%       | |
+| |  - Built FastAPI services & Postgres     | | | Semantic Match (30%):  [========---] 85.5%       | |
+| |                                          | | | Experience Depth (20%):[===========] 92.0%       | |
+| |  DataFlow Soft (2019-2021)               | | | Title Fit (10%):       [========---] 84.0%       | |
+| |  - Developed ETL scripts                 | | +-------------------------------------------------+ |
+| |                                          | | | MATCH EXPLANATIONS                              | |
+| |  SKILLS                                  | | | • Possesses 4 of 5 required ESCO skills.        | |
+| |  Python, FastAPI, Postgres, Redis, Docker| | | • Cosine vector similarity with JD is 0.855.     | |
+| |                                          | | | • 5.5 yrs exp exceeds 4 yrs requirement.        | |
+| |                                          | | +-------------------------------------------------+ |
+| |                                          | | | EXTRACTED ESCO SKILLS (Editable)                | |
+| |                                          | | | [ Python (x) ] [ FastAPI (x) ] [ PostgreSQL (x)]| |
+| |                                          | | | [ Docker (x) ] [ Redis (x) ]   [ + Add Skill   ]| |
+| |                                          | | +-------------------------------------------------+ |
+| |                                          | | | WORK HISTORY TIMELINE                           | |
+| |                                          | | | 💼 TechCorp Inc (3.5 yrs) - Backend Engineer     | |
+| |                                          | | | 💼 DataFlow Soft (2.0 yrs) - Junior Engineer    | |
+| +------------------------------------------+ | +-------------------------------------------------+ |
+|                                              | [ Save Edits ] [ Move Stage ] [ Delete Candidate ]  |
++----------------------------------------------------------------------------------------------------+
+```
+- **Specific Data Points & UI Elements**:
+  - **Header Region**: Candidate Name (`h2`), Job Title Badge, Stage Selector Dropdown (`Select`), Overall ATS Score Badge (`Badge` green/amber/red).
+  - **PDF Viewer Component (`PDFViewer`)**: PDF toolbar (`ZoomIn`, `ZoomOut`, `Download`), canvas/iframe viewer, text highlight toggle.
+  - **Score Breakdown Component (`ScoreBreakdown`)**:
+    - Composite Overall Score Progress Circle / Gauge (`88.5 / 100`).
+    - Sub-Score Progress Bars (`Progress`):
+      - `Skill Overlap Score` (40% weight): 90.0% (Matched: 4, Missing: 1).
+      - `Semantic Similarity Score` (30% weight): 85.5%.
+      - `Experience Depth Score` (20% weight): 92.0% (5.5 yrs vs 4 yrs required).
+      - `Title Fit Score` (10% weight): 84.0%.
+    - Score Explanations: Accordion / Bullet list detailing rationale.
+  - **Parsed Data Editor (`ParsedDataEditor`)**: Interactive Skill Badges with `x` delete icon, Add Skill input, Work History Timeline.
+  - **GDPR Actions**: `Hard Delete Candidate` button (`Button` variant `destructive`, icon `Trash2`) triggering confirmation alert dialog (`ConfirmDeleteDialog`).
+
+---
+
+### 4.2 Screen 2: CV Upload States (`CVUploadDialog` / `/candidates/upload`)
+
+- **Layout Architecture**: Centered Dialog Modal (`Dialog` width `560px`) showcasing the 4 distinct execution states.
+
+#### A. State 1: Idle (Ready for Drop)
+```
++-------------------------------------------------------------------+
+| Upload Candidate Resume                                       [X] |
++-------------------------------------------------------------------+
+|  +-------------------------------------------------------------+  |
+|  |                           [ ☁️ ]                            |  |
+|  |           Drag & drop PDF resume here or click to browse    |  |
+|  |                 Supports PDF files up to 10MB               |  |
+|  |                                                             |  |
+|  |                   [ 📄 Select PDF File ]                    |  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  Candidate Name (Optional)           Email Address (Optional)     |
+|  [ Alex Mercer                     ] [ alex.mercer@example.com  ] |
++-------------------------------------------------------------------+
+| [ Cancel ]                                         [ Upload & Parse ] |
++-------------------------------------------------------------------+
+```
+
+#### B. State 2: Uploading & Parsing (In Progress)
+```
++-------------------------------------------------------------------+
+| Uploading & Extracting Resume Data                            [X] |
++-------------------------------------------------------------------+
+|  Selected File: Alex_Mercer_CV.pdf (1.2 MB)                       |
+|                                                                   |
+|  [========================================--------------] 72%    |
+|                                                                   |
+|  (✓) File upload complete                                         |
+|  (✓) PyMuPDF text extraction complete                             |
+|  (⏳) Running Tesseract OCR fallback... [ Spinner ]                |
+|  ( ) Matching ESCO skill taxonomy...                              |
++-------------------------------------------------------------------+
+| [ Cancel Processing ]                               [ Processing... ] |
++-------------------------------------------------------------------+
+```
+
+#### C. State 3: Success (Parsing Complete)
+```
++-------------------------------------------------------------------+
+| Resume Parsed Successfully!                                   [X] |
++-------------------------------------------------------------------+
+|  +-------------------------------------------------------------+  |
+|  |  [✓]  Alex Mercer                                           |  |
+|  |       alex.mercer@example.com • 5.5 years experience        |  |
+|  |       Parsed 7 ESCO skills: Python, FastAPI, Postgres, Docker|  |
+|  +-------------------------------------------------------------+  |
+|                                                                   |
+|  Assign to Job Posting:                                           |
+|  [ Senior Backend Engineer                                      ▼ ]|
++-------------------------------------------------------------------+
+| [ Upload Another ]                       [ View Profile & Score ] |
++-------------------------------------------------------------------+
+```
+
+#### D. State 4: Error State (Upload / OCR Failure)
+```
++-------------------------------------------------------------------+
+| Upload Failed                                                 [X] |
++-------------------------------------------------------------------+
+|  +-------------------------------------------------------------+  |
+|  | [!] Error: Resume parsing failed.                           |  |
+|  |     The PDF document is password-protected or corrupted.    |  |
+|  |     Please remove password protection and try again.        |  |
+|  +-------------------------------------------------------------+  |
++-------------------------------------------------------------------+
+| [ Cancel ]                                         [ Try Again ]  |
++-------------------------------------------------------------------+
+```
+
+---
+
+### 4.3 Screen 3: Ranked Candidates View (Score Breakdown UI)
+
+- **Layout Architecture**: Table / List View sorted by `overall_score DESC` with expandable candidate score breakdown rows.
+- **Visual Blueprint**:
+```
++------------------------------------------------------------------------------------------------------------------------+
+| Ranked Candidates: Senior Backend Engineer                                          Job Filter: [ Backend ▼ ]           |
++------------------------------------------------------------------------------------------------------------------------+
+| RANK  CANDIDATE NAME & CONTACT       OVERALL FIT   SKILL MATCH  SEMANTIC  EXP SCORE   TITLE FIT  ACTIONS             |
+| ---------------------------------------------------------------------------------------------------------------------- |
+| #1    Alex Mercer                    [ 88.5% ]      90.0%       85.5%     92.0%       84.0%     [ Move Stage ▼ ]    |
+|       alex.mercer@example.com        (Green)       (4/5 skills) (Vector) (5.5/4 yrs)                      [ Details > ]  |
+|       └─ Extracted: Python, FastAPI, PostgreSQL, Docker, Redis                                                         |
+|                                                                                                                        |
+| #2    Jordan Lee                     [ 79.2% ]      75.0%       81.0%     80.0%       78.0%     [ Move Stage ▼ ]    |
+|       jordan.lee@example.com         (Amber)       (3/5 skills) (Vector) (4.0/4 yrs)                      [ Details > ]  |
+|                                                                                                                        |
+| #3    Taylor Smith                   [ 54.0% ]      40.0%       58.0%     60.0%       50.0%     [ Move Stage ▼ ]    |
+|       taylor.smith@example.com       (Red)         (2/5 skills) (Vector) (2.0/4 yrs)                      [ Details > ]  |
++------------------------------------------------------------------------------------------------------------------------+
+```
+- **Data Points & Specific UI Elements**:
+  - `RankPosition`: Sequential badge (`#1`, `#2`, `#3`).
+  - `OverallScoreBadge`: Circular or pill badge color-coded:
+    - **Green** (`>= 80%`): High Match / Shortlist.
+    - **Amber** (`60% - 79%`): Partial Match / Review.
+    - **Red** (`< 60%`): Low Match.
+  - `SubScoreColumns`:
+    - **Skill Match**: Percentage + count tag (`4/5 required skills`).
+    - **Semantic Score**: Vector similarity percentage (`85.5%`).
+    - **Experience Score**: Candidate years vs required (`5.5 / 4.0 yrs`).
+    - **Title Fit**: Title proximity score.
+  - `ActionControls`: Stage selector dropdown (`Move Stage`) and `View Details` trigger button.
+
+---
+
+### 4.4 Screen 4: Pipeline Board (Kanban View)
+
+- **Layout Architecture**: Horizontal Scrollable Kanban Container with 5 Stage Columns.
+- **Visual Blueprint**:
+```
++------------------------------------------------------------------------------------------------------------------------+
+| Pipeline Board: Senior Backend Engineer                              [ Search Candidate... ]  [ Minimum Score: 70% ▼ ]  |
++------------------------------------------------------------------------------------------------------------------------+
+|  APPLIED (12)           AI SCREENING (5)        TECHNICAL INTERVIEW (3) OFFER EXTENDED (1)      HIRED / REJECTED (2)   |
+|  --------------------   --------------------    ----------------------- -------------------    ---------------------  |
+|  +------------------+   +------------------+    +---------------------+ +-----------------+    +-------------------+  |
+|  | :: Alex Mercer   |   | :: Jordan Lee    |    | :: Morgan Vance     | | :: Sam Taylor   |    | :: Casey Reed     |  |
+|  | [ 88.5% Score ]  |   | [ 79.2% Score ]  |    | [ 94.5% Score ]     | | [ 91.0% Score ] |    | [ Rejected: Exp ] |  |
+|  | Python, FastAPI  |   | Python, Django   |    | Python, C++, AWS    | | FastAPI, Docker |    | [ 45.0% Score ]   |  |
+|  | Applied: 2d ago  |   | Applied: 4d ago  |    | Applied: 1w ago     | | Applied: 2w ago|    +-------------------+  |
+|  +------------------+   +------------------+    +---------------------+ +-----------------+                           |
+|  | :: Chris Evans   |   | :: Pat Morgan    |                                                                            |
+|  | [ 81.0% Score ]  |   | [ 72.0% Score ]  |                                                                            |
+|  | FastAPI, Postgres|   | Python, Docker   |                                                                            |
+|  +------------------+   +------------------+                                                                            |
++------------------------------------------------------------------------------------------------------------------------+
+```
+- **Specific Data Points & UI Elements**:
+  - **Kanban Column (`KanbanColumn`)**:
+    - Column Header: Stage Name (`Applied`, `AI Screening`, `Technical Interview`, `Offer Extended`, `Hired / Rejected`).
+    - Badge: Candidate count (`12`).
+    - Actions: Column menu (`Sort by Score`, `Bulk Move`, `Stage Settings`).
+  - **Kanban Card (`CandidateCard`)**:
+    - Drag Grip Icon (`GripVertical`).
+    - Candidate Full Name (`h4`).
+    - ATS Match Score Badge (`Badge` green/amber/red).
+    - Top Skill Badges (`Python`, `FastAPI`).
+    - Submission Date ("Applied 2d ago").
+    - Drag-and-Drop Triggers: Moving card across columns calls `PATCH /api/v1/applications/{id}/stage`.
+    - Click Trigger: Opens `CandidateDrawer` side drawer for quick evaluation.
+
+
