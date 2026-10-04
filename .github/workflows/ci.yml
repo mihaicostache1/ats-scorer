@@ -80,34 +80,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---- Placeholders: replace when F-1 lands ----
-      - name: Lint (placeholder)
-        working-directory: .
-        run: echo "lint not wired yet (F-1)"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
-      - name: Typecheck (placeholder)
-        working-directory: .
-        run: echo "typecheck not wired yet (F-1)"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Test (placeholder)
-        working-directory: .
-        run: echo "tests not wired yet (F-1)"
+      - name: Lint
+        run: npm run lint
 
-      # ---- Real steps: uncomment when F-1 lands, delete placeholders above ----
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 20
-      #     cache: npm
-      #     cache-dependency-path: web/package-lock.json
-      #
-      # - name: Install dependencies
-      #   run: npm ci
-      #
-      # - name: Lint
-      #   run: npm run lint
-      #
-      # - name: Typecheck
-      #   run: npm run typecheck        # add "typecheck": "tsc --noEmit" to package.json
-      #
-      # - name: Test
-      #   run: npm test -- --run        # --run stops vitest watch mode; drop it for jest
+      - name: Typecheck
+        run: npm run typecheck
