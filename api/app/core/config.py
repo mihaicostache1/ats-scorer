@@ -1,5 +1,7 @@
 """Application Settings and Environment Configuration."""
 
+from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,7 +10,7 @@ class Settings(BaseSettings):
     """Pydantic Settings for Environment Configuration."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=[".env", "../.env"],  # api/.env (Docker) or repo root .env (local dev)
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -36,7 +38,18 @@ class Settings(BaseSettings):
         alias="SECRET_KEY",
     )
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # short-lived access token
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # Cookie Settings (httpOnly delivery agreed with frontend)
+    COOKIE_DOMAIN: str = Field(default="", alias="COOKIE_DOMAIN")  # empty = current domain
+    COOKIE_SECURE: bool = Field(default=False, alias="COOKIE_SECURE")  # True in production
+    COOKIE_SAMESITE: Literal["lax", "strict", "none"] = "lax"
+    ACCESS_COOKIE_NAME: str = "access_token"
+    REFRESH_COOKIE_NAME: str = "refresh_token"
+
+    # Rate limiting – login endpoint
+    LOGIN_RATE_LIMIT: str = "10/minute"
 
     # Logging Settings
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
