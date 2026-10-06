@@ -34,3 +34,10 @@ docker compose down -v        # stop AND delete all data
 ### Run the apps
 - API: `uvicorn app.main:app --reload` (from the backend folder)
 - Web: `npm run dev` (from the web folder)
+
+## Folder Structure
+
+- `/api` - Python FastAPI backend service, containing domain logic and vector store logic.
+- `/web` - Next.js (App Router) frontend application using TypeScript, Tailwind CSS, and shadcn/ui.
+- `/docs` - Project documentation.
+- `.github/workflows` - CI pipelines for testing the API and Web services.
