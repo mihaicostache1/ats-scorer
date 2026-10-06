@@ -5,11 +5,12 @@ from collections.abc import AsyncGenerator, Generator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
 from app.main import app
+from app.models import Base
 from app.models.application import Application
 from app.models.candidate import Candidate
 from app.models.job import Job
@@ -19,18 +20,25 @@ from app.models.user import User
 
 
 @pytest.fixture
-async def async_client() -> AsyncGenerator[AsyncClient, None]:
+async def async_client(db_engine) -> AsyncGenerator[AsyncClient, None]:
     """Async HTTP client fixture using httpx and ASGITransport."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
         yield client
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def db_engine():
     """Create test SQLAlchemy engine."""
     engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+    # Create all tables before tests
+    Base.metadata.create_all(engine)
     yield engine
+    # Drop all tables after tests
+    Base.metadata.drop_all(engine)
+    with engine.connect() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
+        conn.commit()
     engine.dispose()
 
 
