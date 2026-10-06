@@ -10,13 +10,13 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
 from app.main import app
+from app.models import Base
 from app.models.application import Application
 from app.models.candidate import Candidate
 from app.models.job import Job
 from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
-from app.models import Base
 
 
 @pytest.fixture

@@ -3,13 +3,12 @@
 import os
 
 from alembic.config import Config
+from sqlalchemy import create_engine, text
 
 from alembic import command
-
-
-from sqlalchemy import create_engine, text
-from app.models import Base
 from app.core.config import settings
+from app.models import Base
+
 
 def test_alembic_migration_lifecycle() -> None:
     """Test alembic upgrade head and alembic downgrade base cycle."""
