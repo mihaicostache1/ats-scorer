@@ -72,30 +72,38 @@ async def test_viewer_cannot_write_and_rbac_dependencies(
     from fastapi import APIRouter, Depends
 
     from app.core.dependencies import get_current_recruiter_or_admin
+    from app.db.session import get_db
 
-    router = APIRouter()
+    # Override get_db so the app sees the same transactional session as the test.
+    app.dependency_overrides[get_db] = lambda: db_session
 
-    @router.post("/test-write")
-    def test_write(current_user: User = Depends(get_current_recruiter_or_admin)):
-        return {"msg": "write success"}
+    try:
+        router = APIRouter()
 
-    app.include_router(router)
+        @router.post("/test-write")
+        def test_write(current_user: User = Depends(get_current_recruiter_or_admin)):
+            return {"msg": "write success"}
 
-    org = Organization(id=uuid.uuid4(), name="Org", slug="org")
-    viewer = User(
-        id=uuid.uuid4(),
-        org_id=org.id,
-        email="viewer@org.com",
-        hashed_password="hash",
-        full_name="Viewer",
-        role="viewer",
-    )
-    db_session.add_all([org, viewer])
-    db_session.commit()
+        app.include_router(router)
 
-    token = create_access_token(user_id=str(viewer.id), org_id=str(org.id), role=viewer.role)
-    async_client.cookies.set(settings.ACCESS_COOKIE_NAME, token)
+        org = Organization(id=uuid.uuid4(), name="Org", slug="org")
+        viewer = User(
+            id=uuid.uuid4(),
+            org_id=org.id,
+            email="viewer@org.com",
+            hashed_password="hash",
+            full_name="Viewer",
+            role="viewer",
+        )
+        db_session.add_all([org, viewer])
+        db_session.commit()
 
-    response = await async_client.post("/test-write")
-    assert response.status_code == 403
-    assert "Not enough privileges" in response.text
+        token = create_access_token(user_id=str(viewer.id), org_id=str(org.id), role=viewer.role)
+        async_client.cookies.set(settings.ACCESS_COOKIE_NAME, token)
+
+        response = await async_client.post("/test-write")
+        assert response.status_code == 403
+        assert "Not enough privileges" in response.text
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
