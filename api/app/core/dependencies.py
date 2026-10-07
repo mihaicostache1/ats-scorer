@@ -8,11 +8,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import decode_access_token
+from app.db.base_class import Base
 from app.db.session import get_db
 from app.models.user import User
 
 
 def get_current_user(
+
     access_token: str | None = Cookie(default=None, alias=settings.ACCESS_COOKIE_NAME),
     db: Session = Depends(get_db),
 ) -> User:
@@ -50,3 +52,35 @@ def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin privileges required",
         )
     return current_user
+
+
+def get_current_recruiter_or_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Require the current user to have at least ``recruiter`` role (admin or recruiter)."""
+    if current_user.role not in ("admin", "recruiter"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough privileges",
+        )
+    return current_user
+
+
+def get_tenant_db(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Session:
+    """Return a database session automatically scoped to the current user's organization."""
+    from sqlalchemy import event, true
+    from sqlalchemy.orm import with_loader_criteria
+
+    @event.listens_for(db, "do_orm_execute")
+    def _add_tenant_filter(execute_state):
+        if execute_state.is_select and not execute_state.is_column_load and not execute_state.is_relationship_load:
+            execute_state.statement = execute_state.statement.options(
+                with_loader_criteria(
+                    Base,
+                    lambda cls: cls.org_id == current_user.org_id if hasattr(cls, "org_id") else true(),
+                    include_aliases=True,
+                )
+            )
+
+    return db
