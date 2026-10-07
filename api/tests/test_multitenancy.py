@@ -31,7 +31,7 @@ async def test_org_a_cannot_access_org_b_data_on_existing_endpoints(
         email="admin@orga.com",
         hashed_password="hashed_password",
         full_name="Admin A",
-        role="admin"
+        role="admin",
     )
     user_b = User(
         id=uuid.uuid4(),
@@ -39,7 +39,7 @@ async def test_org_a_cannot_access_org_b_data_on_existing_endpoints(
         email="admin@orgb.com",
         hashed_password="hashed_password",
         full_name="Admin B",
-        role="admin"
+        role="admin",
     )
     db_session.add_all([user_a, user_b])
     db_session.commit()
@@ -88,7 +88,7 @@ async def test_viewer_cannot_write_and_rbac_dependencies(
         email="viewer@org.com",
         hashed_password="hash",
         full_name="Viewer",
-        role="viewer"
+        role="viewer",
     )
     db_session.add_all([org, viewer])
     db_session.commit()
@@ -99,5 +99,3 @@ async def test_viewer_cannot_write_and_rbac_dependencies(
     response = await async_client.post("/test-write")
     assert response.status_code == 403
     assert "Not enough privileges" in response.text
-
-

@@ -14,7 +14,6 @@ from app.models.user import User
 
 
 def get_current_user(
-
     access_token: str | None = Cookie(default=None, alias=settings.ACCESS_COOKIE_NAME),
     db: Session = Depends(get_db),
 ) -> User:
@@ -82,9 +81,9 @@ def get_tenant_db(
             execute_state.statement = execute_state.statement.options(
                 with_loader_criteria(
                     Base,
-                    lambda cls: cls.org_id == current_user.org_id
-                    if hasattr(cls, "org_id")
-                    else true(),
+                    lambda cls: (
+                        cls.org_id == current_user.org_id if hasattr(cls, "org_id") else true()
+                    ),
                     include_aliases=True,
                 )
             )
