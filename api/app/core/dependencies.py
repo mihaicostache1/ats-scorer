@@ -74,11 +74,17 @@ def get_tenant_db(
 
     @event.listens_for(db, "do_orm_execute")
     def _add_tenant_filter(execute_state):
-        if execute_state.is_select and not execute_state.is_column_load and not execute_state.is_relationship_load:
+        if (
+            execute_state.is_select
+            and not execute_state.is_column_load
+            and not execute_state.is_relationship_load
+        ):
             execute_state.statement = execute_state.statement.options(
                 with_loader_criteria(
                     Base,
-                    lambda cls: cls.org_id == current_user.org_id if hasattr(cls, "org_id") else true(),
+                    lambda cls: cls.org_id == current_user.org_id
+                    if hasattr(cls, "org_id")
+                    else true(),
                     include_aliases=True,
                 )
             )

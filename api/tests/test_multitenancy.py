@@ -70,6 +70,7 @@ async def test_viewer_cannot_write_and_rbac_dependencies(
 ) -> None:
     """Test the get_current_recruiter_or_admin dependency prevents viewers from writing."""
     from fastapi import APIRouter, Depends
+
     from app.core.dependencies import get_current_recruiter_or_admin
 
     router = APIRouter()
