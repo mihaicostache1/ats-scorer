@@ -106,4 +106,3 @@ async def test_viewer_cannot_write_and_rbac_dependencies(
         assert "Not enough privileges" in response.text
     finally:
         app.dependency_overrides.pop(get_db, None)
-
