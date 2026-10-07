@@ -69,10 +69,10 @@ def get_tenant_db(
 ) -> Session:
     """Return a database session automatically scoped to the current user's organization."""
     from sqlalchemy import event, true
-    from sqlalchemy.orm import with_loader_criteria
+    from sqlalchemy.orm import ORMExecuteState, with_loader_criteria
 
     @event.listens_for(db, "do_orm_execute")
-    def _add_tenant_filter(execute_state):
+    def _add_tenant_filter(execute_state: ORMExecuteState) -> None:
         if (
             execute_state.is_select
             and not execute_state.is_column_load
