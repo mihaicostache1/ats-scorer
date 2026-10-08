@@ -39,7 +39,7 @@ def seed_db():
                     email=email,
                     hashed_password=hash_password("DevOnly123!"),
                     full_name=f"Demo {role.capitalize()}",
-                    role=role
+                    role=role,
                 )
                 db.add(user)
         db.commit()
@@ -84,7 +84,7 @@ def seed_db():
                 required_skills=job_data.get("required_skills", []),
                 preferred_skills=job_data.get("preferred_skills", []),
                 min_experience_years=job_data.get("min_experience_years", 0),
-                created_by=admin_user.id if admin_user else None
+                created_by=admin_user.id if admin_user else None,
             )
             db.add(job)
             count += 1
@@ -95,6 +95,7 @@ def seed_db():
         db.rollback()
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     seed_db()

@@ -8,6 +8,7 @@ from app.schemas.auth import UserPublic
 
 router = APIRouter(prefix="", tags=["Users"])
 
+
 @router.get(
     "/me",
     response_model=UserPublic,
