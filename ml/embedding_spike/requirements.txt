@@ -1,0 +1,6 @@
+# The benchmark builds its test data with the L-5 generator.
+-r ../synthetic/requirements.txt
+# torch comes in as a dependency. On Linux, install the CPU build first to avoid the large
+# CUDA download: pip install torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers==6.1.0
+rapidfuzz==3.14.6

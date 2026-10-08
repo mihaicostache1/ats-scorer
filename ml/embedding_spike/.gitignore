@@ -1,0 +1,4 @@
+# ESCO download: get your own copy, see README.md
+data/
+# Cached ESCO label embeddings: rebuilt on the next run
+results/cache/

@@ -39,5 +39,16 @@ docker compose down -v        # stop AND delete all data
 
 - `/api` - Python FastAPI backend service, containing domain logic and vector store logic.
 - `/web` - Next.js (App Router) frontend application using TypeScript, Tailwind CSS, and shadcn/ui.
+- `/ml` - Machine-learning code and data tools. `/ml/synthetic` generates the synthetic CV and job dataset.
 - `/docs` - Project documentation.
 - `.github/workflows` - CI pipelines for testing the API and Web services.
+
+## Documentation
+
+- [Scope, personas and user stories](docs/scope.md)
+- [Privacy and ethics checklist](docs/privacy-ethics-checklist.md)
+- [API specification](docs/api_spec.md) and [OpenAPI file](docs/openapi.yaml)
+- [Data model](docs/erd.md) and [candidate deletion decision](docs/candidate_deletion_decision.md)
+- [UI wireframes](docs/ui_wireframes.md)
+- [Synthetic CV and job dataset](ml/synthetic/README.md)
+- [Embedding model and skill matching](docs/ml/embedding-model-and-skill-matching.md)

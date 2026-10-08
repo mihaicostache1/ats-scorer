@@ -1,0 +1,96 @@
+{
+  "environment": {
+    "date": "2026-10-08",
+    "cpu": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "logical_cores": 16,
+    "torch_threads": 8,
+    "os": "Windows 11",
+    "python": "3.14.0",
+    "torch": "2.14.1",
+    "sentence_transformers": "6.1.0",
+    "transformers": "5.19.0"
+  },
+  "arguments": {
+    "models": [
+      "minilm",
+      "e5-small"
+    ],
+    "seed": 42,
+    "cvs": 100,
+    "jobs": 20,
+    "speed_docs": 1000,
+    "batch_size": 32,
+    "repeats": 3,
+    "single_docs": 30,
+    "threads": null,
+    "ratings": "None"
+  },
+  "results": [
+    {
+      "key": "minilm",
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "dimension": 384,
+      "parameters_millions": 22.7,
+      "tokens": {
+        "max_seq_length": 256,
+        "median_tokens": 265,
+        "max_tokens": 494,
+        "share_truncated": 0.538
+      },
+      "load_seconds": 5.6,
+      "batch_documents": 1000,
+      "batch_size": 32,
+      "batch_seconds": 30.68,
+      "batch_runs_seconds": [
+        30.7,
+        30.68,
+        29.91
+      ],
+      "batch_ms_per_document": 30.68,
+      "single_ms_per_document_median": 40.16,
+      "quality_english": {
+        "precision_at_10_same_family": 0.975,
+        "mrr_same_family": 1.0,
+        "ndcg_at_10_silver": 0.855
+      },
+      "precision_at_10_cross_lingual": {
+        "de": 0.91,
+        "fr": 0.83,
+        "ro": 0.74
+      }
+    },
+    {
+      "key": "e5-small",
+      "model": "intfloat/multilingual-e5-small",
+      "dimension": 384,
+      "parameters_millions": 117.7,
+      "tokens": {
+        "max_seq_length": 512,
+        "median_tokens": 304,
+        "max_tokens": 547,
+        "share_truncated": 0.006
+      },
+      "load_seconds": 11.39,
+      "batch_documents": 1000,
+      "batch_size": 32,
+      "batch_seconds": 85.93,
+      "batch_runs_seconds": [
+        87.33,
+        85.93,
+        85.33
+      ],
+      "batch_ms_per_document": 85.93,
+      "single_ms_per_document_median": 94.36,
+      "quality_english": {
+        "precision_at_10_same_family": 0.915,
+        "mrr_same_family": 1.0,
+        "ndcg_at_10_silver": 0.906
+      },
+      "precision_at_10_cross_lingual": {
+        "de": 0.96,
+        "fr": 0.87,
+        "ro": 0.92
+      }
+    }
+  ]
+}
