@@ -35,6 +35,15 @@ docker compose down -v        # stop AND delete all data
 - API: `uvicorn app.main:app --reload` (from the backend folder)
 - Web: `npm run dev` (from the web folder)
 
+### Demo Data (Dev-only)
+You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:
+```bash
+make seed
+```
+**Demo credentials (dev-only):**
+- **Admin**: `admin@demo.com` / `DevOnly123!`
+- **Recruiter**: `recruiter@demo.com` / `DevOnly123!`
+
 ## Folder Structure
 
 - `/api` - Python FastAPI backend service, containing domain logic and vector store logic.
