@@ -32,7 +32,10 @@ async def test_audit_events_created_on_register_and_login(
     # 2. Login
     login_response = await async_client.post(
         "/api/v1/auth/login",
-        json={"email": REGISTER_PAYLOAD["admin_email"], "password": REGISTER_PAYLOAD["admin_password"]},
+        json={
+            "email": REGISTER_PAYLOAD["admin_email"],
+            "password": REGISTER_PAYLOAD["admin_password"],
+        },
     )
     assert login_response.status_code == 200
 
@@ -49,7 +52,10 @@ async def test_audit_events_list_endpoint(async_client: AsyncClient, db_session:
     await async_client.post("/api/v1/auth/register", json=REGISTER_PAYLOAD)
     await async_client.post(
         "/api/v1/auth/login",
-        json={"email": REGISTER_PAYLOAD["admin_email"], "password": REGISTER_PAYLOAD["admin_password"]},
+        json={
+            "email": REGISTER_PAYLOAD["admin_email"],
+            "password": REGISTER_PAYLOAD["admin_password"],
+        },
     )
 
     # Fetch audit events
@@ -60,7 +66,7 @@ async def test_audit_events_list_endpoint(async_client: AsyncClient, db_session:
     assert len(data["items"]) == 3
     actions = {item["action"] for item in data["items"]}
     assert actions == {"create_org", "create_user", "login"}
-    
+
     # Test pagination
     response_paged = await async_client.get("/api/v1/audit/events?page=1&size=2")
     assert response_paged.status_code == 200

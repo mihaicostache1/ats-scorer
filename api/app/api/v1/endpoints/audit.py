@@ -24,12 +24,12 @@ def list_audit_events(
 ) -> PaginatedAuditEvents:
     """Return a paginated list of audit events. Admin only."""
     offset = (page - 1) * size
-    
+
     query = db.query(AuditEvent).order_by(AuditEvent.created_at.desc())
-    
+
     total = query.count()
     items = query.offset(offset).limit(size).all()
-    
+
     return PaginatedAuditEvents(
         items=items,
         total=total,

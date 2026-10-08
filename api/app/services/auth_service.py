@@ -168,7 +168,7 @@ def login(
     _set_auth_cookies(response, access_token, refresh_token)
 
     logger.info("Successful login for user=%s", user.id)
-    
+
     log_audit_event(
         db=db,
         org_id=user.org_id,
