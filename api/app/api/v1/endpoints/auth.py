@@ -43,12 +43,13 @@ limiter = Limiter(key_func=get_remote_address)
     summary="Register organisation and first admin",
 )
 def register(
+    request: Request,
     payload: OrgRegisterRequest,
     response: Response,
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Create a new Organisation and its first admin user, then issue tokens."""
-    return register_org_and_admin(payload, db, response)
+    return register_org_and_admin(payload, db, response, request)
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +68,7 @@ def login(
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Authenticate credentials and issue access + refresh tokens via cookies."""
-    return svc_login(payload, db, response)
+    return svc_login(payload, db, response, request)
 
 
 # ---------------------------------------------------------------------------

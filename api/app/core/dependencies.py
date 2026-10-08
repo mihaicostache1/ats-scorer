@@ -71,6 +71,8 @@ def get_tenant_db(
     from sqlalchemy import event, true
     from sqlalchemy.orm import ORMExecuteState, with_loader_criteria
 
+    org_id_val = current_user.org_id
+
     @event.listens_for(db, "do_orm_execute")
     def _add_tenant_filter(execute_state: ORMExecuteState) -> None:
         if (
@@ -82,9 +84,10 @@ def get_tenant_db(
                 with_loader_criteria(
                     Base,
                     lambda cls: (
-                        cls.org_id == current_user.org_id if hasattr(cls, "org_id") else true()
+                        cls.org_id == org_id_val if hasattr(cls, "org_id") else true()
                     ),
                     include_aliases=True,
+                    track_closure_variables=False,
                 )
             )
 
