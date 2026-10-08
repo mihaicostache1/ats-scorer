@@ -2,7 +2,7 @@
 
 import uuid
 
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, Request, Response, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -20,6 +20,7 @@ from app.core.security import (
 from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.auth import LoginRequest, OrgRegisterRequest, TokenResponse
+from app.services.audit_service import log_audit_event
 
 # ---------------------------------------------------------------------------
 # Cookie helpers
@@ -65,7 +66,7 @@ def _clear_auth_cookies(response: Response) -> None:
 
 
 def register_org_and_admin(
-    payload: OrgRegisterRequest, db: Session, response: Response
+    payload: OrgRegisterRequest, db: Session, response: Response, request: Request | None = None
 ) -> TokenResponse:
     """Create a new Organisation and its first admin User, then issue tokens."""
     # 1. Create org
@@ -101,6 +102,28 @@ def register_org_and_admin(
     db.refresh(admin)
     logger.info("Registered new org=%s admin_user=%s", org.slug, admin.id)
 
+    log_audit_event(
+        db=db,
+        org_id=org.id,
+        action="create_org",
+        target_entity="organization",
+        target_id=org.id,
+        user_id=admin.id,
+        details={"name": org.name, "slug": org.slug},
+        request=request,
+    )
+    log_audit_event(
+        db=db,
+        org_id=org.id,
+        action="create_user",
+        target_entity="user",
+        target_id=admin.id,
+        user_id=admin.id,
+        details={"email": admin.email, "role": admin.role},
+        request=request,
+    )
+    db.commit()
+
     # 3. Issue tokens via cookies
     access_token = create_access_token(user_id=str(admin.id), org_id=str(org.id), role=admin.role)
     refresh_token = create_refresh_token(user_id=str(admin.id))
@@ -109,7 +132,9 @@ def register_org_and_admin(
     return TokenResponse(user_id=admin.id, org_id=org.id, role=admin.role)
 
 
-def login(payload: LoginRequest, db: Session, response: Response) -> TokenResponse:
+def login(
+    payload: LoginRequest, db: Session, response: Response, request: Request | None = None
+) -> TokenResponse:
     """Authenticate credentials and issue tokens.
 
     The plain password is *never* logged; only the email is referenced in logs.
@@ -143,6 +168,19 @@ def login(payload: LoginRequest, db: Session, response: Response) -> TokenRespon
     _set_auth_cookies(response, access_token, refresh_token)
 
     logger.info("Successful login for user=%s", user.id)
+
+    log_audit_event(
+        db=db,
+        org_id=user.org_id,
+        action="login",
+        target_entity="user",
+        target_id=user.id,
+        user_id=user.id,
+        details={"email": user.email},
+        request=request,
+    )
+    db.commit()
+
     return TokenResponse(user_id=user.id, org_id=user.org_id, role=user.role)
 
 
