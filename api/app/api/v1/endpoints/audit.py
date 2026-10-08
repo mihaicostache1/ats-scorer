@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_current_admin, get_tenant_db
 from app.models.audit_event import AuditEvent
 from app.models.user import User
-from app.schemas.audit import PaginatedAuditEvents
+from app.schemas.audit import AuditEventResponse, PaginatedAuditEvents
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 
@@ -29,9 +29,10 @@ def list_audit_events(
 
     total = query.count()
     items = query.offset(offset).limit(size).all()
+    parsed_items = [AuditEventResponse.model_validate(item) for item in items]
 
     return PaginatedAuditEvents(
-        items=items,
+        items=parsed_items,
         total=total,
         page=page,
         size=size,
