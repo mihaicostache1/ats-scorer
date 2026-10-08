@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 
 class AuditEventResponse(BaseModel):
     """Schema for a single audit event returned in the API."""
+
     id: uuid.UUID
     org_id: uuid.UUID
     user_id: uuid.UUID | None
@@ -25,6 +26,7 @@ class AuditEventResponse(BaseModel):
 
 class PaginatedAuditEvents(BaseModel):
     """Paginated list of audit events."""
+
     items: list[AuditEventResponse]
     total: int
     page: int

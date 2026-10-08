@@ -83,9 +83,7 @@ def get_tenant_db(
             execute_state.statement = execute_state.statement.options(
                 with_loader_criteria(
                     Base,
-                    lambda cls: (
-                        cls.org_id == org_id_val if hasattr(cls, "org_id") else true()
-                    ),
+                    lambda cls: cls.org_id == org_id_val if hasattr(cls, "org_id") else true(),
                     include_aliases=True,
                     track_closure_variables=False,
                 )
