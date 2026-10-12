@@ -108,7 +108,7 @@ Authenticates recruiter or admin credentials.
 ### 2.2 Jobs & Pipeline Stages
 
 #### `POST /api/v1/jobs`
-Creates a new job posting with ESCO required and preferred skills.
+Creates a new job posting with ESCO required and preferred skills. The job starts as `draft`. Requires the `admin` or `recruiter` role; only `title` and `description` are required.
 
 **Request Body**:
 ```json
@@ -133,14 +133,58 @@ Creates a new job posting with ESCO required and preferred skills.
   "department": "Engineering",
   "location": "Remote (US/EU)",
   "employment_type": "full_time",
-  "status": "open",
+  "status": "draft",
   "description": "We are looking for a Senior Backend Engineer...",
   "required_skills": ["Python", "FastAPI", "PostgreSQL", "Docker"],
   "preferred_skills": ["Redis", "PyTorch", "Fairlearn"],
   "min_experience_years": 4,
-  "created_at": "2026-10-01T08:00:00Z"
+  "created_at": "2026-10-01T08:00:00Z",
+  "updated_at": "2026-10-01T08:00:00Z"
 }
 ```
+
+#### `GET /api/v1/jobs`
+Lists the organization's job postings in the standard pagination envelope. Any role can read.
+
+| Query param | Values | Default |
+| --- | --- | --- |
+| `status` | `draft`, `open`, `paused`, `closed`, `archived` | all except `archived` |
+| `search` | case-insensitive substring of title, department or location | none |
+| `page` | integer, 1 or more | `1` |
+| `per_page` | integer, 1 to 100 | `20` |
+| `sort_by` | `created_at`, `updated_at`, `title`, `status` | `created_at` |
+| `sort_order` | `asc`, `desc` | `desc` |
+
+Archived jobs are only returned when `status=archived` is requested.
+
+#### `GET /api/v1/jobs/{id}`
+Returns one job posting. Any role can read. A job in another organization returns `404`.
+
+#### `PATCH /api/v1/jobs/{id}`
+Partially updates a job posting; fields left out are unchanged. `department` and `location` can be cleared with `null`. Status is not editable here. Requires the `admin` or `recruiter` role.
+
+**Request Body**:
+```json
+{
+  "title": "Staff Backend Engineer",
+  "location": null
+}
+```
+
+#### `PATCH /api/v1/jobs/{id}/status`
+Moves a job posting to `draft`, `open` or `closed`. Requires the `admin` or `recruiter` role.
+
+**Request Body**:
+```json
+{
+  "status": "open"
+}
+```
+
+#### `POST /api/v1/jobs/{id}/archive`
+Sets the job's status to `archived`, which hides it from the default list. No request body; repeating the call is harmless. Requires the `admin` or `recruiter` role.
+
+The update, status and archive endpoints all return the full job (`200 OK`), and every successful write is recorded as an audit event (`create_job`, `update_job`, `change_job_status`, `archive_job`).
 
 #### `GET /api/v1/jobs/{id}/stages`
 Retrieves ordered pipeline stages for a job.

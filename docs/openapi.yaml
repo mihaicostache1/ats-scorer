@@ -67,7 +67,9 @@ paths:
   /jobs:
     get:
       summary: List Jobs
-      description: Retrieve paginated list of job postings for the current organization.
+      description: |
+        Retrieve paginated list of job postings for the current organization.
+        Archived jobs are excluded unless `status=archived` is requested.
       operationId: listJobs
       security:
         - BearerAuth: []
@@ -78,16 +80,40 @@ paths:
           schema:
             type: string
             enum: [draft, open, paused, closed, archived]
+        - name: search
+          in: query
+          required: false
+          description: Case-insensitive substring match on title, department and location.
+          schema:
+            type: string
+            maxLength: 255
         - name: page
           in: query
           schema:
             type: integer
+            minimum: 1
             default: 1
         - name: per_page
           in: query
           schema:
             type: integer
+            minimum: 1
+            maximum: 100
             default: 20
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [created_at, updated_at, title, status]
+            default: created_at
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         '200':
           description: Paginated job postings list
@@ -95,10 +121,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedJobsResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
 
     post:
       summary: Create Job Posting
-      description: Create a new job posting with ESCO required and preferred skills.
+      description: |
+        Create a new job posting with ESCO required and preferred skills.
+        The job starts in `draft`. Requires the `admin` or `recruiter` role.
       operationId: createJob
       security:
         - BearerAuth: []
@@ -115,6 +145,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
 
   /jobs/{id}:
     get:
@@ -132,6 +166,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    patch:
+      summary: Update Job Posting
+      description: |
+        Partially update a job posting; omitted fields are left unchanged.
+        Status is changed through `/jobs/{id}/status` and `/jobs/{id}/archive`.
+        Requires the `admin` or `recruiter` role.
+      operationId: updateJob
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobRequest'
+      responses:
+        '200':
+          description: Updated job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /jobs/{id}/status:
+    patch:
+      summary: Change Job Status
+      description: |
+        Move a job posting to `draft`, `open` or `closed`.
+        Requires the `admin` or `recruiter` role.
+      operationId: updateJobStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobStatusRequest'
+      responses:
+        '200':
+          description: Job posting with the new status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /jobs/{id}/archive:
+    post:
+      summary: Archive Job Posting
+      description: |
+        Set a job posting's status to `archived`, hiding it from the default job list.
+        Idempotent. Requires the `admin` or `recruiter` role.
+      operationId: archiveJob
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: Archived job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
           $ref: '#/components/responses/404NotFound'
 
@@ -489,7 +611,48 @@ components:
           example: ["Redis", "PyTorch", "Fairlearn"]
         min_experience_years:
           type: integer
+          minimum: 0
           example: 4
+
+    UpdateJobRequest:
+      type: object
+      description: All fields are optional; only the fields sent are changed.
+      properties:
+        title:
+          type: string
+          example: Staff Python Backend Engineer
+        department:
+          type: [string, 'null']
+          example: Engineering
+        location:
+          type: [string, 'null']
+          example: Remote (US/EU)
+        employment_type:
+          type: string
+          example: full_time
+        description:
+          type: string
+        required_skills:
+          type: array
+          items:
+            type: string
+        preferred_skills:
+          type: array
+          items:
+            type: string
+        min_experience_years:
+          type: integer
+          minimum: 0
+
+    UpdateJobStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [draft, open, closed]
+          example: open
 
     JobResponse:
       type: object
@@ -497,10 +660,16 @@ components:
         - id
         - org_id
         - title
+        - department
+        - location
+        - employment_type
         - status
         - description
         - required_skills
+        - preferred_skills
+        - min_experience_years
         - created_at
+        - updated_at
       properties:
         id:
           type: string
@@ -514,16 +683,17 @@ components:
           type: string
           example: Senior Python Backend Engineer
         department:
-          type: string
+          type: [string, 'null']
           example: Engineering
         location:
-          type: string
+          type: [string, 'null']
           example: Remote
         employment_type:
           type: string
           example: full_time
         status:
           type: string
+          enum: [draft, open, paused, closed, archived]
           example: open
         description:
           type: string
@@ -545,6 +715,10 @@ components:
           type: string
           format: date-time
           example: '2026-10-01T08:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-02T10:30:00Z'
 
     PipelineStageResponse:
       type: object
@@ -857,6 +1031,20 @@ components:
               details: []
               timestamp: '2026-10-01T09:17:21Z'
               request_id: req_auth_01
+
+    403Forbidden:
+      description: Authenticated user's role lacks the required permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: FORBIDDEN
+              message: Your role does not allow this action.
+              details: []
+              timestamp: '2026-10-01T09:17:21Z'
+              request_id: req_403_03
 
     404NotFound:
       description: Requested resource was not found
