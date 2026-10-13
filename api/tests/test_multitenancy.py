@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -13,8 +14,12 @@ from app.core.security import create_access_token
 from app.main import app
 from app.models.application_stage_history import ApplicationStageHistory
 from app.models.audit_event import AuditEvent
+from app.models.cv_document import CvDocument
 from app.models.organization import Organization
 from app.models.user import User
+
+# Synthetic CVs from the L-5 generator.
+L5_CVS = Path(__file__).parent / "fixtures" / "cvs"
 
 
 @pytest.mark.asyncio
@@ -344,3 +349,97 @@ async def test_org_b_cannot_read_or_write_org_a_applications_and_stages(
         (admin_a.org_id, "create_application", application_a["id"]),
         (admin_b.org_id, "create_application", application_b["id"]),
     }
+
+
+@pytest.mark.asyncio
+async def test_org_b_cannot_read_or_write_org_a_cv_documents(
+    async_client: AsyncClient,
+    committed_db: Session,
+    tmp_path: Path,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    """CV upload, list, status and download never cross organizations (L-5 PDFs)."""
+    pdf_a = (L5_CVS / "C001.pdf").read_bytes()
+    pdf_b = (L5_CVS / "C002.pdf").read_bytes()
+    storage_root = tmp_path / "storage"
+
+    def stored_files() -> list[Path]:
+        return sorted(path for path in storage_root.rglob("*") if path.is_file())
+
+    async def setup(pdf: bytes) -> tuple[Any, Any]:
+        """Create a candidate with one uploaded CV for the logged-in org."""
+        candidate = (
+            await async_client.post(
+                "/api/v1/candidates", json={"full_name": "Person", "email": "person@example.com"}
+            )
+        ).json()
+        uploaded = await async_client.post(
+            f"/api/v1/candidates/{candidate['id']}/cv",
+            files={"file": ("cv.pdf", pdf, "application/pdf")},
+        )
+        assert uploaded.status_code == 201, uploaded.text
+        return candidate, uploaded.json()
+
+    admin_a = create_user("admin")
+    admin_b = create_user("admin")
+
+    login_as(admin_a)
+    candidate_a, document_a = await setup(pdf_a)
+    base_a = f"/api/v1/candidates/{candidate_a['id']}/cv"
+
+    login_as(admin_b)
+    candidate_b, document_b = await setup(pdf_b)
+    base_b = f"/api/v1/candidates/{candidate_b['id']}/cv"
+    files_before = stored_files()
+    assert len(files_before) == 2
+
+    # Reads: org A's documents are invisible, by its own URL or grafted onto org B's candidate.
+    reads = [
+        await async_client.get(base_a),
+        await async_client.get(f"{base_a}/{document_a['id']}"),
+        await async_client.get(f"{base_a}/{document_a['id']}/download"),
+        await async_client.get(f"{base_b}/{document_a['id']}"),
+        await async_client.get(f"{base_b}/{document_a['id']}/download"),
+    ]
+    assert [r.status_code for r in reads] == [404] * len(reads)
+    for response in reads:
+        assert response.content != pdf_a
+    assert [doc["id"] for doc in (await async_client.get(base_b)).json()] == [document_b["id"]]
+
+    # Write: org B cannot attach a file to org A's candidate, and nothing is stored.
+    upload = await async_client.post(
+        base_a, files={"file": ("takeover.pdf", pdf_b, "application/pdf")}
+    )
+    assert upload.status_code == 404
+    assert stored_files() == files_before
+
+    # Org B still gets its own file, and only that.
+    own = await async_client.get(f"{base_b}/{document_b['id']}/download")
+    assert own.status_code == 200
+    assert own.content == pdf_b
+
+    # Org A's document is untouched and org A cannot reach org B's either.
+    login_as(admin_a)
+    assert (await async_client.get(f"{base_a}/{document_a['id']}")).json() == document_a
+    assert [doc["id"] for doc in (await async_client.get(base_a)).json()] == [document_a["id"]]
+    assert (await async_client.get(f"{base_a}/{document_a['id']}/download")).content == pdf_a
+    assert (await async_client.get(f"{base_b}/{document_b['id']}/download")).status_code == 404
+
+    # Each file is stored under its own org's prefix, and no cross-org attempt was audited.
+    rows = committed_db.query(CvDocument).all()
+    assert {(row.org_id, str(row.id)) for row in rows} == {
+        (admin_a.org_id, document_a["id"]),
+        (admin_b.org_id, document_b["id"]),
+    }
+    for row in rows:
+        assert row.storage_key.startswith(f"cvs/{row.org_id}/")
+    events = committed_db.query(AuditEvent).filter(AuditEvent.target_entity == "cv_document").all()
+    assert sorted((str(e.org_id), e.action, str(e.target_id)) for e in events) == sorted(
+        [
+            (str(admin_a.org_id), "upload_cv", document_a["id"]),
+            (str(admin_a.org_id), "download_cv", document_a["id"]),
+            (str(admin_b.org_id), "upload_cv", document_b["id"]),
+            (str(admin_b.org_id), "download_cv", document_b["id"]),
+        ]
+    )

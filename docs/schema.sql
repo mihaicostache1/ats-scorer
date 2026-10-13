@@ -97,6 +97,26 @@ CREATE TABLE IF NOT EXISTS candidates (
 );
 
 -- -----------------------------------------------------------------------------
+-- 5b. CV DOCUMENTS
+-- Uploaded CV files; the file itself lives in file storage under storage_key
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS cv_documents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    candidate_id UUID NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
+    storage_key TEXT NOT NULL, -- Random; never returned by the API
+    original_filename VARCHAR(255) NOT NULL,
+    content_type VARCHAR(100) NOT NULL,
+    size_bytes INT NOT NULL,
+    sha256 VARCHAR(64) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'extracting', 'parsed', 'needs_review', 'failed')),
+    uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_cv_documents_storage_key UNIQUE (storage_key)
+);
+
+-- -----------------------------------------------------------------------------
 -- 6. APPLICATIONS
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS applications (
@@ -193,6 +213,7 @@ CREATE INDEX IF NOT EXISTS idx_users_org_role ON users(org_id, role);
 CREATE INDEX IF NOT EXISTS idx_jobs_org_status ON jobs(org_id, status);
 CREATE INDEX IF NOT EXISTS idx_pipeline_stages_org_job ON pipeline_stages(org_id, job_id, stage_order);
 CREATE INDEX IF NOT EXISTS idx_candidates_org_email ON candidates(org_id, email);
+CREATE INDEX IF NOT EXISTS idx_cv_documents_org_candidate ON cv_documents(org_id, candidate_id);
 CREATE INDEX IF NOT EXISTS idx_applications_org_job_stage ON applications(org_id, job_id, stage_id);
 CREATE INDEX IF NOT EXISTS idx_applications_org_candidate ON applications(org_id, candidate_id);
 CREATE INDEX IF NOT EXISTS idx_application_stage_history_org_application ON application_stage_history(org_id, application_id);

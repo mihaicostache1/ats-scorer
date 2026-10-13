@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import AsyncGenerator, Callable, Generator
+from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -19,6 +20,7 @@ from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
 from app.services.pipeline_service import seed_default_stages
+from app.services.storage import LocalDiskStorage, get_storage
 
 
 @pytest.fixture
@@ -206,6 +208,15 @@ def create_user(committed_db: Session) -> Callable[..., User]:
         return user
 
     return _create
+
+
+@pytest.fixture(autouse=True)
+def cv_storage(tmp_path: Path) -> Generator[LocalDiskStorage, None, None]:
+    """Point the app's file storage at a temporary directory for every test."""
+    storage = LocalDiskStorage(tmp_path / "storage")
+    app.dependency_overrides[get_storage] = lambda: storage
+    yield storage
+    app.dependency_overrides.pop(get_storage, None)
 
 
 @pytest.fixture

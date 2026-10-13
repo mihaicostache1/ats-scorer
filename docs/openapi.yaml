@@ -362,40 +362,6 @@ paths:
         '409':
           $ref: '#/components/responses/409Conflict'
 
-  /candidates/upload:
-    post:
-      summary: Upload & Parse PDF CV
-      description: Upload PDF CV file with automatic parsing, OCR fallback, and structured data extraction.
-      operationId: uploadCandidateCV
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required:
-                - file
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: PDF resume file
-                full_name:
-                  type: string
-                  description: Optional override if candidate name is manually provided
-                email:
-                  type: string
-                  format: email
-      responses:
-        '201':
-          description: CV uploaded and parsed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CandidateUploadResponse'
-
   /candidates/{id}:
     get:
       summary: Get Candidate Details
@@ -450,7 +416,8 @@ paths:
     delete:
       summary: GDPR Hard Delete Candidate
       description: |
-        Permanently delete a candidate with their applications, stage history and scores.
+        Permanently delete a candidate with their applications, stage history, scores
+        and stored CV files.
         Requires the `admin` role.
       operationId: hardDeleteCandidate
       security:
@@ -464,6 +431,125 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '403':
           $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /candidates/{id}/cv:
+    get:
+      summary: List Candidate CV Documents
+      description: Retrieve the candidate's CV documents with their status, newest first.
+      operationId: listCandidateCvDocuments
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: CV documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    post:
+      summary: Upload PDF CV
+      description: |
+        Upload a PDF CV for a candidate and queue it for processing.
+        The file is checked by its content, not its extension, and may be at most 10 MB.
+        Requires the `admin` or `recruiter` role.
+      operationId: uploadCandidateCV
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF resume file
+      responses:
+        '201':
+          description: CV stored and queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '413':
+          description: The file is larger than 10 MB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '415':
+          description: The file content is not a PDF
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /candidates/{id}/cv/{cv_id}:
+    get:
+      summary: Get CV Document Status
+      description: Retrieve one CV document, including its processing status.
+      operationId: getCandidateCvDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+        - $ref: '#/components/parameters/CvIdPathParam'
+      responses:
+        '200':
+          description: CV document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /candidates/{id}/cv/{cv_id}/download:
+    get:
+      summary: Download CV File
+      description: |
+        Download the stored PDF. Only members of the organization that owns the
+        candidate can download it. Files are not served from any public path.
+      operationId: downloadCandidateCV
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+        - $ref: '#/components/parameters/CvIdPathParam'
+      responses:
+        '200':
+          description: The PDF file, sent as an attachment
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
         '404':
           $ref: '#/components/responses/404NotFound'
 
@@ -657,6 +743,14 @@ components:
   parameters:
     UUIDPathParam:
       name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    CvIdPathParam:
+      name: cv_id
       in: path
       required: true
       schema:
@@ -953,72 +1047,61 @@ components:
           type: string
           example: interview
 
-    CandidateUploadResponse:
+    CvDocumentResponse:
       type: object
       required:
         - id
         - org_id
-        - full_name
-        - email
-        - ocr_used
-        - parsed_data
+        - candidate_id
+        - original_filename
+        - content_type
+        - size_bytes
+        - sha256
+        - status
+        - uploaded_by
+        - created_at
+        - updated_at
       properties:
         id:
           type: string
           format: uuid
-          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
         org_id:
           type: string
           format: uuid
           example: 123e4567-e89b-12d3-a456-426614174000
-        full_name:
+        candidate_id:
           type: string
-          example: Alex Mercer
-        email:
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        original_filename:
           type: string
-          example: alex.mercer@example.com
-        phone:
+          description: The uploaded file's name, for display only.
+          example: alex-mercer.pdf
+        content_type:
           type: string
-          example: +1-555-0199
-        location:
+          example: application/pdf
+        size_bytes:
+          type: integer
+          example: 48211
+        sha256:
           type: string
-          example: San Francisco, CA
-        cv_file_path:
+          description: SHA-256 of the file content.
+        status:
           type: string
-          example: uploads/org_123/cv_f47ac10b.pdf
-        ocr_used:
-          type: boolean
-          example: false
-        parsed_data:
-          type: object
-          properties:
-            skills:
-              type: array
-              items:
-                type: string
-              example: ["Python", "FastAPI", "PostgreSQL", "Redis", "Git"]
-            experience_years:
-              type: number
-              example: 5.5
-            education:
-              type: array
-              items:
-                type: string
-              example: ["B.S. Computer Science, UC Berkeley"]
-            work_history:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                    example: Backend Software Engineer
-                  company:
-                    type: string
-                    example: TechCorp Inc.
-                  years:
-                    type: number
-                    example: 3.5
+          enum: [queued, extracting, parsed, needs_review, failed]
+          example: queued
+        uploaded_by:
+          type: [string, 'null']
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
 
     CandidateResponse:
       type: object

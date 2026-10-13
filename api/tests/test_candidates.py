@@ -337,4 +337,4 @@ async def test_delete_candidate(
     events = _candidate_events(committed_db, candidate["id"])
     assert [e.action for e in events] == ["create_candidate", "delete_candidate"]
     assert events[1].user_id == admin.id
-    assert events[1].details == {"applications_deleted": 1}
+    assert events[1].details == {"applications_deleted": 1, "cv_files_deleted": 0}

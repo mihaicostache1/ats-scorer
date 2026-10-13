@@ -44,6 +44,9 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - ENVIRONMENT=development
       - LOG_LEVEL=INFO
+      - STORAGE_LOCAL_DIR=/data/storage
+    volumes:
+      - cvdata:/data/storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,3 +75,4 @@ services:
 volumes:
   pgdata:
   redisdata:
+  cvdata:

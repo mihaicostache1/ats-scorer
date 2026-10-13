@@ -14,6 +14,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from app.models.application import Application
     from app.models.consent_record import ConsentRecord
+    from app.models.cv_document import CvDocument
     from app.models.organization import Organization
 
 
@@ -63,4 +64,7 @@ class Candidate(Base):
     )
     consent_records: Mapped[list["ConsentRecord"]] = relationship(
         "ConsentRecord", back_populates="candidate"
+    )
+    cv_documents: Mapped[list["CvDocument"]] = relationship(
+        "CvDocument", back_populates="candidate", cascade="all, delete-orphan"
     )
