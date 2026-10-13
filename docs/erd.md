@@ -206,6 +206,8 @@ One row per stage an application entered, including its initial placement. Remov
 | `from_stage_id` | UUID | NULLABLE, FK -> `pipeline_stages(id)` RESTRICT | Previous stage (NULL = initial placement) |
 | `to_stage_id` | UUID | NOT NULL, FK -> `pipeline_stages(id)` RESTRICT | Stage entered |
 | `reason` | TEXT | NULLABLE | Optional reason given for the move |
+| `overall_score` | NUMERIC(5,2) | NULLABLE | The application's latest score when the move was made |
+| `model_version` | VARCHAR(50) | NULLABLE | Model that produced `overall_score` |
 | `moved_by` | UUID | NULLABLE, FK -> `users(id)` SET NULL | User who made the move |
 | `moved_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Time of the move |
 
@@ -220,10 +222,10 @@ Hybrid AI score rankings generated for candidate applications against job requir
 | `job_id` | UUID | NOT NULL, FK -> `jobs(id)` CASCADE | Reference job posting |
 | `candidate_id` | UUID | NOT NULL, FK -> `candidates(id)` CASCADE | Scored candidate |
 | `overall_score` | NUMERIC(5,2) | NOT NULL, CHECK (0 to 100) | Final weighted composite fit score |
-| `skill_overlap_score` | NUMERIC(5,2) | NOT NULL, CHECK (0 to 100) | ESCO skill taxonomy match score |
+| `skill_overlap_score` | NUMERIC(5,2) | NULLABLE, CHECK (0 to 100) | ESCO skill taxonomy match score (NULL = not computed by this model) |
 | `semantic_score` | NUMERIC(5,2) | NOT NULL, CHECK (0 to 100) | Vector cosine similarity score |
-| `experience_score` | NUMERIC(5,2) | NOT NULL, CHECK (0 to 100) | Experience depth & title match score |
-| `title_fit_score` | NUMERIC(5,2) | NOT NULL, CHECK (0 to 100) | Job title hierarchy match score |
+| `experience_score` | NUMERIC(5,2) | NULLABLE, CHECK (0 to 100) | Experience depth & title match score (NULL = not computed by this model) |
+| `title_fit_score` | NUMERIC(5,2) | NULLABLE, CHECK (0 to 100) | Job title hierarchy match score (NULL = not computed by this model) |
 | `model_version` | VARCHAR(50) | NOT NULL | Algorithm identifier e.g., `v1.0.0-baseline-cpu` |
 | `component_breakdown` | JSONB | NOT NULL, DEFAULT `'{}'` | JSON store for matched/missing skills, weightings, & explanations |
 | `calculated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Scoring calculation timestamp |

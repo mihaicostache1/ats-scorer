@@ -1284,6 +1284,8 @@ components:
         - from_stage_id
         - to_stage_id
         - reason
+        - overall_score
+        - model_version
         - moved_by
         - moved_at
       properties:
@@ -1302,6 +1304,12 @@ components:
           format: uuid
         reason:
           type: [string, 'null']
+        overall_score:
+          type: [number, 'null']
+          description: The application's latest score when the move was made; null if it had none.
+        model_version:
+          type: [string, 'null']
+          description: Model that produced `overall_score`.
         moved_by:
           type: [string, 'null']
           format: uuid
@@ -1336,16 +1344,19 @@ components:
           type: number
           example: 87.5
         skill_overlap_score:
-          type: number
+          type: [number, 'null']
+          description: Null when the scoring model does not compute this component.
           example: 90.0
         semantic_score:
           type: number
           example: 85.0
         experience_score:
-          type: number
+          type: [number, 'null']
+          description: Null when the scoring model does not compute this component.
           example: 92.0
         title_fit_score:
-          type: number
+          type: [number, 'null']
+          description: Null when the scoring model does not compute this component.
           example: 80.0
         model_version:
           type: string

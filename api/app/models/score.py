@@ -49,10 +49,11 @@ class Score(Base):
         index=True,
     )
     overall_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    skill_overlap_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
+    # NULL in a component means the model did not compute it, which is not a score of 0.
+    skill_overlap_score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     semantic_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    experience_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    title_fit_score: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
+    experience_score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
+    title_fit_score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     model_version: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     component_breakdown: Mapped[dict[str, Any]] = mapped_column(
         JSONB, server_default="{}", nullable=False

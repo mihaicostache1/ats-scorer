@@ -382,6 +382,8 @@ Returns every stage the application entered, oldest first. Any role can read. Th
     "from_stage_id": null,
     "to_stage_id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
     "reason": null,
+    "overall_score": null,
+    "model_version": null,
     "moved_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
     "moved_at": "2026-10-01T09:16:00Z"
   },
@@ -391,16 +393,20 @@ Returns every stage the application entered, oldest first. Any role can read. Th
     "from_stage_id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
     "to_stage_id": "e3f4a5b6-c7d8-4e9f-8a1b-3c4d5e6f7a8b",
     "reason": "Strong take-home exercise",
+    "overall_score": 88.5,
+    "model_version": "tfidf-skills-0.1.0",
     "moved_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
     "moved_at": "2026-10-01T09:17:21Z"
   }
 ]
 ```
 
+Each entry keeps the application's latest `overall_score` and `model_version` at the time of the move (both `null` if it had no score), so a later re-score does not change what a decision was based on.
+
 Creating an application and every stage move are recorded as audit events (`create_application`, `move_application_stage`). The move event carries the job and the from/to stage IDs and names; the free-text reason is kept only in the stage history.
 
 #### `GET /api/v1/applications/{id}/score`
-Retrieves candidate hybrid ranking score breakdown and explanations.
+Retrieves candidate hybrid ranking score breakdown and explanations. `skill_overlap_score`, `experience_score` and `title_fit_score` are `null` when the scoring model does not compute them; `null` never means a score of 0.
 
 **Response (`200 OK`)**:
 ```json

@@ -90,6 +90,34 @@ def test_create_score_with_component_breakdown(
     assert fetched.overall_score == 88.50
 
 
+def test_score_components_a_model_does_not_compute_are_null(
+    db_session: Session,
+    test_org: Organization,
+    test_job: Job,
+    test_candidate: Candidate,
+    test_application: Application,
+) -> None:
+    """A baseline model can store a score without skill, experience or title components."""
+    score = Score(
+        id=uuid.uuid4(),
+        org_id=test_org.id,
+        application_id=test_application.id,
+        job_id=test_job.id,
+        candidate_id=test_candidate.id,
+        overall_score=61.20,
+        semantic_score=61.20,
+        model_version="tfidf-skills-0.1.0",
+    )
+    db_session.add(score)
+    db_session.commit()
+
+    fetched = db_session.query(Score).filter_by(id=score.id).one()
+    assert fetched.skill_overlap_score is None
+    assert fetched.experience_score is None
+    assert fetched.title_fit_score is None
+    assert fetched.overall_score is not None
+
+
 def test_create_audit_event_and_consent_record(
     db_session: Session, test_org: Organization, test_candidate: Candidate
 ) -> None:
