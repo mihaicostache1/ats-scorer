@@ -11,6 +11,7 @@ from app.db.session import SessionLocal
 from app.models.job import Job
 from app.models.organization import Organization
 from app.models.user import User
+from app.services.pipeline_service import seed_default_stages
 
 
 def seed_db():
@@ -22,6 +23,8 @@ def seed_db():
             print("Creating Demo organization...")
             org = Organization(name="Demo Org", slug="demo")
             db.add(org)
+            db.flush()
+            seed_default_stages(db, org.id)
             db.commit()
             db.refresh(org)
         else:

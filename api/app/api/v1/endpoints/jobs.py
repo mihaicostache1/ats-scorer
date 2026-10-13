@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_recruiter_or_admin, get_current_user, get_tenant_db
 from app.models.job import Job
+from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
+from app.schemas.application import PipelineStageResponse
 from app.schemas.job import (
     CreateJobRequest,
     JobResponse,
@@ -21,6 +23,7 @@ from app.schemas.job import (
 )
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.pipeline_service import get_job_stages
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -201,6 +204,20 @@ def update_job(
     db.commit()
     db.refresh(job)
     return job
+
+
+@router.get(
+    "/{id}/stages",
+    response_model=list[PipelineStageResponse],
+    summary="Get a job's pipeline stages in order",
+)
+def get_job_stages_endpoint(
+    id: uuid.UUID,
+    db: Session = Depends(get_tenant_db),
+    _current_user: User = Depends(get_current_user),
+) -> list[PipelineStage]:
+    """Return the job's own stages, or the organization defaults when it has none."""
+    return get_job_stages(db, _get_job_or_404(db, id))
 
 
 @router.patch(

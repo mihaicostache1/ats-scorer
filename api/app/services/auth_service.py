@@ -21,6 +21,7 @@ from app.models.organization import Organization
 from app.models.user import User
 from app.schemas.auth import LoginRequest, OrgRegisterRequest, TokenResponse
 from app.services.audit_service import log_audit_event
+from app.services.pipeline_service import seed_default_stages
 
 # ---------------------------------------------------------------------------
 # Cookie helpers
@@ -90,6 +91,9 @@ def register_org_and_admin(
     db.add(admin)
 
     try:
+        # The org row must exist before its default pipeline stages reference it.
+        db.flush()
+        seed_default_stages(db, org.id)
         db.commit()
     except IntegrityError:
         db.rollback()

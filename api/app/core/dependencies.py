@@ -68,10 +68,18 @@ def get_tenant_db(
     db: Session = Depends(get_db),
 ) -> Session:
     """Return a database session automatically scoped to the current user's organization."""
-    from sqlalchemy import event, true
+    from sqlalchemy import event
     from sqlalchemy.orm import ORMExecuteState, with_loader_criteria
 
-    org_id_val = current_user.org_id
+    # Plain expressions, not a lambda: SQLAlchemy caches lambda criteria, and an
+    # untracked closure would keep filtering by the first request's org_id.
+    tenant_criteria = [
+        with_loader_criteria(
+            mapper.class_, mapper.class_.org_id == current_user.org_id, include_aliases=True
+        )
+        for mapper in Base.registry.mappers
+        if hasattr(mapper.class_, "org_id")
+    ]
 
     @event.listens_for(db, "do_orm_execute")
     def _add_tenant_filter(execute_state: ORMExecuteState) -> None:
@@ -80,13 +88,6 @@ def get_tenant_db(
             and not execute_state.is_column_load
             and not execute_state.is_relationship_load
         ):
-            execute_state.statement = execute_state.statement.options(
-                with_loader_criteria(
-                    Base,
-                    lambda cls: cls.org_id == org_id_val if hasattr(cls, "org_id") else true(),
-                    include_aliases=True,
-                    track_closure_variables=False,
-                )
-            )
+            execute_state.statement = execute_state.statement.options(*tenant_criteria)
 
     return db

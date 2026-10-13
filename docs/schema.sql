@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS candidates (
     embedding vector(384), -- Candidate resume text embedding (384 dims for vector similarity search)
     protected_attributes JSONB NOT NULL DEFAULT '{}'::jsonb, -- Redacted/encrypted demographic proxies for fairness audit
     is_anonymized BOOLEAN NOT NULL DEFAULT FALSE,
+    consent_given_at TIMESTAMPTZ, -- When the candidate consented to data processing; NULL = not recorded
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_candidates_org_email UNIQUE (org_id, email)
@@ -109,6 +110,21 @@ CREATE TABLE IF NOT EXISTS applications (
     applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_applications_job_candidate UNIQUE (org_id, job_id, candidate_id)
+);
+
+-- -----------------------------------------------------------------------------
+-- 6b. APPLICATION STAGE HISTORY
+-- One row per stage an application entered, including its initial placement
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS application_stage_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+    from_stage_id UUID REFERENCES pipeline_stages(id) ON DELETE RESTRICT, -- NULL for the initial placement
+    to_stage_id UUID NOT NULL REFERENCES pipeline_stages(id) ON DELETE RESTRICT,
+    reason TEXT,
+    moved_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    moved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- -----------------------------------------------------------------------------
@@ -179,6 +195,9 @@ CREATE INDEX IF NOT EXISTS idx_pipeline_stages_org_job ON pipeline_stages(org_id
 CREATE INDEX IF NOT EXISTS idx_candidates_org_email ON candidates(org_id, email);
 CREATE INDEX IF NOT EXISTS idx_applications_org_job_stage ON applications(org_id, job_id, stage_id);
 CREATE INDEX IF NOT EXISTS idx_applications_org_candidate ON applications(org_id, candidate_id);
+CREATE INDEX IF NOT EXISTS idx_application_stage_history_org_application ON application_stage_history(org_id, application_id);
+-- uq_pipeline_stage_order treats NULL job_ids as distinct, so org-default stages need their own index
+CREATE UNIQUE INDEX IF NOT EXISTS uq_pipeline_stages_org_default_order ON pipeline_stages(org_id, stage_order) WHERE job_id IS NULL;
 
 -- Scoring Engine & Ranking Indexes
 CREATE INDEX IF NOT EXISTS idx_scores_org_job_score ON scores(org_id, job_id, overall_score DESC);

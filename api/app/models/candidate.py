@@ -43,6 +43,9 @@ class Candidate(Base):
         JSONB, server_default="{}", nullable=False
     )
     is_anonymized: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    consent_given_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

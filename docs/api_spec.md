@@ -187,42 +187,26 @@ Sets the job's status to `archived`, which hides it from the default list. No re
 The update, status and archive endpoints all return the full job (`200 OK`), and every successful write is recorded as an audit event (`create_job`, `update_job`, `change_job_status`, `archive_job`).
 
 #### `GET /api/v1/jobs/{id}/stages`
-Retrieves ordered pipeline stages for a job.
+Returns the job's pipeline stages in order. Any role can read. Every organization is seeded with six default stages (`job_id` is `null`); a job uses them unless it has stages of its own.
 
-**Response (`200 OK`)**:
+**Response (`200 OK`)** (first two of the six defaults shown; the rest are `Interview`/`interview`, `Offer`/`offer`, `Hired`/`hired`, `Rejected`/`rejected`):
 ```json
 [
   {
-    "id": "stage-01-applied",
+    "id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
     "org_id": "123e4567-e89b-12d3-a456-426614174000",
-    "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "job_id": null,
     "name": "Applied",
     "stage_order": 1,
     "stage_type": "applied"
   },
   {
-    "id": "stage-02-screening",
+    "id": "d2e3f4a5-b6c7-4d8e-9f0a-2b3c4d5e6f7a",
     "org_id": "123e4567-e89b-12d3-a456-426614174000",
-    "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-    "name": "AI Screening & Review",
+    "job_id": null,
+    "name": "Shortlisted",
     "stage_order": 2,
     "stage_type": "screening"
-  },
-  {
-    "id": "stage-03-interview",
-    "org_id": "123e4567-e89b-12d3-a456-426614174000",
-    "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-    "name": "Technical Interview",
-    "stage_order": 3,
-    "stage_type": "interview"
-  },
-  {
-    "id": "stage-04-offer",
-    "org_id": "123e4567-e89b-12d3-a456-426614174000",
-    "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-    "name": "Offer Extended",
-    "stage_order": 4,
-    "stage_type": "offer"
   }
 ]
 ```
@@ -230,6 +214,51 @@ Retrieves ordered pipeline stages for a job.
 ---
 
 ### 2.3 Candidates & CV Upload
+
+#### `POST /api/v1/candidates`
+Adds a candidate to the organization. Requires the `admin` or `recruiter` role; only `full_name` and `email` are required. `consent_given_at` is the time the candidate consented to data processing and stays `null` until consent is recorded; it must include a timezone. Emails are stored lowercase and are unique per organization (`409` on a duplicate).
+
+**Request Body**:
+```json
+{
+  "full_name": "Alex Mercer",
+  "email": "alex.mercer@example.com",
+  "phone": "+1-555-0199",
+  "location": "San Francisco, CA",
+  "consent_given_at": "2026-10-01T09:00:00Z"
+}
+```
+
+**Response (`201 Created`)**:
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "org_id": "123e4567-e89b-12d3-a456-426614174000",
+  "full_name": "Alex Mercer",
+  "email": "alex.mercer@example.com",
+  "phone": "+1-555-0199",
+  "location": "San Francisco, CA",
+  "cv_file_path": null,
+  "parsed_data": {},
+  "consent_given_at": "2026-10-01T09:00:00Z",
+  "created_at": "2026-10-01T09:15:00Z",
+  "updated_at": "2026-10-01T09:15:00Z"
+}
+```
+
+#### `GET /api/v1/candidates`
+Lists the organization's candidates in the standard pagination envelope. Any role can read.
+
+| Query param | Values | Default |
+| --- | --- | --- |
+| `search` | case-insensitive substring of name or email | none |
+| `page` | integer, 1 or more | `1` |
+| `per_page` | integer, 1 to 100 | `20` |
+| `sort_by` | `created_at`, `updated_at`, `full_name`, `email` | `created_at` |
+| `sort_order` | `asc`, `desc` | `desc` |
+
+#### `GET /api/v1/candidates/{id}`
+Returns one candidate. Any role can read. A candidate in another organization returns `404`.
 
 #### `POST /api/v1/candidates/upload`
 Uploads a PDF resume file. Performs automatic PyMuPDF text parsing with Tesseract OCR fallback, extracting skills and work history.
@@ -278,63 +307,100 @@ Uploads a PDF resume file. Performs automatic PyMuPDF text parsing with Tesserac
 ```
 
 #### `PATCH /api/v1/candidates/{id}`
-Screen to review and manually edit/correct parsed candidate skills and profile data.
+Partially updates a candidate's `full_name`, `email`, `phone`, `location` or `consent_given_at`; fields left out are unchanged. `phone`, `location` and `consent_given_at` can be cleared with `null`. Requires the `admin` or `recruiter` role. Returns the full candidate (`200 OK`).
 
 **Request Body**:
 ```json
 {
   "full_name": "Alexander Mercer",
-  "parsed_data": {
-    "skills": ["Python", "FastAPI", "PostgreSQL", "Redis", "Git", "Docker", "PyTorch"]
-  }
-}
-```
-
-**Response (`200 OK`)**:
-```json
-{
-  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "org_id": "123e4567-e89b-12d3-a456-426614174000",
-  "full_name": "Alexander Mercer",
-  "email": "alex.mercer@example.com",
-  "parsed_data": {
-    "skills": ["Python", "FastAPI", "PostgreSQL", "Redis", "Git", "Docker", "PyTorch"]
-  }
+  "consent_given_at": "2026-10-02T10:00:00Z"
 }
 ```
 
 #### `DELETE /api/v1/candidates/{id}`
-GDPR Right to Erasure hard delete.
+Permanently deletes the candidate together with their applications, stage history and scores. Requires the `admin` role.
 
 **Response (`204 No Content`)**
 
+Candidate writes are recorded as audit events (`create_candidate`, `update_candidate`, `delete_candidate`). Their details never contain personal data, because the audit log outlives a deleted candidate.
+
 ---
 
-### 2.4 Applications & Drag-and-Drop Pipeline
+### 2.4 Applications & Pipeline Stages
 
-#### `PATCH /api/v1/applications/{id}/stage`
-Updates application pipeline stage (drag-and-drop on KanBan board). Logged to audit logs for candidate ranker training dataset.
+#### `POST /api/v1/applications`
+Links a candidate to a job. The application starts in the job's first stage (`Applied`). Requires the `admin` or `recruiter` role. Returns `404` if the job or candidate is not in the organization and `409` if the candidate already applied to this job or the job is `closed` or `archived`.
 
 **Request Body**:
 ```json
 {
-  "stage_id": "stage-03-interview",
-  "rejection_reason": null
+  "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "candidate_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 }
 ```
 
-**Response (`200 OK`)**:
+**Response (`201 Created`)**:
 ```json
 {
   "id": "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
   "org_id": "123e4567-e89b-12d3-a456-426614174000",
   "job_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
   "candidate_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "stage_id": "stage-03-interview",
+  "stage_id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
   "status": "active",
-  "updated_at": "2026-10-01T09:17:21Z"
+  "rejection_reason": null,
+  "applied_at": "2026-10-01T09:16:00Z",
+  "updated_at": "2026-10-01T09:16:00Z"
 }
 ```
+
+#### `GET /api/v1/applications`
+Lists applications, newest first, in the standard pagination envelope. Any role can read. Optional filters: `job_id`, `candidate_id`, `stage_id`, `status` (`active`, `hired`, `rejected`, `withdrawn`), plus `page` and `per_page`.
+
+#### `GET /api/v1/applications/{id}`
+Returns one application. Any role can read.
+
+#### `PATCH /api/v1/applications/{id}/stage`
+Moves an application to another stage of its job's pipeline. Requires the `admin` or `recruiter` role. `reason` is optional and is stored with the move. `status` follows the type of the new stage: `hired`, `rejected` (the reason is also copied to `rejection_reason`), otherwise `active`. Moving to the stage the application is already in changes nothing. A stage that does not belong to the job's pipeline returns `404`.
+
+**Request Body**:
+```json
+{
+  "stage_id": "e3f4a5b6-c7d8-4e9f-8a1b-3c4d5e6f7a8b",
+  "reason": "Strong take-home exercise"
+}
+```
+
+**Response (`200 OK`)**: the full application, as above, with the new `stage_id`.
+
+#### `GET /api/v1/applications/{id}/history`
+Returns every stage the application entered, oldest first. Any role can read. The first entry is the initial placement and has `from_stage_id: null`.
+
+**Response (`200 OK`)**:
+```json
+[
+  {
+    "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+    "application_id": "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
+    "from_stage_id": null,
+    "to_stage_id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
+    "reason": null,
+    "moved_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "moved_at": "2026-10-01T09:16:00Z"
+  },
+  {
+    "id": "1b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e",
+    "application_id": "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
+    "from_stage_id": "c1d2e3f4-a5b6-4c8d-9e0f-1a2b3c4d5e6f",
+    "to_stage_id": "e3f4a5b6-c7d8-4e9f-8a1b-3c4d5e6f7a8b",
+    "reason": "Strong take-home exercise",
+    "moved_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "moved_at": "2026-10-01T09:17:21Z"
+  }
+]
+```
+
+Creating an application and every stage move are recorded as audit events (`create_application`, `move_application_stage`). The move event carries the job and the from/to stage IDs and names; the free-text reason is kept only in the stage history.
 
 #### `GET /api/v1/applications/{id}/score`
 Retrieves candidate hybrid ranking score breakdown and explanations.
