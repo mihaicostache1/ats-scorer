@@ -22,10 +22,10 @@ def test_example_is_valid(validator: Draft202012Validator) -> None:
     assert list(validator.iter_errors(load_parsed_cv_example())) == []
 
 
-def test_schema_and_example_use_the_current_version() -> None:
+def test_schema_accepts_the_current_version_and_the_example_uses_it() -> None:
     schema = load_parsed_cv_schema()
 
-    assert schema["properties"]["schema_version"]["const"] == PARSED_CV_SCHEMA_VERSION
+    assert PARSED_CV_SCHEMA_VERSION in schema["properties"]["schema_version"]["enum"]
     assert load_parsed_cv_example()["schema_version"] == PARSED_CV_SCHEMA_VERSION
 
 
@@ -37,6 +37,7 @@ def test_a_record_with_only_skills_is_valid(validator: Draft202012Validator) -> 
     "record",
     [
         {},
+        {"skills": [], "schema_version": "9.9"},
         {"skills": "Python"},
         {"skills": ["Python"], "experience_years": -1},
         {"skills": [], "work_history": [{"company": "Nimbuscraft Labs"}]},

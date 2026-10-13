@@ -4,7 +4,8 @@ import json
 from importlib import resources
 from typing import Any, TypedDict
 
-# Version of the parsed-CV schema in schemas/parsed_cv.schema.json.
+# Version the parser writes into new records. The schema file accepts this one and any
+# older version that is still compatible.
 PARSED_CV_SCHEMA_VERSION = "0.1"
 
 
@@ -20,8 +21,10 @@ class ScoreResult(TypedDict):
 
     total: float  # 0-100
     components: ScoreComponents
+    weights: dict[str, float]  # weight actually applied to each component
     matched_skills: list[str]
     missing_skills: list[str]
+    score_explanations: list[str]  # plain-language reasons, for recruiters
     model_version: str
 
 

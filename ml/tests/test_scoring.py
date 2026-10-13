@@ -2,7 +2,7 @@
 
 import pytest
 
-from ats_scoring import MODEL_VERSION, WEIGHTS, score
+from ats_scoring import MODEL_VERSION, WEIGHTS, NothingToScoreError, score
 
 JOB = {
     "title": "Backend Developer",
@@ -77,11 +77,14 @@ def test_result_has_the_agreed_shape_and_range(candidate: dict[str, object]) -> 
     assert set(result) == {
         "total",
         "components",
+        "weights",
         "matched_skills",
         "missing_skills",
+        "score_explanations",
         "model_version",
     }
     assert result["model_version"] == MODEL_VERSION
+    assert result["weights"] == WEIGHTS
     assert 0 <= result["total"] <= 100
     for value in result["components"].values():
         assert value is not None
@@ -90,13 +93,29 @@ def test_result_has_the_agreed_shape_and_range(candidate: dict[str, object]) -> 
 
 def test_total_is_the_weighted_mix_of_the_components() -> None:
     result = score(PARTIAL, JOB)
-    components = result["components"]
+    components, weights = result["components"], result["weights"]
 
     expected = (
-        WEIGHTS["skill_overlap"] * components["skill_overlap"]
-        + WEIGHTS["text_similarity"] * components["text_similarity"]
+        weights["skill_overlap"] * components["skill_overlap"]
+        + weights["text_similarity"] * components["text_similarity"]
     )
     assert result["total"] == pytest.approx(expected, abs=0.02)
+
+
+def test_partial_pair_is_explained() -> None:
+    explanations = score(PARTIAL, JOB)["score_explanations"]
+
+    assert explanations[:2] == ["Has 2 of 4 required skills.", "Has 0 of 2 preferred skills."]
+    assert explanations[2].startswith("Text similarity with the job: ")
+    assert len(explanations) == 3
+
+
+def test_explanations_use_the_singular_for_one_skill() -> None:
+    job = {"title": "Data Analyst", "required_skills": ["SQL"]}
+
+    explanations = score({"skills": ["SQL"]}, job)["score_explanations"]
+
+    assert explanations[0] == "Has 1 of 1 required skill."
 
 
 def test_scoring_is_repeatable() -> None:
@@ -145,9 +164,11 @@ def test_job_without_skills_is_scored_on_text_alone() -> None:
     result = score(PARTIAL, job)
 
     assert result["components"]["skill_overlap"] is None
+    assert result["weights"] == {"skill_overlap": 0.0, "text_similarity": 1.0}
     assert result["total"] == result["components"]["text_similarity"]
     assert result["matched_skills"] == []
     assert result["missing_skills"] == []
+    assert result["score_explanations"][0].startswith("The job lists no skills")
 
 
 def test_missing_and_null_fields_are_tolerated() -> None:
@@ -160,10 +181,21 @@ def test_missing_and_null_fields_are_tolerated() -> None:
 
 
 def test_empty_candidate_is_an_error_not_a_zero() -> None:
-    with pytest.raises(ValueError, match="candidate"):
+    with pytest.raises(NothingToScoreError, match="candidate"):
         score({"skills": [], "full_name": "Maria Ionescu"}, JOB)
 
 
+def test_unparsed_candidate_is_an_error() -> None:
+    # The backend stores {} for a candidate whose CV has not been parsed yet.
+    with pytest.raises(NothingToScoreError, match="candidate"):
+        score({}, JOB)
+
+
 def test_empty_job_is_an_error() -> None:
-    with pytest.raises(ValueError, match="job"):
+    with pytest.raises(NothingToScoreError, match="job"):
         score(PARTIAL, {"title": " ", "required_skills": []})
+
+
+def test_nothing_to_score_is_still_a_value_error() -> None:
+    # Code that already catches ValueError keeps working.
+    assert issubclass(NothingToScoreError, ValueError)

@@ -1,6 +1,6 @@
 # Parsed-CV schema (draft 0.1)
 
-**Status:** draft for the backend to review. Owner: ML/DevOps lead.
+**Status:** draft 0.1, reviewed with the backend in the L-7 PR. Owner: ML/DevOps lead.
 
 This is the proposed shape of `candidates.parsed_data`: what the CV parser writes, and what the scorer and the CV review screen read.
 
@@ -12,7 +12,7 @@ This is the proposed shape of `candidates.parsed_data`: what the CV parser write
 
 | Field | Type | Required | Read by the scorer |
 |---|---|---|---|
-| `schema_version` | `"0.1"` | No (see question 5) | No |
+| `schema_version` | one of the accepted versions, now `"0.1"` | No, but the parser always writes it | No |
 | `headline` | string or null | No | Yes |
 | `summary` | string or null | No | Yes |
 | `skills` | list of strings | **Yes**, may be empty | Yes |
@@ -34,6 +34,8 @@ This is the proposed shape of `candidates.parsed_data`: what the CV parser write
 - **Skills are stored as written in the CV.** The scorer normalizes them when it compares.
 - **`end: null` means the position is current.** Leave `end` out when it is unknown.
 - **Extra fields are allowed,** so the parser can add data without breaking validation.
+- **Old records keep validating after a version bump.** The schema lists every accepted version. A change that keeps older records valid adds its version to that list. A breaking change gets a new schema file.
+- **`{}` means "not parsed yet".** It fails the schema on purpose, because `skills` is required, and it is never scored.
 
 ## How the scorer uses it
 
@@ -45,24 +47,31 @@ result = score(candidate.parsed_data, job_fields)
 
 `job_fields` is a dict with `title`, `description`, `required_skills` and `preferred_skills`.
 
-| `score()` returns | Suggested place in `scores` |
+| `score()` returns | Place in `scores` |
 |---|---|
 | `total` (0-100) | `overall_score` |
 | `components["skill_overlap"]` (0-100 or null) | `skill_overlap_score` |
 | `components["text_similarity"]` (0-100) | `semantic_score` |
-| `matched_skills`, `missing_skills` | `component_breakdown` |
+| `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |
 | `model_version` | `model_version` |
+
+`experience_score` and `title_fit_score` stay null, because the baseline does not compute them. `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has nothing to compare.
 
 Details of the scoring are in [ml/README.md](../../ml/README.md).
 
-## Questions for the backend
+## Decisions from the L-7 review
 
-1. **`experience_score` and `title_fit_score` are NOT NULL,** but the baseline does not compute them. Can they become nullable? Storing 0 would read as a bad result.
-2. **`skill_overlap_score` can be null,** when a job lists no skills. Same question.
-3. **`score()` raises `ValueError`** when a CV has no skills and no text. Proposal: catch it and put the candidate in "needs manual review" (US-08), without storing a score.
-4. **`headline` and `summary`** are new compared with the example in the API spec. Is `parsed_data` the right place for them?
-5. **`schema_version`** is optional in this draft so existing records still validate. Proposal: the parser always writes it, and it becomes required in version 1.0.
-6. **Re-scoring:** `scores` is unique on `(application_id, model_version)`, so scoring the same application again with the same model has to update the row.
-7. **Dependency:** the package needs scikit-learn. The API image installs it with `pip install -e ml/` or the equivalent line in its requirements.
+- **Nullable components:** `experience_score`, `title_fit_score` and `skill_overlap_score` are null when a model does not compute them (backend PR #22).
+- **Nothing to score:** no score is stored and the candidate goes to manual review. The backend catches `NothingToScoreError`, not every `ValueError`.
+- **`headline` and `summary`** live in `parsed_data`. The API returns `parsed_data` as an opaque object for now and will validate it against this schema once users can edit it.
+- **`schema_version`:** the parser always writes it, and the schema accepts a list of versions.
+- **Re-scoring:** the backend upserts on `(application_id, model_version)`, and every stage move keeps a copy of the score and model version it was based on (PR #22). `MODEL_VERSION` changes whenever the weights or the alias table change.
+- **`semantic_score` holds the TF-IDF similarity** for now. `model_version` tells it apart from embedding similarity later.
+- **Scoring runs in the worker,** not during a request.
+
+**Still open:**
+
+- Where the "needs manual review" state for scoring lives. `cv_documents.status = needs_review` is about parsing (backend).
+- The API image builds from `./api` and cannot see `ml/` yet (backend, separate PR).
 
 The synthetic CVs from `ml/synthetic` keep `headline`, `summary` and `certifications` next to `parsed_data`, not inside it. Merge them when loading that data: `{**cv["parsed_data"], "headline": cv["headline"], "summary": cv["summary"], "certifications": cv["certifications"]}`.
