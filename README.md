@@ -33,7 +33,13 @@ docker compose down -v        # stop AND delete all data
 
 ### Run the apps
 - API: `uvicorn app.main:app --reload` (from the backend folder)
+- Worker: `arq app.worker.WorkerSettings` (from the backend folder, in a second terminal)
 - Web: `npm run dev` (from the web folder)
+
+### Background worker
+Uploaded CVs are processed by an [Arq](https://arq-docs.helpmanual.io/) worker that reads jobs from Redis. The API only queues the work, so without a running worker an uploaded CV stays `queued`.
+
+The worker extracts the text with PyMuPDF and uses Tesseract for scanned pages. It needs the same `.env` as the API (`DATABASE_URL`, `REDIS_URL`, `STORAGE_LOCAL_DIR`) and must see the same storage folder. A CV goes `queued` → `extracting` → `extracted`, or `failed` with an `error_code` and a message. `docker compose up` starts a worker container too.
 
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:

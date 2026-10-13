@@ -286,13 +286,35 @@ The file is checked by its content, not its extension or declared type, and may 
   "size_bytes": 48211,
   "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
   "status": "queued",
+  "page_count": null,
+  "ocr_used": false,
+  "error_code": null,
+  "error_message": null,
+  "attempts": 0,
+  "processed_at": null,
   "uploaded_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
   "created_at": "2026-10-01T09:15:00Z",
   "updated_at": "2026-10-01T09:15:00Z"
 }
 ```
 
-`status` is one of `queued`, `extracting`, `parsed`, `needs_review`, `failed`. Where the file is stored is never returned.
+`status` is one of `queued`, `extracting`, `extracted`, `parsed`, `needs_review`, `failed`. Where the file is stored is never returned, and neither is the extracted text.
+
+**Processing.** A background worker extracts the text: `queued` → `extracting` → `extracted`, or `failed`. Scanned pages go through OCR (`ocr_used` is then `true`). A failure that may pass (a timeout, an unexpected error) is retried up to 3 times; between attempts the document is `queued` again, with `attempts` counting up and `error_code` showing why the last attempt failed. `parsed` and `needs_review` are set by the later parsing step.
+
+When `status` is `failed`, `error_code` and `error_message` say why:
+
+| `error_code` | Meaning |
+| --- | --- |
+| `invalid_pdf` | The file is damaged and cannot be read |
+| `encrypted_pdf` | The PDF is password-protected |
+| `too_many_pages` | More than 50 pages |
+| `no_text_found` | No text in the file, even after OCR |
+| `ocr_unavailable` | The file looks scanned and OCR could not be run |
+| `file_missing` | The stored file could not be found |
+| `timeout` | Extraction took too long on every attempt |
+| `internal_error` | An unexpected error on every attempt |
+| `queue_unavailable` | The file was saved but could not be queued |
 
 #### `GET /api/v1/candidates/{id}/cv`
 Lists the candidate's CV documents, newest first. Any role can read.
@@ -300,8 +322,11 @@ Lists the candidate's CV documents, newest first. Any role can read.
 #### `GET /api/v1/candidates/{id}/cv/{cv_id}`
 Returns one CV document; poll it to follow the processing `status`. Any role can read.
 
+#### `POST /api/v1/candidates/{id}/cv/{cv_id}/retry`
+Queues a document for text extraction again. Requires the `admin` or `recruiter` role. No request body. A `failed` document is reset to `queued` with `attempts` 0 and its error cleared. A document that is still `queued` or `extracting` is queued again unchanged, which recovers one whose job was lost. Any other status returns `409`. Returns the document (`200 OK`).
+
 #### `GET /api/v1/candidates/{id}/cv/{cv_id}/download`
-Returns the PDF (`Content-Type: application/pdf`, sent as an attachment). Any role in the organization that owns the candidate can download; everyone else gets `404`. This endpoint is the only way to read a CV file: files are not served from any public path. Uploads and downloads are recorded as audit events (`upload_cv`, `download_cv`).
+Returns the PDF (`Content-Type: application/pdf`, sent as an attachment). Any role in the organization that owns the candidate can download; everyone else gets `404`. This endpoint is the only way to read a CV file: files are not served from any public path. Uploads, downloads and retries of a failed document are recorded as audit events (`upload_cv`, `download_cv`, `retry_cv`).
 
 #### `PATCH /api/v1/candidates/{id}`
 Partially updates a candidate's `full_name`, `email`, `phone`, `location` or `consent_given_at`; fields left out are unchanged. `phone`, `location` and `consent_given_at` can be cleared with `null`. Requires the `admin` or `recruiter` role. Returns the full candidate (`200 OK`).
