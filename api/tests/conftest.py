@@ -18,6 +18,7 @@ from app.models.job import Job
 from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
+from app.services.pipeline_service import seed_default_stages
 
 
 @pytest.fixture
@@ -189,6 +190,8 @@ def create_user(committed_db: Session) -> Callable[..., User]:
         if org_id is None:
             org = Organization(id=uuid.uuid4(), name=f"Org {suffix}", slug=f"org-{suffix}")
             committed_db.add(org)
+            committed_db.flush()
+            seed_default_stages(committed_db, org.id)
             org_id = org.id
         user = User(
             id=uuid.uuid4(),

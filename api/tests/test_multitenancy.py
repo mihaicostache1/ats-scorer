@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Callable
+from typing import Any
 
 import pytest
 from httpx import AsyncClient
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import create_access_token
 from app.main import app
+from app.models.application_stage_history import ApplicationStageHistory
 from app.models.audit_event import AuditEvent
 from app.models.organization import Organization
 from app.models.user import User
@@ -171,3 +173,174 @@ async def test_org_b_cannot_read_or_write_org_a_jobs(
     }
     audit_a = (await async_client.get("/api/v1/audit/events")).json()
     assert [item["target_id"] for item in audit_a["items"]] == [job_a["id"]]
+
+
+@pytest.mark.asyncio
+async def test_org_b_cannot_read_or_write_org_a_candidates(
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    """Every candidates endpoint hides org A's candidates from org B, even for an org B admin."""
+    admin_a = create_user("admin")
+    admin_b = create_user("admin")
+    payload = {"full_name": "Org A Secret Person", "email": "secret@orga.example"}
+
+    login_as(admin_a)
+    created = await async_client.post("/api/v1/candidates", json=payload)
+    assert created.status_code == 201
+    candidate_a = created.json()
+    candidate_url = f"/api/v1/candidates/{candidate_a['id']}"
+
+    login_as(admin_b)
+
+    # Reads: not listed (with or without search) and not fetchable by ID.
+    for params in ({}, {"search": "Secret"}, {"search": "orga.example"}):
+        listing = await async_client.get("/api/v1/candidates", params=params)
+        assert listing.status_code == 200
+        assert listing.json()["items"] == []
+        assert listing.json()["pagination"]["total_items"] == 0
+    assert (await async_client.get(candidate_url)).status_code == 404
+
+    # Writes: all look like a missing candidate.
+    writes = [
+        await async_client.patch(candidate_url, json={"full_name": "Taken over"}),
+        await async_client.delete(candidate_url),
+    ]
+    assert [r.status_code for r in writes] == [404] * len(writes)
+    for response in writes:
+        assert "Org A Secret Person" not in response.text
+
+    # The same email is free in org B, and the new candidate lands in org B.
+    created_b = await async_client.post("/api/v1/candidates", json=payload)
+    assert created_b.status_code == 201
+    candidate_b = created_b.json()
+    assert candidate_b["org_id"] == str(admin_b.org_id)
+    assert candidate_b["id"] != candidate_a["id"]
+
+    # Org A's candidate is untouched and org A only sees its own.
+    login_as(admin_a)
+    assert (await async_client.get(candidate_url)).json() == candidate_a
+    listing_a = (await async_client.get("/api/v1/candidates")).json()
+    assert [item["id"] for item in listing_a["items"]] == [candidate_a["id"]]
+
+    # The failed cross-org writes left no audit trail on org A's candidate.
+    events = committed_db.query(AuditEvent).filter(AuditEvent.target_entity == "candidate").all()
+    assert {(e.org_id, e.action, str(e.target_id)) for e in events} == {
+        (admin_a.org_id, "create_candidate", candidate_a["id"]),
+        (admin_b.org_id, "create_candidate", candidate_b["id"]),
+    }
+
+
+@pytest.mark.asyncio
+async def test_org_b_cannot_read_or_write_org_a_applications_and_stages(
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    """Applications, stage history, stage moves and pipeline stages never cross organizations."""
+    admin_a = create_user("admin")
+    admin_b = create_user("admin")
+
+    async def setup() -> tuple[Any, Any, Any, dict[str, str]]:
+        """Create a job, a candidate and their application for the logged-in org."""
+        job = (
+            await async_client.post("/api/v1/jobs", json={"title": "Role", "description": "x"})
+        ).json()
+        candidate = (
+            await async_client.post(
+                "/api/v1/candidates", json={"full_name": "Person", "email": "person@example.com"}
+            )
+        ).json()
+        created = await async_client.post(
+            "/api/v1/applications", json={"job_id": job["id"], "candidate_id": candidate["id"]}
+        )
+        assert created.status_code == 201, created.text
+        stages = (await async_client.get(f"/api/v1/jobs/{job['id']}/stages")).json()
+        return job, candidate, created.json(), {s["name"]: s["id"] for s in stages}
+
+    login_as(admin_a)
+    job_a, candidate_a, application_a, stages_a = await setup()
+    application_url = f"/api/v1/applications/{application_a['id']}"
+
+    login_as(admin_b)
+    job_b, candidate_b, application_b, stages_b = await setup()
+
+    # Each org has its own copy of the default stages.
+    assert stages_a.keys() == stages_b.keys()
+    assert not set(stages_a.values()) & set(stages_b.values())
+    assert application_b["stage_id"] == stages_b["Applied"]
+
+    # Reads: org A's application is not listed under any filter, nor fetchable.
+    for params in (
+        {},
+        {"job_id": job_a["id"]},
+        {"candidate_id": candidate_a["id"]},
+        {"stage_id": stages_a["Applied"]},
+    ):
+        listing = await async_client.get("/api/v1/applications", params=params)
+        assert listing.status_code == 200
+        assert application_a["id"] not in [item["id"] for item in listing.json()["items"]]
+    assert (await async_client.get("/api/v1/applications")).json()["pagination"]["total_items"] == 1
+    reads = [
+        await async_client.get(application_url),
+        await async_client.get(f"{application_url}/history"),
+        await async_client.get(f"/api/v1/jobs/{job_a['id']}/stages"),
+    ]
+    assert [r.status_code for r in reads] == [404] * len(reads)
+
+    # Writes: org A's application cannot be moved, even to a stage org B owns.
+    for stage_id in (stages_a["Interview"], stages_b["Interview"]):
+        response = await async_client.patch(
+            f"{application_url}/stage", json={"stage_id": stage_id, "reason": "takeover"}
+        )
+        assert response.status_code == 404
+
+    # Org B's own application cannot be moved into one of org A's stages.
+    response = await async_client.patch(
+        f"/api/v1/applications/{application_b['id']}/stage",
+        json={"stage_id": stages_a["Interview"]},
+    )
+    assert response.status_code == 404
+
+    # An application cannot link org A's job or candidate from org B, in any combination.
+    other_b = (
+        await async_client.post(
+            "/api/v1/candidates", json={"full_name": "Other", "email": "other@example.com"}
+        )
+    ).json()
+    for body in (
+        {"job_id": job_a["id"], "candidate_id": candidate_a["id"]},
+        {"job_id": job_a["id"], "candidate_id": other_b["id"]},
+        {"job_id": job_b["id"], "candidate_id": candidate_a["id"]},
+    ):
+        assert (await async_client.post("/api/v1/applications", json=body)).status_code == 404
+
+    # Org B's application is where org B left it.
+    unchanged_b = (await async_client.get(f"/api/v1/applications/{application_b['id']}")).json()
+    assert unchanged_b == application_b
+
+    # Org A's application, history and stages are untouched, and org A sees only its own.
+    login_as(admin_a)
+    assert (await async_client.get(application_url)).json() == application_a
+    history_a = (await async_client.get(f"{application_url}/history")).json()
+    assert [(h["from_stage_id"], h["to_stage_id"]) for h in history_a] == [
+        (None, stages_a["Applied"])
+    ]
+    listing_a = (await async_client.get("/api/v1/applications")).json()
+    assert [item["id"] for item in listing_a["items"]] == [application_a["id"]]
+    assert (await async_client.get(f"/api/v1/jobs/{job_b['id']}/stages")).status_code == 404
+
+    # Stored rows carry their own org, and no cross-org attempt was audited.
+    history_rows = committed_db.query(ApplicationStageHistory).all()
+    assert {(h.org_id, str(h.application_id)) for h in history_rows} == {
+        (admin_a.org_id, application_a["id"]),
+        (admin_b.org_id, application_b["id"]),
+    }
+    events = committed_db.query(AuditEvent).filter(AuditEvent.target_entity == "application").all()
+    assert {(e.org_id, e.action, str(e.target_id)) for e in events} == {
+        (admin_a.org_id, "create_application", application_a["id"]),
+        (admin_b.org_id, "create_application", application_b["id"]),
+    }

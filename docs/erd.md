@@ -50,6 +50,8 @@ erDiagram
     APPLICATIONS }|--|| CANDIDATES : "by candidate"
     APPLICATIONS }|--|| PIPELINE_STAGES : "at stage"
     APPLICATIONS ||--o{ SCORES : "has scores"
+    APPLICATIONS ||--o{ APPLICATION_STAGE_HISTORY : "moved through"
+    PIPELINE_STAGES ||--o{ APPLICATION_STAGE_HISTORY : "from / to"
 
     SCORES }|--|| ORGANIZATIONS : "belongs to"
     SCORES }|--|| APPLICATIONS : "scores"
@@ -130,7 +132,9 @@ Customizable hiring pipeline stages (e.g. Applied -> Screening -> Interview -> O
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Creation timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last update timestamp |
 
-*Unique Constraint*: `(org_id, job_id, stage_order)`
+*Unique Constraint*: `(org_id, job_id, stage_order)`, plus a partial unique index on `(org_id, stage_order) WHERE job_id IS NULL` for the org-default stages.
+
+Every organization is seeded with six default stages (`job_id` NULL): Applied, Shortlisted, Interview, Offer, Hired, Rejected. A job uses them unless it has stages of its own.
 
 ### 5. `candidates`
 Candidate records storing parsed CV text, structured extraction, vector embeddings, and demographic redaction flags.
@@ -149,6 +153,7 @@ Candidate records storing parsed CV text, structured extraction, vector embeddin
 | `embedding` | `vector(384)` | NULLABLE | Resume semantic embedding vector |
 | `protected_attributes` | JSONB | NOT NULL, DEFAULT `'{}'` | Redacted demographic attributes for fairness audit |
 | `is_anonymized` | BOOLEAN | NOT NULL, DEFAULT `FALSE` | Flag indicating if PII has been redacted |
+| `consent_given_at` | TIMESTAMPTZ | NULLABLE | When the candidate consented to data processing (NULL = not recorded) |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Resume upload timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last modification timestamp |
 
@@ -170,6 +175,20 @@ Join entity linking candidates to jobs and tracking their current pipeline stage
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last stage update timestamp |
 
 *Unique Constraint*: `(org_id, job_id, candidate_id)`
+
+### 6b. `application_stage_history`
+One row per stage an application entered, including its initial placement. Removed with the application (and so with the candidate on hard delete).
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | UUID | PRIMARY KEY, `gen_random_uuid()` | History entry identifier |
+| `org_id` | UUID | NOT NULL, FK -> `organizations(id)` CASCADE | Tenant workspace owner |
+| `application_id` | UUID | NOT NULL, FK -> `applications(id)` CASCADE | Application that moved |
+| `from_stage_id` | UUID | NULLABLE, FK -> `pipeline_stages(id)` RESTRICT | Previous stage (NULL = initial placement) |
+| `to_stage_id` | UUID | NOT NULL, FK -> `pipeline_stages(id)` RESTRICT | Stage entered |
+| `reason` | TEXT | NULLABLE | Optional reason given for the move |
+| `moved_by` | UUID | NULLABLE, FK -> `users(id)` SET NULL | User who made the move |
+| `moved_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Time of the move |
 
 ### 7. `scores`
 Hybrid AI score rankings generated for candidate applications against job requirements.

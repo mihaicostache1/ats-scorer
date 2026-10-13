@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, UniqueConstraint, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +22,15 @@ class PipelineStage(Base):
 
     __table_args__ = (
         UniqueConstraint("org_id", "job_id", "stage_order", name="uq_pipeline_stage_order"),
+        # The constraint above treats NULL job_ids as distinct, so it does not
+        # cover the org-default stages; this index does.
+        Index(
+            "uq_pipeline_stages_org_default_order",
+            "org_id",
+            "stage_order",
+            unique=True,
+            postgresql_where=text("job_id IS NULL"),
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
