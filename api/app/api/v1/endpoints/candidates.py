@@ -13,6 +13,7 @@ from app.core.dependencies import (
     get_current_user,
     get_tenant_db,
 )
+from app.core.logging import logger
 from app.models.candidate import Candidate
 from app.models.user import User
 from app.schemas.candidate import (
@@ -25,6 +26,7 @@ from app.schemas.candidate import (
 from app.schemas.job import SortOrder
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.storage import Storage, get_storage
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
@@ -199,10 +201,15 @@ def delete_candidate(
     id: uuid.UUID,
     request: Request,
     db: Session = Depends(get_tenant_db),
+    storage: Storage = Depends(get_storage),
     current_user: User = Depends(get_current_admin),
 ) -> Response:
-    """Hard-delete a candidate with their applications, stage history and scores. Admin only."""
+    """Hard-delete a candidate with their applications, stage history, scores and CV files.
+
+    Admin only.
+    """
     candidate = _get_candidate_or_404(db, id)
+    storage_keys = [document.storage_key for document in candidate.cv_documents]
 
     log_audit_event(
         db=db,
@@ -211,9 +218,18 @@ def delete_candidate(
         target_entity="candidate",
         target_id=candidate.id,
         user_id=current_user.id,
-        details={"applications_deleted": len(candidate.applications)},
+        details={
+            "applications_deleted": len(candidate.applications),
+            "cv_files_deleted": len(storage_keys),
+        },
         request=request,
     )
     db.delete(candidate)
     db.commit()
+    # Files go after the commit: a failed commit must not leave records without files.
+    for key in storage_keys:
+        try:
+            storage.delete(key)
+        except Exception:
+            logger.exception("Could not delete a stored CV file of deleted candidate=%s", id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

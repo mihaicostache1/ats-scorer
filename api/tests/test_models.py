@@ -9,6 +9,7 @@ from app.models.application_stage_history import ApplicationStageHistory
 from app.models.audit_event import AuditEvent
 from app.models.candidate import Candidate
 from app.models.consent_record import ConsentRecord
+from app.models.cv_document import CvDocument
 from app.models.job import Job
 from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
@@ -28,6 +29,7 @@ def test_tenant_tables_have_org_id() -> None:
         Score,
         AuditEvent,
         ConsentRecord,
+        CvDocument,
     ]
     for model in tenant_models:
         assert hasattr(model, "org_id"), f"Model {model.__name__} is missing org_id!"

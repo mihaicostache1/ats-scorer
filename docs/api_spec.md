@@ -260,51 +260,48 @@ Lists the organization's candidates in the standard pagination envelope. Any rol
 #### `GET /api/v1/candidates/{id}`
 Returns one candidate. Any role can read. A candidate in another organization returns `404`.
 
-#### `POST /api/v1/candidates/upload`
-Uploads a PDF resume file. Performs automatic PyMuPDF text parsing with Tesseract OCR fallback, extracting skills and work history.
+#### `POST /api/v1/candidates/{id}/cv`
+Uploads a PDF CV for an existing candidate and queues it for processing. Requires the `admin` or `recruiter` role. A candidate can have several CVs.
 
-**Request Header**: `Content-Type: multipart/form-data`  
-**Request Payload**: `file` (binary PDF file), `full_name` (optional), `email` (optional).
+**Request Header**: `Content-Type: multipart/form-data`
+**Request Payload**: `file` (binary PDF file).
+
+The file is checked by its content, not its extension or declared type, and may be at most 10 MB.
+
+| Status | When |
+| --- | --- |
+| `201` | Stored; the document's `status` is `queued` |
+| `404` | The candidate is not in the organization |
+| `413` | The file is larger than 10 MB |
+| `415` | The content is not a PDF |
 
 **Response (`201 Created`)**:
 ```json
 {
-  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
   "org_id": "123e4567-e89b-12d3-a456-426614174000",
-  "full_name": "Alex Mercer",
-  "email": "alex.mercer@example.com",
-  "phone": "+1-555-0199",
-  "location": "San Francisco, CA",
-  "cv_file_path": "uploads/123e4567/cv_f47ac10b.pdf",
-  "ocr_used": false,
-  "parsed_data": {
-    "skills": ["Python", "FastAPI", "PostgreSQL", "Redis", "Git", "Docker"],
-    "experience_years": 5.5,
-    "education": [
-      {
-        "degree": "B.S. Computer Science",
-        "institution": "UC Berkeley",
-        "grad_year": 2019
-      }
-    ],
-    "work_history": [
-      {
-        "title": "Backend Software Engineer",
-        "company": "TechCorp Inc.",
-        "years": 3.5,
-        "summary": "Built high-throughput FastAPI web services and managed PostgreSQL databases."
-      },
-      {
-        "title": "Junior Software Engineer",
-        "company": "DataFlow Soft",
-        "years": 2.0,
-        "summary": "Developed Python ETL scripts and REST APIs."
-      }
-    ]
-  },
-  "created_at": "2026-10-01T09:15:00Z"
+  "candidate_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "original_filename": "alex-mercer.pdf",
+  "content_type": "application/pdf",
+  "size_bytes": 48211,
+  "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "status": "queued",
+  "uploaded_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+  "created_at": "2026-10-01T09:15:00Z",
+  "updated_at": "2026-10-01T09:15:00Z"
 }
 ```
+
+`status` is one of `queued`, `extracting`, `parsed`, `needs_review`, `failed`. Where the file is stored is never returned.
+
+#### `GET /api/v1/candidates/{id}/cv`
+Lists the candidate's CV documents, newest first. Any role can read.
+
+#### `GET /api/v1/candidates/{id}/cv/{cv_id}`
+Returns one CV document; poll it to follow the processing `status`. Any role can read.
+
+#### `GET /api/v1/candidates/{id}/cv/{cv_id}/download`
+Returns the PDF (`Content-Type: application/pdf`, sent as an attachment). Any role in the organization that owns the candidate can download; everyone else gets `404`. This endpoint is the only way to read a CV file: files are not served from any public path. Uploads and downloads are recorded as audit events (`upload_cv`, `download_cv`).
 
 #### `PATCH /api/v1/candidates/{id}`
 Partially updates a candidate's `full_name`, `email`, `phone`, `location` or `consent_given_at`; fields left out are unchanged. `phone`, `location` and `consent_given_at` can be cleared with `null`. Requires the `admin` or `recruiter` role. Returns the full candidate (`200 OK`).
@@ -318,7 +315,7 @@ Partially updates a candidate's `full_name`, `email`, `phone`, `location` or `co
 ```
 
 #### `DELETE /api/v1/candidates/{id}`
-Permanently deletes the candidate together with their applications, stage history and scores. Requires the `admin` role.
+Permanently deletes the candidate together with their applications, stage history, scores and stored CV files. Requires the `admin` role.
 
 **Response (`204 No Content`)**
 

@@ -41,6 +41,7 @@ erDiagram
     CANDIDATES ||--o{ APPLICATIONS : "submits"
     CANDIDATES ||--o{ SCORES : "evaluated in"
     CANDIDATES ||--o{ CONSENT_RECORDS : "provides consent"
+    CANDIDATES ||--o{ CV_DOCUMENTS : "has CVs"
 
     PIPELINE_STAGES }|--|| ORGANIZATIONS : "belongs to"
     PIPELINE_STAGES ||--o{ APPLICATIONS : "current stage"
@@ -158,6 +159,24 @@ Candidate records storing parsed CV text, structured extraction, vector embeddin
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last modification timestamp |
 
 *Unique Constraint*: `(org_id, email)`
+
+### 5b. `cv_documents`
+Uploaded CV files and their processing status. The file itself lives in file storage under `storage_key`. Rows are removed with the candidate, and the API deletes the stored files at the same time.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | UUID | PRIMARY KEY, `gen_random_uuid()` | CV document identifier |
+| `org_id` | UUID | NOT NULL, FK -> `organizations(id)` CASCADE | Tenant workspace owner |
+| `candidate_id` | UUID | NOT NULL, FK -> `candidates(id)` CASCADE | Candidate the CV belongs to |
+| `storage_key` | TEXT | NOT NULL, UNIQUE | Random key of the file in storage; never returned by the API |
+| `original_filename` | VARCHAR(255) | NOT NULL | Sanitised name of the uploaded file, for display only |
+| `content_type` | VARCHAR(100) | NOT NULL | Always `application/pdf` |
+| `size_bytes` | INT | NOT NULL | File size (at most 10 MB) |
+| `sha256` | VARCHAR(64) | NOT NULL | SHA-256 of the file content |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'queued'`, CHECK IN (`queued`, `extracting`, `parsed`, `needs_review`, `failed`) | Processing status |
+| `uploaded_by` | UUID | NULLABLE, FK -> `users(id)` SET NULL | User who uploaded the file |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Upload timestamp |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last status change |
 
 ### 6. `applications`
 Join entity linking candidates to jobs and tracking their current pipeline stage.
