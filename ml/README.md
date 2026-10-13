@@ -4,6 +4,7 @@
 |---|---|
 | `ats_scoring/` | The scoring package the backend imports. Installed with `pip install -e ml/` |
 | `tests/` | Unit tests for `ats_scoring` |
+| `benchmarks/` | Speed measurement for the scorer |
 | `synthetic/` | Script that generates the synthetic CV and job dataset ([README](synthetic/README.md)) |
 | `embedding_spike/` | Experiments behind the embedding-model decision ([README](embedding_spike/README.md)) |
 
@@ -41,8 +42,14 @@ score(candidate, job)
 # {
 #     "total": ...,                      # 0-100
 #     "components": {"skill_overlap": 40.0, "text_similarity": ...},
+#     "weights": {"skill_overlap": 0.6, "text_similarity": 0.4},
 #     "matched_skills": ["Python", "PostgreSQL"],
 #     "missing_skills": ["Docker", "REST APIs"],
+#     "score_explanations": [
+#         "Has 2 of 4 required skills.",
+#         "Has 0 of 2 preferred skills.",
+#         "Text similarity with the job: .../100. It counts shared words, not meaning.",
+#     ],
 #     "model_version": "tfidf-skills-0.1.0",
 # }
 ```
@@ -59,8 +66,9 @@ score(candidate, job)
 - **Skills are compared after normalization:** case, spacing and list bullets are ignored, and a small alias table resolves abbreviations such as `JS`, `Postgres` and `k8s`.
 - **`matched_skills`** lists the job's skills the candidate has, required ones first, in the job's spelling. **`missing_skills`** lists the required skills the candidate lacks.
 - **Only qualifications are read:** headline, summary, skills, job titles and descriptions, degrees and certifications. Names, contact details, employers, schools and dates never reach the score.
-- **A job with no skills** is scored on text alone, and `skill_overlap` is `None`.
-- **Nothing to score is an error:** `score()` raises `ValueError` when the candidate or the job has no skills and no text. A CV that failed to parse must not look like a poor candidate.
+- **`weights`** are the weights actually applied, and **`score_explanations`** are short sentences for the recruiter-facing breakdown.
+- **A job with no skills** is scored on text alone: `skill_overlap` is `None` and the weights become 0 and 1.
+- **Nothing to score is an error:** `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has no skills and no text. A CV that failed to parse must not look like a poor candidate.
 
 ### Limits of the baseline
 
@@ -69,7 +77,16 @@ score(candidate, job)
 - The TF-IDF weights come from the two texts being compared, not from a larger collection, and the stop-word list is English.
 - Experience and job-title fit are not scored yet.
 
-Change `MODEL_VERSION` in `ats_scoring/scoring.py` whenever the same input could get a different score.
+Change `MODEL_VERSION` in `ats_scoring/scoring.py` whenever the same input could get a different score, for example when the weights or the alias table change.
+
+### Speed
+
+`benchmarks/time_scoring.py` scores synthetic CVs against one job, as the backend worker will. It needs the synthetic dataset (see [synthetic/README.md](synthetic/README.md)):
+
+```bash
+cd ml
+python benchmarks/time_scoring.py --candidates 1000
+```
 
 ### Test
 

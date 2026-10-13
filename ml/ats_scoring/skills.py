@@ -30,11 +30,23 @@ SKILL_ALIASES = {
 
 @dataclass(frozen=True)
 class SkillMatch:
-    """Outcome of comparing a candidate's skills with a job's skills."""
+    """Outcome of comparing a candidate's skills with a job's skills, in the job's spelling."""
 
-    matched: list[str]  # job skills the candidate has, required first, in the job's spelling
-    missing: list[str]  # required job skills the candidate lacks
+    matched_required: list[str]
+    missing_required: list[str]
+    matched_preferred: list[str]
+    missing_preferred: list[str]
     overlap: float | None  # 0-1, or None when the job lists no skills
+
+    @property
+    def matched(self) -> list[str]:
+        """Job skills the candidate has, required ones first."""
+        return self.matched_required + self.matched_preferred
+
+    @property
+    def missing(self) -> list[str]:
+        """Required job skills the candidate lacks."""
+        return self.missing_required
 
 
 def normalize_skill(skill: str) -> str:
@@ -73,12 +85,12 @@ def match_skills(candidate_skills: object, required: object, preferred: object) 
 
     matched_required = [name for key, name in wanted.items() if key in have]
     matched_optional = [name for key, name in optional.items() if key in have]
-    missing = [name for key, name in wanted.items() if key not in have]
-
     possible = len(wanted) + PREFERRED_WEIGHT * len(optional)
-    if possible == 0:
-        return SkillMatch(matched=[], missing=[], overlap=None)
     earned = len(matched_required) + PREFERRED_WEIGHT * len(matched_optional)
     return SkillMatch(
-        matched=matched_required + matched_optional, missing=missing, overlap=earned / possible
+        matched_required=matched_required,
+        missing_required=[name for key, name in wanted.items() if key not in have],
+        matched_preferred=matched_optional,
+        missing_preferred=[name for key, name in optional.items() if key not in have],
+        overlap=earned / possible if possible else None,
     )

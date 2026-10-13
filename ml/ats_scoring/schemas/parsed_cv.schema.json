@@ -6,8 +6,8 @@
   "required": ["skills"],
   "properties": {
     "schema_version": {
-      "description": "Version of this schema the record was written with.",
-      "const": "0.1"
+      "description": "Version of this schema the record was written with. The parser always writes it. Add a version to the list when a change keeps older records valid; a breaking change gets a new schema file instead.",
+      "enum": ["0.1"]
     },
     "headline": {
       "description": "Current or most recent job title.",
