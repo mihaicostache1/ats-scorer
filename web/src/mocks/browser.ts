@@ -3,12 +3,13 @@
  * Imported only when NEXT_PUBLIC_MOCK_API=true.
  */
 import { setupWorker } from "msw/browser";
-import { authHandlers } from "./handlers/auth";
+import { authHandlers, sessionGuard } from "./handlers/auth";
 import { jobHandlers } from "./handlers/jobs";
 import { candidateHandlers } from "./handlers/candidates";
 import { applicationHandlers } from "./handlers/applications";
 
 export const worker = setupWorker(
+  sessionGuard,
   ...authHandlers,
   ...jobHandlers,
   ...candidateHandlers,

@@ -11,9 +11,22 @@ import { apiClient } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
+// Sessions are httpOnly cookies set by the API; none of these return a token.
+
+export function register(body: components["schemas"]["RegisterRequest"]) {
+  return apiClient.POST("/auth/register", { body });
+}
 
 export function login(body: components["schemas"]["LoginRequest"]) {
   return apiClient.POST("/auth/login", { body });
+}
+
+export function refreshSession() {
+  return apiClient.POST("/auth/refresh");
+}
+
+export function logout() {
+  return apiClient.POST("/auth/logout");
 }
 
 export function getCurrentUser() {

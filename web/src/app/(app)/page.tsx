@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { AppShell } from "@/components/layout/app-shell";
+import { Can } from "@/components/auth/can";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -251,7 +251,7 @@ export default function HomePage() {
   ];
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-8">
         {/* Top welcome banner */}
         <div className="border-border flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
@@ -277,170 +277,172 @@ export default function HomePage() {
               </Button>
             </Link>
 
-            {/* Modal Dialog with react-hook-form */}
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger>
-                <Button className="gap-2">
-                  <Plus className="size-4" />
-                  Post New Requisition
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-xl">
-                <DialogHeader>
-                  <DialogTitle>Create New Job Opening</DialogTitle>
-                  <DialogDescription>
-                    Fill in the details below. Our semantic matcher will automatically index the
-                    skills for incoming CV evaluations.
-                  </DialogDescription>
-                </DialogHeader>
+            {/* Write action: hidden from viewers */}
+            <Can action="job:write">
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger>
+                  <Button className="gap-2">
+                    <Plus className="size-4" />
+                    Post New Requisition
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-xl">
+                  <DialogHeader>
+                    <DialogTitle>Create New Job Opening</DialogTitle>
+                    <DialogDescription>
+                      Fill in the details below. Our semantic matcher will automatically index the
+                      skills for incoming CV evaluations.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleCreateJob)} className="space-y-4 py-2">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Job Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g. Senior Machine Learning Engineer"
-                              error={!!form.formState.errors.title}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleCreateJob)} className="space-y-4 py-2">
                       <FormField
                         control={form.control}
-                        name="department"
+                        name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Department</FormLabel>
-                            <FormControl>
-                              <Select {...field}>
-                                <option value="Engineering">Engineering</option>
-                                <option value="AI & Research">AI & Research</option>
-                                <option value="Product">Product</option>
-                                <option value="Data Engineering">Data Engineering</option>
-                                <option value="Operations">Operations</option>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="location"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Location</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g. Remote, San Francisco" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="employmentType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Employment Type</FormLabel>
-                            <FormControl>
-                              <Select {...field}>
-                                <option value="Full-Time">Full-Time</option>
-                                <option value="Part-Time">Part-Time</option>
-                                <option value="Contract">Contract</option>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="minExperience"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Min Experience (Years)</FormLabel>
+                            <FormLabel>Job Title</FormLabel>
                             <FormControl>
                               <Input
-                                type="number"
-                                min="0"
+                                placeholder="e.g. Senior Machine Learning Engineer"
+                                error={!!form.formState.errors.title}
                                 {...field}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Requisition Summary & Key Skills</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Describe responsibilities, required skills (Python, PyTorch, etc.)..."
-                              rows={3}
-                              error={!!form.formState.errors.description}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="department"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Department</FormLabel>
+                              <FormControl>
+                                <Select {...field}>
+                                  <option value="Engineering">Engineering</option>
+                                  <option value="AI & Research">AI & Research</option>
+                                  <option value="Product">Product</option>
+                                  <option value="Data Engineering">Data Engineering</option>
+                                  <option value="Operations">Operations</option>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={form.control}
-                      name="autoScreen"
-                      render={({ field }) => (
-                        <FormItem className="border-border flex items-center gap-3 rounded-lg border p-3">
-                          <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <div className="space-y-0.5">
-                            <FormLabel className="cursor-pointer">
-                              Enable Automated Vector Scoring
-                            </FormLabel>
-                            <FormDescription>
-                              Trigger pgvector embeddings calculation immediately upon candidate
-                              application.
-                            </FormDescription>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
+                        <FormField
+                          control={form.control}
+                          name="location"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Location</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g. Remote, San Francisco" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                    <DialogFooter className="pt-2">
-                      <DialogClose>
-                        <Button type="button" variant="outline">
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                      <Button type="submit">Create Requisition</Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="employmentType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Employment Type</FormLabel>
+                              <FormControl>
+                                <Select {...field}>
+                                  <option value="Full-Time">Full-Time</option>
+                                  <option value="Part-Time">Part-Time</option>
+                                  <option value="Contract">Contract</option>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="minExperience"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Min Experience (Years)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  {...field}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Requisition Summary & Key Skills</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe responsibilities, required skills (Python, PyTorch, etc.)..."
+                                rows={3}
+                                error={!!form.formState.errors.description}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="autoScreen"
+                        render={({ field }) => (
+                          <FormItem className="border-border flex items-center gap-3 rounded-lg border p-3">
+                            <FormControl>
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <div className="space-y-0.5">
+                              <FormLabel className="cursor-pointer">
+                                Enable Automated Vector Scoring
+                              </FormLabel>
+                              <FormDescription>
+                                Trigger pgvector embeddings calculation immediately upon candidate
+                                application.
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <DialogFooter className="pt-2">
+                        <DialogClose>
+                          <Button type="button" variant="outline">
+                            Cancel
+                          </Button>
+                        </DialogClose>
+                        <Button type="submit">Create Requisition</Button>
+                      </DialogFooter>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            </Can>
           </div>
         </div>
 
@@ -513,6 +515,6 @@ export default function HomePage() {
           />
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }

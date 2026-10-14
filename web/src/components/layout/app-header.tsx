@@ -3,9 +3,11 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Briefcase, Menu, Shield, Sparkles, Users, X } from "lucide-react";
+import { Bell, Briefcase, LogOut, Menu, Shield, Sparkles, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { Action } from "@/lib/permissions";
+import { useSession } from "@/providers/session-provider";
 import { cn } from "@/lib/utils";
 
 export interface NavItem {
@@ -13,17 +15,33 @@ export interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
+  /** Hidden unless the signed-in role may perform this action. */
+  requires?: Action;
+  /** Only shown in development builds. */
+  devOnly?: boolean;
 }
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: Briefcase },
   { label: "Candidates", href: "/#candidates", icon: Users },
-  { label: "Audit Logs", href: "/#audit", icon: Shield },
-  { label: "Design System", href: "/dev/components", icon: Sparkles, badge: "UI" },
+  { label: "Audit Logs", href: "/#audit", icon: Shield, requires: "audit:read" },
+  { label: "Design System", href: "/dev/components", icon: Sparkles, badge: "UI", devOnly: true },
 ];
 
 export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const pathname = usePathname();
+  const { user, can, signOut } = useSession();
+  const visibleNavItems = navItems.filter(
+    (item) =>
+      (!item.requires || can(item.requires)) &&
+      (!item.devOnly || process.env.NODE_ENV === "development")
+  );
+  const initials = (user?.full_name ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   return (
@@ -62,7 +80,7 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
 
         {/* Desktop Header Nav Links */}
         <nav className="hidden items-center space-x-1 md:flex" aria-label="Main Navigation">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
@@ -101,14 +119,32 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
           </Button>
 
           <div className="border-border hidden items-center gap-2 border-l pl-2 sm:flex">
-            <div className="bg-primary/10 text-primary border-border flex size-7 items-center justify-center rounded-full border text-xs font-medium">
-              AD
+            <div
+              className="bg-primary/10 text-primary border-border flex size-7 items-center justify-center rounded-full border text-xs font-medium"
+              aria-hidden="true"
+            >
+              {initials || "?"}
             </div>
             <div className="hidden text-left lg:block">
-              <div className="text-xs leading-none font-semibold">Admin</div>
-              <div className="text-muted-foreground text-[10px]">admin@demo.com</div>
+              <div className="flex items-center gap-1.5 text-xs leading-none font-semibold">
+                {user?.full_name}
+                <Badge variant="outline" className="h-4 px-1 py-0 text-[10px] capitalize">
+                  {user?.role}
+                </Badge>
+              </div>
+              <div className="text-muted-foreground text-[10px]">{user?.email}</div>
             </div>
           </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void signOut()}
+            className="text-muted-foreground hover:text-foreground gap-1.5"
+          >
+            <LogOut className="size-3.5" />
+            <span className="hidden sm:inline">Sign out</span>
+          </Button>
 
           {/* Mobile hamburger menu */}
           <Button
@@ -126,7 +162,7 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
       {/* Mobile drawer / dropdown */}
       {mobileMenuOpen && (
         <div className="border-border bg-background animate-in slide-in-from-top-2 space-y-1 border-t px-4 py-3 shadow-lg md:hidden">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (

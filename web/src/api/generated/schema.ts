@@ -4,6 +4,27 @@
  */
 
 export interface paths {
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register Organization and First Admin
+         * @description Create a new organization and its first admin user, then sign them in.
+         *     Tokens are set as httpOnly cookies; the body carries identity only.
+         */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -15,9 +36,50 @@ export interface paths {
         put?: never;
         /**
          * User Login
-         * @description Authenticate user credentials and return JWT access token with user profile.
+         * @description Authenticate user credentials. The access and refresh tokens are set as httpOnly
+         *     cookies and are never returned in the body. Rate limited per IP.
          */
         post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Access Token
+         * @description Issue a new access token from the httpOnly refresh cookie.
+         */
+        post: operations["refreshSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Expire the auth cookies.
+         */
+        post: operations["logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -442,12 +504,41 @@ export interface components {
             /** @example SecretPass123! */
             password: string;
         };
-        AuthTokenResponse: {
-            /** @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... */
-            access_token: string;
-            /** @example Bearer */
+        /** @description FastAPI error body. `detail` is a message, or a list of field errors for 422. */
+        DetailError: {
+            detail: string | {
+                loc?: (string | number)[];
+                msg?: string;
+                type?: string;
+            }[];
+        };
+        RegisterRequest: {
+            /** @example Acme Corp */
+            org_name: string;
+            /** @example acme-corp */
+            org_slug: string;
+            /** @example Sarah Jenkins */
+            admin_full_name: string;
+            /**
+             * Format: email
+             * @example sarah@acme.com
+             */
+            admin_email: string;
+            /** @example SecretPass123! */
+            admin_password: string;
+        };
+        /** @description Identity of the signed-in user. Tokens are only ever sent as httpOnly cookies. */
+        TokenResponse: {
+            /** @example bearer */
             token_type: string;
-            user: components["schemas"]["UserProfileResponse"];
+            /** Format: uuid */
+            user_id: string;
+            /** Format: uuid */
+            org_id: string;
+            /** @enum {string} */
+            role: "admin" | "recruiter" | "viewer";
+            /** @example Tokens issued via httpOnly cookies */
+            message: string;
         };
         UserProfileResponse: {
             /**
@@ -469,6 +560,8 @@ export interface components {
              * @enum {string}
              */
             role: "admin" | "recruiter" | "viewer";
+            /** @example true */
+            is_active: boolean;
         };
         OrganizationResponse: {
             /**
@@ -987,6 +1080,48 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description Organization created and admin signed in */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Organization slug or email already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+        };
+    };
     login: {
         parameters: {
             query?: never;
@@ -1006,10 +1141,97 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthTokenResponse"];
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
-            401: components["responses"]["401Unauthorized"];
+            /** @description Incorrect email or password */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+            /** @description Too many login attempts */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+        };
+    };
+    refreshSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session refreshed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Missing, invalid or expired refresh token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Logged out */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example Logged out successfully */
+                        message?: string;
+                    };
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
         };
     };
     getCurrentUser: {
@@ -1030,7 +1252,15 @@ export interface operations {
                     "application/json": components["schemas"]["UserProfileResponse"];
                 };
             };
-            401: components["responses"]["401Unauthorized"];
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailError"];
+                };
+            };
         };
     };
     getOrganization: {
