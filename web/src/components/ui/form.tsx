@@ -98,22 +98,24 @@ const FormLabel = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<H
 );
 FormLabel.displayName = "FormLabel";
 
-const FormControl = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ ...props }, ref) => {
-    const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+/**
+ * Wires the control (its only child) to the surrounding label and messages: the `id` the
+ * `<FormLabel htmlFor>` points at, plus `aria-describedby` / `aria-invalid`. The attributes go
+ * on the control itself — not a wrapper — so the label actually names the input.
+ */
+const FormControl = ({
+  children,
+}: {
+  children: React.ReactElement<React.HTMLAttributes<HTMLElement>>;
+}) => {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
-    return (
-      <div
-        ref={ref}
-        id={formItemId}
-        aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
-        aria-invalid={!!error}
-        {...props}
-      />
-    );
-  }
-);
-FormControl.displayName = "FormControl";
+  return React.cloneElement(children, {
+    id: formItemId,
+    "aria-describedby": !error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`,
+    "aria-invalid": !!error,
+  });
+};
 
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,

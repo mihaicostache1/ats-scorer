@@ -15,6 +15,8 @@ import {
   Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import type { Action } from "@/lib/permissions";
+import { useSession } from "@/providers/session-provider";
 import { cn } from "@/lib/utils";
 
 interface SidebarItem {
@@ -22,10 +24,14 @@ interface SidebarItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
+  /** Hidden unless the signed-in role may perform this action. */
+  requires?: Action;
 }
 
 interface SidebarSection {
   title: string;
+  /** Only shown in development builds. */
+  devOnly?: boolean;
   items: SidebarItem[];
 }
 
@@ -34,7 +40,7 @@ const sections: SidebarSection[] = [
     title: "Overview",
     items: [
       { title: "Dashboard", href: "/", icon: LayoutDashboard },
-      { title: "Job Openings", href: "/#jobs", icon: Briefcase, badge: "20" },
+      { title: "Job Openings", href: "/jobs", icon: Briefcase },
       { title: "Candidates", href: "/#candidates", icon: Users, badge: "48" },
       { title: "Pipeline Stages", href: "/#pipeline", icon: Layers },
     ],
@@ -42,13 +48,14 @@ const sections: SidebarSection[] = [
   {
     title: "Compliance & AI",
     items: [
-      { title: "Audit Trail", href: "/#audit", icon: ShieldAlert },
+      { title: "Audit Trail", href: "/#audit", icon: ShieldAlert, requires: "audit:read" },
       { title: "Consent Records", href: "/#consent", icon: FileCheck2 },
       { title: "Vector Embeddings", href: "/#vectors", icon: Database },
     ],
   },
   {
     title: "Developer Tools",
+    devOnly: true,
     items: [
       {
         title: "Component Library",
@@ -73,6 +80,14 @@ export function AppSidebar({
   onItemClick?: () => void;
 }) {
   const pathname = usePathname();
+  const { can } = useSession();
+  const visibleSections = sections
+    .filter((section) => !section.devOnly || process.env.NODE_ENV === "development")
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => !item.requires || can(item.requires)),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <aside
@@ -83,7 +98,7 @@ export function AppSidebar({
       aria-label="Sidebar navigation"
     >
       <div className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
-        {sections.map((section) => (
+        {visibleSections.map((section) => (
           <div key={section.title} className="space-y-1">
             <h4 className="text-muted-foreground/80 px-3 text-[11px] font-semibold tracking-wider uppercase">
               {section.title}
@@ -92,7 +107,7 @@ export function AppSidebar({
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isExternal = item.href.startsWith("http");
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                 const content = (
                   <div
