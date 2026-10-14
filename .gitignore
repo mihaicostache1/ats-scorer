@@ -2,3 +2,5 @@
 __pycache__/
 .venv/
 node_modules/
+# Uploaded CV files (local-disk storage in development)
+api/storage/

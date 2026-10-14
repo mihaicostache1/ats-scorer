@@ -1,7 +1,8 @@
 """Pytest Configuration and Shared Test Fixtures."""
 
 import uuid
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
+from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -9,6 +10,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
+from app.core.security import create_access_token
 from app.main import app
 from app.models import Base
 from app.models.application import Application
@@ -17,6 +19,8 @@ from app.models.job import Job
 from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
+from app.services.pipeline_service import seed_default_stages
+from app.services.storage import LocalDiskStorage, get_storage
 
 
 @pytest.fixture
@@ -166,3 +170,61 @@ def test_application(
     db_session.commit()
     db_session.refresh(application)
     return application
+
+
+@pytest.fixture
+def committed_db(db_engine) -> Generator[Session, None, None]:
+    """Session that really commits, for data the app's own request sessions must see.
+
+    Unlike ``db_session`` it is not rolled back; ``db_engine`` drops the tables afterwards.
+    """
+    session = Session(db_engine, expire_on_commit=False)
+    yield session
+    session.close()
+
+
+@pytest.fixture
+def create_user(committed_db: Session) -> Callable[..., User]:
+    """Factory committing a user, in a brand-new organization unless ``org_id`` is given."""
+
+    def _create(role: str = "admin", org_id: uuid.UUID | None = None) -> User:
+        suffix = uuid.uuid4().hex[:8]
+        if org_id is None:
+            org = Organization(id=uuid.uuid4(), name=f"Org {suffix}", slug=f"org-{suffix}")
+            committed_db.add(org)
+            committed_db.flush()
+            seed_default_stages(committed_db, org.id)
+            org_id = org.id
+        user = User(
+            id=uuid.uuid4(),
+            org_id=org_id,
+            email=f"{role}-{suffix}@example.com",
+            hashed_password="hashed_password",
+            full_name=f"{role.title()} {suffix}",
+            role=role,
+        )
+        committed_db.add(user)
+        committed_db.commit()
+        return user
+
+    return _create
+
+
+@pytest.fixture(autouse=True)
+def cv_storage(tmp_path: Path) -> Generator[LocalDiskStorage, None, None]:
+    """Point the app's file storage at a temporary directory for every test."""
+    storage = LocalDiskStorage(tmp_path / "storage")
+    app.dependency_overrides[get_storage] = lambda: storage
+    yield storage
+    app.dependency_overrides.pop(get_storage, None)
+
+
+@pytest.fixture
+def login_as(async_client: AsyncClient) -> Callable[[User], None]:
+    """Authenticate ``async_client`` as the given user via the access-token cookie."""
+
+    def _login(user: User) -> None:
+        token = create_access_token(user_id=str(user.id), org_id=str(user.org_id), role=user.role)
+        async_client.cookies.set(settings.ACCESS_COOKIE_NAME, token)
+
+    return _login

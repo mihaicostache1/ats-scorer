@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     # Rate limiting – login endpoint
     LOGIN_RATE_LIMIT: str = "10/minute"
 
+    # File storage (local disk in development). Must not be a publicly served directory.
+    STORAGE_LOCAL_DIR: str = Field(default="storage", alias="STORAGE_LOCAL_DIR")
+    MAX_CV_SIZE_BYTES: int = 10 * 1024 * 1024
+
     # Logging Settings
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
 

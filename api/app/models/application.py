@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
+    from app.models.application_stage_history import ApplicationStageHistory
     from app.models.candidate import Candidate
     from app.models.job import Job
     from app.models.pipeline_stage import PipelineStage
@@ -69,4 +70,7 @@ class Application(Base):
     stage: Mapped["PipelineStage"] = relationship("PipelineStage", back_populates="applications")
     scores: Mapped[list["Score"]] = relationship(
         "Score", back_populates="application", cascade="all, delete-orphan"
+    )
+    stage_history: Mapped[list["ApplicationStageHistory"]] = relationship(
+        "ApplicationStageHistory", back_populates="application", cascade="all, delete-orphan"
     )

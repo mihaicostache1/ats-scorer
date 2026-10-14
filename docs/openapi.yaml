@@ -67,7 +67,9 @@ paths:
   /jobs:
     get:
       summary: List Jobs
-      description: Retrieve paginated list of job postings for the current organization.
+      description: |
+        Retrieve paginated list of job postings for the current organization.
+        Archived jobs are excluded unless `status=archived` is requested.
       operationId: listJobs
       security:
         - BearerAuth: []
@@ -78,16 +80,40 @@ paths:
           schema:
             type: string
             enum: [draft, open, paused, closed, archived]
+        - name: search
+          in: query
+          required: false
+          description: Case-insensitive substring match on title, department and location.
+          schema:
+            type: string
+            maxLength: 255
         - name: page
           in: query
           schema:
             type: integer
+            minimum: 1
             default: 1
         - name: per_page
           in: query
           schema:
             type: integer
+            minimum: 1
+            maximum: 100
             default: 20
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [created_at, updated_at, title, status]
+            default: created_at
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         '200':
           description: Paginated job postings list
@@ -95,10 +121,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedJobsResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
 
     post:
       summary: Create Job Posting
-      description: Create a new job posting with ESCO required and preferred skills.
+      description: |
+        Create a new job posting with ESCO required and preferred skills.
+        The job starts in `draft`. Requires the `admin` or `recruiter` role.
       operationId: createJob
       security:
         - BearerAuth: []
@@ -115,6 +145,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
 
   /jobs/{id}:
     get:
@@ -132,13 +166,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    patch:
+      summary: Update Job Posting
+      description: |
+        Partially update a job posting; omitted fields are left unchanged.
+        Status is changed through `/jobs/{id}/status` and `/jobs/{id}/archive`.
+        Requires the `admin` or `recruiter` role.
+      operationId: updateJob
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobRequest'
+      responses:
+        '200':
+          description: Updated job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /jobs/{id}/status:
+    patch:
+      summary: Change Job Status
+      description: |
+        Move a job posting to `draft`, `open` or `closed`.
+        Requires the `admin` or `recruiter` role.
+      operationId: updateJobStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobStatusRequest'
+      responses:
+        '200':
+          description: Job posting with the new status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /jobs/{id}/archive:
+    post:
+      summary: Archive Job Posting
+      description: |
+        Set a job posting's status to `archived`, hiding it from the default job list.
+        Idempotent. Requires the `admin` or `recruiter` role.
+      operationId: archiveJob
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: Archived job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
           $ref: '#/components/responses/404NotFound'
 
   /jobs/{id}/stages:
     get:
       summary: Get Job Pipeline Stages
-      description: Retrieve ordered pipeline stages for a specific job.
+      description: |
+        Retrieve the ordered pipeline stages for a job: the job's own stages,
+        or the organization's default stages (`job_id` null) when it has none.
       operationId: getJobStages
       security:
         - BearerAuth: []
@@ -153,6 +277,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PipelineStageResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
   /candidates:
     get:
@@ -165,18 +293,37 @@ paths:
         - name: search
           in: query
           required: false
+          description: Case-insensitive substring match on name and email.
           schema:
             type: string
+            maxLength: 255
         - name: page
           in: query
           schema:
             type: integer
+            minimum: 1
             default: 1
         - name: per_page
           in: query
           schema:
             type: integer
+            minimum: 1
+            maximum: 100
             default: 20
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [created_at, updated_at, full_name, email]
+            default: created_at
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         '200':
           description: Paginated candidate list
@@ -184,45 +331,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCandidatesResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
 
-  /candidates/upload:
     post:
-      summary: Upload & Parse PDF CV
-      description: Upload PDF CV file with automatic parsing, OCR fallback, and structured data extraction.
-      operationId: uploadCandidateCV
+      summary: Add Candidate
+      description: |
+        Add a candidate to the organization. `consent_given_at` stays null until
+        consent is recorded. Requires the `admin` or `recruiter` role.
+      operationId: createCandidate
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - file
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: PDF resume file
-                full_name:
-                  type: string
-                  description: Optional override if candidate name is manually provided
-                email:
-                  type: string
-                  format: email
+              $ref: '#/components/schemas/CreateCandidateRequest'
       responses:
         '201':
-          description: CV uploaded and parsed successfully
+          description: Candidate created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CandidateUploadResponse'
+                $ref: '#/components/schemas/CandidateResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '409':
+          $ref: '#/components/responses/409Conflict'
 
   /candidates/{id}:
     get:
       summary: Get Candidate Details
-      description: Retrieve candidate profile, extracted skills, and parsed resume text.
+      description: Retrieve a candidate profile.
       operationId: getCandidate
       security:
         - BearerAuth: []
@@ -230,13 +373,20 @@ paths:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
         '200':
+          description: Candidate details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CandidateResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
     patch:
-      summary: Correct Parsed Candidate Data
-      description: Screen to update/correct extracted skills and candidate fields.
+      summary: Update Candidate
+      description: |
+        Partially update a candidate; omitted fields are left unchanged.
+        Requires the `admin` or `recruiter` role.
       operationId: updateCandidate
       security:
         - BearerAuth: []
@@ -250,13 +400,25 @@ paths:
               $ref: '#/components/schemas/UpdateCandidateRequest'
       responses:
         '200':
+          description: Updated candidate
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CandidateResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409Conflict'
     delete:
       summary: GDPR Hard Delete Candidate
-      description: Permanently purge candidate, CV files, applications, embeddings, and scores.
+      description: |
+        Permanently delete a candidate with their applications, stage history, scores
+        and stored CV files.
+        Requires the `admin` role.
       operationId: hardDeleteCandidate
       security:
         - BearerAuth: []
@@ -265,11 +427,193 @@ paths:
       responses:
         '204':
           description: Candidate permanently deleted
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /candidates/{id}/cv:
+    get:
+      summary: List Candidate CV Documents
+      description: Retrieve the candidate's CV documents with their status, newest first.
+      operationId: listCandidateCvDocuments
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: CV documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    post:
+      summary: Upload PDF CV
+      description: |
+        Upload a PDF CV for a candidate and queue it for processing.
+        The file is checked by its content, not its extension, and may be at most 10 MB.
+        Requires the `admin` or `recruiter` role.
+      operationId: uploadCandidateCV
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF resume file
+      responses:
+        '201':
+          description: CV stored and queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '413':
+          description: The file is larger than 10 MB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '415':
+          description: The file content is not a PDF
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /candidates/{id}/cv/{cv_id}:
+    get:
+      summary: Get CV Document Status
+      description: Retrieve one CV document, including its processing status.
+      operationId: getCandidateCvDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+        - $ref: '#/components/parameters/CvIdPathParam'
+      responses:
+        '200':
+          description: CV document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /candidates/{id}/cv/{cv_id}/download:
+    get:
+      summary: Download CV File
+      description: |
+        Download the stored PDF. Only members of the organization that owns the
+        candidate can download it. Files are not served from any public path.
+      operationId: downloadCandidateCV
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+        - $ref: '#/components/parameters/CvIdPathParam'
+      responses:
+        '200':
+          description: The PDF file, sent as an attachment
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
   /applications:
+    get:
+      summary: List Applications
+      description: Retrieve a paginated list of applications, newest first.
+      operationId: listApplications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: job_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: candidate_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: stage_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, hired, rejected, withdrawn]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated application list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApplicationsResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+
     post:
       summary: Submit Candidate Application
-      description: Link a candidate to a job and trigger AI hybrid score evaluation.
+      description: |
+        Link a candidate to a job. The application starts in the job's first stage.
+        Returns 409 if the candidate already applied to the job, or the job is
+        closed or archived. Requires the `admin` or `recruiter` role.
       operationId: createApplication
       security:
         - BearerAuth: []
@@ -281,15 +625,73 @@ paths:
               $ref: '#/components/schemas/CreateApplicationRequest'
       responses:
         '201':
+          description: Application created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409Conflict'
+
+  /applications/{id}:
+    get:
+      summary: Get Application
+      operationId: getApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: Application details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /applications/{id}/history:
+    get:
+      summary: Get Application Stage History
+      description: |
+        Every stage the application entered, oldest first. The first entry is the
+        initial placement and has a null `from_stage_id`.
+      operationId: getApplicationHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      responses:
+        '200':
+          description: Stage history entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StageHistoryResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
   /applications/{id}/stage:
     patch:
       summary: Move Pipeline Stage (Drag-and-Drop)
-      description: Transition application stage in hiring pipeline. Logged for recruiter ranker dataset.
+      description: |
+        Move an application to another stage of its job's pipeline, with an optional reason.
+        Each move is added to the stage history and recorded as an audit event.
+        Moving to the current stage changes nothing. A stage outside the job's
+        pipeline returns 404. Requires the `admin` or `recruiter` role.
       operationId: updateApplicationStage
       security:
         - BearerAuth: []
@@ -303,10 +705,17 @@ paths:
               $ref: '#/components/schemas/UpdateStageRequest'
       responses:
         '200':
+          description: Application in its new stage
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
   /applications/{id}/score:
     get:
@@ -334,6 +743,14 @@ components:
   parameters:
     UUIDPathParam:
       name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    CvIdPathParam:
+      name: cv_id
       in: path
       required: true
       schema:
@@ -489,7 +906,48 @@ components:
           example: ["Redis", "PyTorch", "Fairlearn"]
         min_experience_years:
           type: integer
+          minimum: 0
           example: 4
+
+    UpdateJobRequest:
+      type: object
+      description: All fields are optional; only the fields sent are changed.
+      properties:
+        title:
+          type: string
+          example: Staff Python Backend Engineer
+        department:
+          type: [string, 'null']
+          example: Engineering
+        location:
+          type: [string, 'null']
+          example: Remote (US/EU)
+        employment_type:
+          type: string
+          example: full_time
+        description:
+          type: string
+        required_skills:
+          type: array
+          items:
+            type: string
+        preferred_skills:
+          type: array
+          items:
+            type: string
+        min_experience_years:
+          type: integer
+          minimum: 0
+
+    UpdateJobStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [draft, open, closed]
+          example: open
 
     JobResponse:
       type: object
@@ -497,10 +955,16 @@ components:
         - id
         - org_id
         - title
+        - department
+        - location
+        - employment_type
         - status
         - description
         - required_skills
+        - preferred_skills
+        - min_experience_years
         - created_at
+        - updated_at
       properties:
         id:
           type: string
@@ -514,16 +978,17 @@ components:
           type: string
           example: Senior Python Backend Engineer
         department:
-          type: string
+          type: [string, 'null']
           example: Engineering
         location:
-          type: string
+          type: [string, 'null']
           example: Remote
         employment_type:
           type: string
           example: full_time
         status:
           type: string
+          enum: [draft, open, paused, closed, archived]
           example: open
         description:
           type: string
@@ -545,6 +1010,10 @@ components:
           type: string
           format: date-time
           example: '2026-10-01T08:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-02T10:30:00Z'
 
     PipelineStageResponse:
       type: object
@@ -564,9 +1033,10 @@ components:
           format: uuid
           example: 123e4567-e89b-12d3-a456-426614174000
         job_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          example: a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+          description: Null for an organization-default stage.
+          example: null
         name:
           type: string
           example: Technical Interview
@@ -577,15 +1047,76 @@ components:
           type: string
           example: interview
 
-    CandidateUploadResponse:
+    CvDocumentResponse:
+      type: object
+      required:
+        - id
+        - org_id
+        - candidate_id
+        - original_filename
+        - content_type
+        - size_bytes
+        - sha256
+        - status
+        - uploaded_by
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+        org_id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        candidate_id:
+          type: string
+          format: uuid
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        original_filename:
+          type: string
+          description: The uploaded file's name, for display only.
+          example: alex-mercer.pdf
+        content_type:
+          type: string
+          example: application/pdf
+        size_bytes:
+          type: integer
+          example: 48211
+        sha256:
+          type: string
+          description: SHA-256 of the file content.
+        status:
+          type: string
+          enum: [queued, extracting, parsed, needs_review, failed]
+          example: queued
+        uploaded_by:
+          type: [string, 'null']
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
+
+    CandidateResponse:
       type: object
       required:
         - id
         - org_id
         - full_name
         - email
-        - ocr_used
+        - phone
+        - location
+        - cv_file_path
         - parsed_data
+        - consent_given_at
+        - created_at
+        - updated_at
       properties:
         id:
           type: string
@@ -602,64 +1133,72 @@ components:
           type: string
           example: alex.mercer@example.com
         phone:
-          type: string
+          type: [string, 'null']
           example: +1-555-0199
         location:
-          type: string
+          type: [string, 'null']
           example: San Francisco, CA
         cv_file_path:
-          type: string
-          example: uploads/org_123/cv_f47ac10b.pdf
-        ocr_used:
-          type: boolean
-          example: false
+          type: [string, 'null']
+          example: null
         parsed_data:
           type: object
-          properties:
-            skills:
-              type: array
-              items:
-                type: string
-              example: ["Python", "FastAPI", "PostgreSQL", "Redis", "Git"]
-            experience_years:
-              type: number
-              example: 5.5
-            education:
-              type: array
-              items:
-                type: string
-              example: ["B.S. Computer Science, UC Berkeley"]
-            work_history:
-              type: array
-              items:
-                type: object
-                properties:
-                  title:
-                    type: string
-                    example: Backend Software Engineer
-                  company:
-                    type: string
-                    example: TechCorp Inc.
-                  years:
-                    type: number
-                    example: 3.5
+        consent_given_at:
+          type: [string, 'null']
+          format: date-time
+          description: When the candidate consented to data processing; null if not recorded.
+          example: '2026-10-01T09:00:00Z'
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:15:00Z'
 
-    CandidateResponse:
-      $ref: '#/components/schemas/CandidateUploadResponse'
+    CreateCandidateRequest:
+      type: object
+      required:
+        - full_name
+        - email
+      properties:
+        full_name:
+          type: string
+          example: Alex Mercer
+        email:
+          type: string
+          format: email
+          description: Stored lowercase; unique per organization.
+          example: alex.mercer@example.com
+        phone:
+          type: [string, 'null']
+          example: +1-555-0199
+        location:
+          type: [string, 'null']
+          example: San Francisco, CA
+        consent_given_at:
+          type: [string, 'null']
+          format: date-time
+          description: Must include a timezone.
+          example: '2026-10-01T09:00:00Z'
 
     UpdateCandidateRequest:
       type: object
+      description: All fields are optional; only the fields sent are changed.
       properties:
         full_name:
           type: string
         email:
           type: string
+          format: email
         phone:
-          type: string
-        skills:
-          type: array
-          items:
-            type: string
+          type: [string, 'null']
+        location:
+          type: [string, 'null']
+        consent_given_at:
+          type: [string, 'null']
+          format: date-time
 
     CreateApplicationRequest:
       type: object
@@ -683,7 +1222,9 @@ components:
         - candidate_id
         - stage_id
         - status
+        - rejection_reason
         - applied_at
+        - updated_at
       properties:
         id:
           type: string
@@ -707,11 +1248,20 @@ components:
           example: c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f
         status:
           type: string
+          enum: [active, hired, rejected, withdrawn]
+          description: Follows the type of the current stage.
           example: active
+        rejection_reason:
+          type: [string, 'null']
+          description: The reason given when the application was moved to a rejected stage.
         applied_at:
           type: string
           format: date-time
           example: '2026-10-01T09:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:17:21Z'
 
     UpdateStageRequest:
       type: object
@@ -721,8 +1271,45 @@ components:
         stage_id:
           type: string
           format: uuid
-        rejection_reason:
+        reason:
+          type: [string, 'null']
+          maxLength: 2000
+          description: Optional reason for the move, stored in the stage history.
+
+    StageHistoryResponse:
+      type: object
+      required:
+        - id
+        - application_id
+        - from_stage_id
+        - to_stage_id
+        - reason
+        - moved_by
+        - moved_at
+      properties:
+        id:
           type: string
+          format: uuid
+        application_id:
+          type: string
+          format: uuid
+        from_stage_id:
+          type: [string, 'null']
+          format: uuid
+          description: Null for the initial placement.
+        to_stage_id:
+          type: string
+          format: uuid
+        reason:
+          type: [string, 'null']
+        moved_by:
+          type: [string, 'null']
+          format: uuid
+          description: The user who made the move.
+        moved_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T09:17:21Z'
 
     ScoreResponse:
       type: object
@@ -814,6 +1401,19 @@ components:
         pagination:
           $ref: '#/components/schemas/PaginationMeta'
 
+    PaginatedApplicationsResponse:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
     PaginationMeta:
       type: object
       required:
@@ -858,6 +1458,20 @@ components:
               timestamp: '2026-10-01T09:17:21Z'
               request_id: req_auth_01
 
+    403Forbidden:
+      description: Authenticated user's role lacks the required permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: FORBIDDEN
+              message: Your role does not allow this action.
+              details: []
+              timestamp: '2026-10-01T09:17:21Z'
+              request_id: req_403_03
+
     404NotFound:
       description: Requested resource was not found
       content:
@@ -871,3 +1485,17 @@ components:
               details: []
               timestamp: '2026-10-01T09:17:21Z'
               request_id: req_404_02
+
+    409Conflict:
+      description: The request conflicts with existing data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error:
+              code: CONFLICT
+              message: This candidate already has an application for this job.
+              details: []
+              timestamp: '2026-10-01T09:17:21Z'
+              request_id: req_409_04
