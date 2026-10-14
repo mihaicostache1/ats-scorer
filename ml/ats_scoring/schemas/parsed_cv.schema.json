@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parsed CV",
+  "description": "Draft 0.1. Structured data extracted from one CV, stored in candidates.parsed_data. Name and contact details are not part of it: they stay in their own candidate columns.",
+  "type": "object",
+  "required": ["skills"],
+  "properties": {
+    "schema_version": {
+      "description": "Version of this schema the record was written with. The parser always writes it. Add a version to the list when a change keeps older records valid; a breaking change gets a new schema file instead.",
+      "enum": ["0.1"]
+    },
+    "headline": {
+      "description": "Current or most recent job title.",
+      "type": ["string", "null"]
+    },
+    "summary": {
+      "description": "The candidate's own profile or summary paragraph.",
+      "type": ["string", "null"]
+    },
+    "skills": {
+      "description": "Skills as written in the CV, one per entry. May be empty.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "experience_years": {
+      "description": "Total years of work experience.",
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "work_history": {
+      "description": "Positions held, most recent first.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/position" }
+    },
+    "education": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/education" }
+    },
+    "languages": {
+      "description": "Spoken languages, each with its level if given, e.g. 'German (B2)'.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "certifications": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "year_month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+    },
+    "position": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "company": { "type": ["string", "null"] },
+        "start": {
+          "description": "First month in the position, as YYYY-MM.",
+          "anyOf": [{ "$ref": "#/$defs/year_month" }, { "type": "null" }]
+        },
+        "end": {
+          "description": "Last month in the position, as YYYY-MM. null means the position is current. Leave the field out if unknown.",
+          "anyOf": [{ "$ref": "#/$defs/year_month" }, { "type": "null" }]
+        },
+        "years": {
+          "description": "Length of the position in years.",
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "summary": {
+          "description": "One-sentence description of the work.",
+          "type": ["string", "null"]
+        },
+        "bullets": {
+          "description": "Achievements or responsibilities, one per entry.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "education": {
+      "type": "object",
+      "required": ["degree"],
+      "properties": {
+        "degree": { "type": "string", "minLength": 1 },
+        "institution": { "type": ["string", "null"] },
+        "grad_year": { "type": ["integer", "null"], "minimum": 1950, "maximum": 2100 }
+      },
+      "additionalProperties": true
+    }
+  }
+}
