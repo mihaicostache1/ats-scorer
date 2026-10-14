@@ -1,7 +1,9 @@
 import type { components } from "@/api/generated/schema";
 import { MOCK_ORG_ID } from "./auth";
 
-export const mockJobs: components["schemas"]["JobResponse"][] = [
+type JobResponse = components["schemas"]["JobResponse"];
+
+const seedJobs: JobResponse[] = [
   {
     id: "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
     org_id: MOCK_ORG_ID,
@@ -96,6 +98,235 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     updated_at: "2026-10-05T08:00:00Z",
   },
 ];
+
+/** Compact rows: title, department, location, employment type, status, skills, min years, created. */
+type JobRow = [
+  string,
+  string,
+  string | null,
+  string,
+  JobResponse["status"],
+  string[],
+  number,
+  string,
+];
+
+const moreJobRows: JobRow[] = [
+  [
+    "Senior Backend Engineer",
+    "Engineering",
+    "Remote (US/EU)",
+    "full_time",
+    "open",
+    ["Python", "FastAPI", "PostgreSQL"],
+    5,
+    "2026-10-01",
+  ],
+  [
+    "Product Designer",
+    "Design",
+    "San Francisco, CA",
+    "full_time",
+    "open",
+    ["Figma", "Prototyping", "User Research"],
+    4,
+    "2026-09-28",
+  ],
+  [
+    "Data Scientist",
+    "AI & Analytics",
+    "Remote (EU)",
+    "contract",
+    "draft",
+    ["Python", "SQL", "scikit-learn"],
+    3,
+    "2026-09-25",
+  ],
+  [
+    "QA Automation Engineer",
+    "Engineering",
+    "Berlin, Germany",
+    "full_time",
+    "open",
+    ["Playwright", "TypeScript", "CI/CD"],
+    3,
+    "2026-09-24",
+  ],
+  [
+    "Customer Success Manager",
+    "Sales",
+    "Austin, TX",
+    "full_time",
+    "open",
+    ["Onboarding", "CRM", "Account Management"],
+    3,
+    "2026-09-22",
+  ],
+  [
+    "Security Engineer",
+    "Engineering",
+    "Remote",
+    "full_time",
+    "paused",
+    ["AppSec", "Threat Modeling", "AWS"],
+    6,
+    "2026-09-20",
+  ],
+  [
+    "Technical Recruiter",
+    "People",
+    "London, UK",
+    "full_time",
+    "open",
+    ["Sourcing", "Interviewing", "ATS tooling"],
+    2,
+    "2026-09-18",
+  ],
+  [
+    "Mobile Engineer (React Native)",
+    "Engineering",
+    "Remote (US)",
+    "full_time",
+    "open",
+    ["React Native", "TypeScript", "iOS"],
+    4,
+    "2026-09-15",
+  ],
+  [
+    "Sales Development Representative",
+    "Sales",
+    "New York, NY",
+    "full_time",
+    "closed",
+    ["Outbound", "Salesforce"],
+    1,
+    "2026-09-12",
+  ],
+  [
+    "UX Researcher",
+    "Design",
+    "Amsterdam, Netherlands",
+    "contract",
+    "open",
+    ["Interviews", "Usability Testing", "Synthesis"],
+    3,
+    "2026-09-10",
+  ],
+  [
+    "Site Reliability Engineer",
+    "Operations",
+    "Dublin, Ireland",
+    "full_time",
+    "open",
+    ["Kubernetes", "Prometheus", "Terraform"],
+    5,
+    "2026-09-08",
+  ],
+  [
+    "Analytics Engineer",
+    "Data Engineering",
+    "Remote (EU)",
+    "full_time",
+    "draft",
+    ["dbt", "SQL", "Snowflake"],
+    3,
+    "2026-09-05",
+  ],
+  [
+    "Engineering Manager",
+    "Engineering",
+    "Toronto, Canada",
+    "full_time",
+    "open",
+    ["People Management", "Delivery", "Python"],
+    7,
+    "2026-09-03",
+  ],
+  [
+    "Content Designer",
+    "Design",
+    null,
+    "part_time",
+    "paused",
+    ["UX Writing", "Content Strategy"],
+    2,
+    "2026-09-01",
+  ],
+  [
+    "Machine Learning Engineer",
+    "AI & Research",
+    "Remote",
+    "full_time",
+    "open",
+    ["PyTorch", "MLOps", "Python"],
+    4,
+    "2026-08-29",
+  ],
+  [
+    "Finance Analyst",
+    "Finance",
+    "Chicago, IL",
+    "full_time",
+    "closed",
+    ["Excel", "Forecasting", "SQL"],
+    2,
+    "2026-08-26",
+  ],
+  [
+    "Solutions Architect",
+    "Sales",
+    "Remote (US)",
+    "full_time",
+    "open",
+    ["Cloud Architecture", "Pre-sales", "APIs"],
+    6,
+    "2026-08-22",
+  ],
+  [
+    "Junior Frontend Developer",
+    "Engineering",
+    "Warsaw, Poland",
+    "internship",
+    "open",
+    ["React", "CSS", "Git"],
+    0,
+    "2026-08-19",
+  ],
+  [
+    "Legal Counsel",
+    "Legal",
+    "London, UK",
+    "full_time",
+    "closed",
+    ["Contract Law", "GDPR"],
+    5,
+    "2026-08-14",
+  ],
+];
+
+const extraJobs: JobResponse[] = moreJobRows.map(
+  (
+    [title, department, location, employment_type, status, skills, min_experience_years, day],
+    i
+  ) => ({
+    id: `00000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`,
+    org_id: MOCK_ORG_ID,
+    title,
+    department,
+    location,
+    employment_type,
+    status,
+    description: `We are hiring a ${title} to join the ${department} team.`,
+    required_skills: skills,
+    preferred_skills: [],
+    min_experience_years,
+    created_at: `${day}T09:00:00Z`,
+    updated_at: `${day}T09:00:00Z`,
+  })
+);
+
+/** 6 hand-written jobs + 19 generated ones = 25, so lists paginate at 10 per page. */
+export const mockJobs: JobResponse[] = [...seedJobs, ...extraJobs];
 
 /** Organization-default pipeline stages (job_id null), mirroring the API's DEFAULT_STAGES. */
 export const mockPipelineStages: components["schemas"]["PipelineStageResponse"][] = [

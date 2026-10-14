@@ -23,6 +23,7 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: Briefcase },
+  { label: "Jobs", href: "/jobs", icon: Briefcase },
   { label: "Candidates", href: "/#candidates", icon: Users },
   { label: "Audit Logs", href: "/#audit", icon: Shield, requires: "audit:read" },
   { label: "Design System", href: "/dev/components", icon: Sparkles, badge: "UI", devOnly: true },
@@ -82,7 +83,8 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
         <nav className="hidden items-center space-x-1 md:flex" aria-label="Main Navigation">
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive =
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
                 key={item.href}
@@ -164,7 +166,8 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
         <div className="border-border bg-background animate-in slide-in-from-top-2 space-y-1 border-t px-4 py-3 shadow-lg md:hidden">
           {visibleNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive =
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
                 key={item.href}

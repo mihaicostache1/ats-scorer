@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { delay, http, HttpResponse } from "msw";
 import { mockJobs, mockPipelineStages } from "../fixtures/jobs";
 import { MOCK_ORG_ID } from "../fixtures/auth";
 import type { components } from "@/api/generated/schema";
@@ -22,7 +22,8 @@ export const jobHandlers = [
    * Supports ?status=, ?search=, sorting and pagination. Archived jobs are hidden
    * unless ?status=archived is requested.
    */
-  http.get(`${BASE}/jobs`, ({ request }) => {
+  http.get(`${BASE}/jobs`, async ({ request }) => {
+    await delay(300); // realistic latency so loading states are visible
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
     const search = url.searchParams.get("search")?.toLowerCase() ?? "";

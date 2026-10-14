@@ -40,7 +40,7 @@ const sections: SidebarSection[] = [
     title: "Overview",
     items: [
       { title: "Dashboard", href: "/", icon: LayoutDashboard },
-      { title: "Job Openings", href: "/#jobs", icon: Briefcase, badge: "20" },
+      { title: "Job Openings", href: "/jobs", icon: Briefcase },
       { title: "Candidates", href: "/#candidates", icon: Users, badge: "48" },
       { title: "Pipeline Stages", href: "/#pipeline", icon: Layers },
     ],
@@ -107,7 +107,7 @@ export function AppSidebar({
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isExternal = item.href.startsWith("http");
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                 const content = (
                   <div
