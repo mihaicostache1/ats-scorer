@@ -39,8 +39,11 @@ npm run lint
 npm run typecheck        # runs `next typegen && tsc --noEmit`
 npm run format           # prettier (with tailwind plugin)
 npm run gen:api          # regenerate src/api/generated/schema.ts from ../docs/openapi.yaml
+npm test                 # Vitest + React Testing Library (src/**/*.test.tsx)
+npx vitest run src/components/common/pagination.test.tsx   # a single test file
+npm run test:e2e         # Playwright smoke test (e2e/), builds with mocks and serves on :3100
 ```
-CI runs lint + typecheck only; there is no web test runner yet.
+Both test layers run in CI (`web` and `web e2e` jobs, no API/DB needed). First time only: `npx playwright install chromium`. The e2e test depends on mock fixtures (`admin@demo.com`, 25 jobs); details in `web/README.md#testing`. Pinned for Node 20 (CI): `vitest@4`, `jsdom@27`, `@testing-library/jest-dom@6.6` — newer majors need Node 22+.
 
 `web/AGENTS.md` (imported by `web/CLAUDE.md`) warns that this Next.js version has breaking changes — consult `web/node_modules/next/dist/docs/` before writing Next.js code.
 
