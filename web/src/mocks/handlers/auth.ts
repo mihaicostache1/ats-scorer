@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { mockAuthTokenResponse, mockUser, MOCK_ACCESS_TOKEN } from "../fixtures/auth";
+import { mockAuthTokenResponse, mockOrg, mockUser, MOCK_ACCESS_TOKEN } from "../fixtures/auth";
 import type { components } from "@/api/generated/schema";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
@@ -63,7 +63,6 @@ export const authHandlers = [
    */
   http.get(`${BASE}/orgs/current`, ({ request }) => {
     if (!isAuthenticated(request)) return unauthorizedResponse();
-    const { mockOrg } = require("../fixtures/auth");
     return HttpResponse.json(mockOrg satisfies components["schemas"]["OrganizationResponse"]);
   }),
 ];

@@ -1,5 +1,5 @@
 import type { components } from "@/api/generated/schema";
-import { MOCK_ORG_ID } from "./auth";
+import { MOCK_ORG_ID, MOCK_USER_ID } from "./auth";
 
 type CandidateResponse = components["schemas"]["CandidateResponse"];
 
@@ -11,8 +11,10 @@ export const mockCandidates: CandidateResponse[] = [
     email: "alex.mercer@example.com",
     phone: "+1-555-0199",
     location: "San Francisco, CA",
-    cv_file_path: "uploads/acme-corp/cv_f47ac10b.pdf",
-    ocr_used: false,
+    cv_file_path: null,
+    consent_given_at: "2026-10-01T09:00:00Z",
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:15:00Z",
     parsed_data: {
       skills: ["Python", "FastAPI", "PostgreSQL", "Redis", "Git", "Docker"],
       experience_years: 5.5,
@@ -30,8 +32,10 @@ export const mockCandidates: CandidateResponse[] = [
     email: "priya.nair@example.com",
     phone: "+44-7700-900123",
     location: "London, UK",
-    cv_file_path: "uploads/acme-corp/cv_a2b3c4d5.pdf",
-    ocr_used: false,
+    cv_file_path: null,
+    consent_given_at: "2026-10-01T09:00:00Z",
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:15:00Z",
     parsed_data: {
       skills: ["TypeScript", "React", "Next.js", "Tailwind CSS", "Playwright", "Figma"],
       experience_years: 7.0,
@@ -49,8 +53,10 @@ export const mockCandidates: CandidateResponse[] = [
     email: "d.okonkwo@example.com",
     phone: "+1-555-0247",
     location: "New York, NY",
-    cv_file_path: "uploads/acme-corp/cv_b3c4d5e6.pdf",
-    ocr_used: true,
+    cv_file_path: null,
+    consent_given_at: "2026-10-01T09:00:00Z",
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:15:00Z",
     parsed_data: {
       skills: ["Python", "PyTorch", "scikit-learn", "NLP", "Fairlearn", "MLflow"],
       experience_years: 6.0,
@@ -71,8 +77,10 @@ export const mockCandidates: CandidateResponse[] = [
     email: "emilia.santos@example.com",
     phone: "+55-11-98765-4321",
     location: "São Paulo, Brazil",
-    cv_file_path: "uploads/acme-corp/cv_c4d5e6f7.pdf",
-    ocr_used: false,
+    cv_file_path: null,
+    consent_given_at: "2026-10-01T09:00:00Z",
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:15:00Z",
     parsed_data: {
       skills: ["Kubernetes", "Terraform", "AWS", "Docker", "Datadog", "ArgoCD"],
       experience_years: 8.0,
@@ -90,15 +98,15 @@ export const mockCandidates: CandidateResponse[] = [
     email: "jordan.kim@example.com",
     phone: "+82-10-9876-5432",
     location: "Seoul, South Korea",
-    cv_file_path: "uploads/acme-corp/cv_d5e6f7a8.pdf",
-    ocr_used: false,
+    cv_file_path: null,
+    consent_given_at: "2026-10-01T09:00:00Z",
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:15:00Z",
     parsed_data: {
       skills: ["Apache Kafka", "dbt", "Spark", "Python", "Iceberg", "Airflow"],
       experience_years: 4.5,
       education: ["B.Sc. Data Science, KAIST"],
-      work_history: [
-        { title: "Data Engineer", company: "E-Commerce Giant", years: 4.5 },
-      ],
+      work_history: [{ title: "Data Engineer", company: "E-Commerce Giant", years: 4.5 }],
     },
   },
 ];
@@ -114,3 +122,48 @@ export const mockPaginatedCandidates: components["schemas"]["PaginatedCandidates
     has_prev: false,
   },
 };
+
+type CvDocumentResponse = components["schemas"]["CvDocumentResponse"];
+
+/** CV documents for the first three candidates, in the three most common processing states. */
+export const mockCvDocuments: CvDocumentResponse[] = [
+  {
+    id: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    org_id: MOCK_ORG_ID,
+    candidate_id: mockCandidates[0].id,
+    original_filename: "alex-mercer.pdf",
+    content_type: "application/pdf",
+    size_bytes: 48211,
+    sha256: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+    status: "parsed",
+    uploaded_by: MOCK_USER_ID,
+    created_at: "2026-10-01T09:15:00Z",
+    updated_at: "2026-10-01T09:16:10Z",
+  },
+  {
+    id: "7c9e6679-7425-40de-944b-e07fc1f90ae8",
+    org_id: MOCK_ORG_ID,
+    candidate_id: mockCandidates[1].id,
+    original_filename: "priya-nair-cv.pdf",
+    content_type: "application/pdf",
+    size_bytes: 91734,
+    sha256: "60303ae22b998861bce3b28f33eec1be758a213c86c93c076dbe9f558c11c752",
+    status: "parsed",
+    uploaded_by: MOCK_USER_ID,
+    created_at: "2026-10-02T11:40:00Z",
+    updated_at: "2026-10-02T11:41:05Z",
+  },
+  {
+    id: "7c9e6679-7425-40de-944b-e07fc1f90ae9",
+    org_id: MOCK_ORG_ID,
+    candidate_id: mockCandidates[2].id,
+    original_filename: "okonkwo_scan.pdf",
+    content_type: "application/pdf",
+    size_bytes: 1204557,
+    sha256: "fd61a03af4f77d870fc21e05e7e80678095c92d808cfb3b5c279ee04c74aac13",
+    status: "needs_review",
+    uploaded_by: MOCK_USER_ID,
+    created_at: "2026-10-03T15:05:00Z",
+    updated_at: "2026-10-03T15:07:30Z",
+  },
+];

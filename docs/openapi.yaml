@@ -1143,6 +1143,7 @@ components:
           example: null
         parsed_data:
           type: object
+          additionalProperties: true
         consent_given_at:
           type: [string, 'null']
           format: date-time
@@ -1365,6 +1366,8 @@ components:
               example: ["Docker"]
             weights:
               type: object
+              additionalProperties:
+                type: number
               example: {"skill_overlap": 0.4, "semantic": 0.3, "experience": 0.2, "title_fit": 0.1}
             explanations:
               type: array

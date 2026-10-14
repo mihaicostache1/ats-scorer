@@ -1,5 +1,5 @@
 import type { components } from "@/api/generated/schema";
-import { MOCK_ORG_ID } from "./auth";
+import { MOCK_ORG_ID, MOCK_USER_ID } from "./auth";
 import { mockJobs, mockPipelineStages } from "./jobs";
 import { mockCandidates } from "./candidates";
 
@@ -13,18 +13,22 @@ export const mockApplications: ApplicationResponse[] = [
     org_id: MOCK_ORG_ID,
     job_id: mockJobs[0].id,
     candidate_id: mockCandidates[0].id,
-    stage_id: mockPipelineStages[1].id, // Screening
+    stage_id: mockPipelineStages[1].id, // Shortlisted
     status: "active",
+    rejection_reason: null,
     applied_at: "2026-10-05T09:00:00Z",
+    updated_at: "2026-10-05T09:00:00Z",
   },
   {
     id: "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5d",
     org_id: MOCK_ORG_ID,
     job_id: mockJobs[0].id,
     candidate_id: mockCandidates[2].id,
-    stage_id: mockPipelineStages[2].id, // Technical Interview
+    stage_id: mockPipelineStages[2].id, // Interview
     status: "active",
+    rejection_reason: null,
     applied_at: "2026-10-04T14:30:00Z",
+    updated_at: "2026-10-04T14:30:00Z",
   },
   {
     id: "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5e",
@@ -33,7 +37,9 @@ export const mockApplications: ApplicationResponse[] = [
     candidate_id: mockCandidates[1].id,
     stage_id: mockPipelineStages[0].id, // Applied
     status: "active",
+    rejection_reason: null,
     applied_at: "2026-10-06T10:00:00Z",
+    updated_at: "2026-10-06T10:00:00Z",
   },
 ];
 
@@ -51,7 +57,7 @@ export const mockScores: Record<string, ScoreResponse> = {
     component_breakdown: {
       matched_skills: ["Python", "FastAPI", "PostgreSQL", "Docker"],
       missing_skills: [],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 } as unknown as Record<string, never>,
+      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
       explanations: [
         "Candidate matched 4 of 4 required skills (100%).",
         "Vector semantic similarity cosine distance is 0.85.",
@@ -72,7 +78,7 @@ export const mockScores: Record<string, ScoreResponse> = {
     component_breakdown: {
       matched_skills: ["Python", "PyTorch", "scikit-learn"],
       missing_skills: ["FastAPI", "Docker"],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 } as unknown as Record<string, never>,
+      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
       explanations: [
         "Candidate matched 3 of 4 required skills (75%).",
         "Vector semantic similarity cosine distance is 0.82.",
@@ -93,7 +99,7 @@ export const mockScores: Record<string, ScoreResponse> = {
     component_breakdown: {
       matched_skills: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
       missing_skills: [],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 } as unknown as Record<string, never>,
+      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
       explanations: [
         "Candidate matched 4 of 4 required skills (100%).",
         "Vector semantic similarity cosine distance is 0.91.",
@@ -102,4 +108,61 @@ export const mockScores: Record<string, ScoreResponse> = {
       ],
     },
   },
+};
+
+type StageHistoryResponse = components["schemas"]["StageHistoryResponse"];
+
+/** Stage history per application id, oldest first; the first entry is the initial placement. */
+export const mockStageHistory: Record<string, StageHistoryResponse[]> = {
+  [mockApplications[0].id]: [
+    {
+      id: "e1000000-0000-4000-8000-000000000001",
+      application_id: mockApplications[0].id,
+      from_stage_id: null,
+      to_stage_id: mockPipelineStages[0].id,
+      reason: null,
+      moved_by: MOCK_USER_ID,
+      moved_at: "2026-10-05T09:00:00Z",
+    },
+    {
+      id: "e1000000-0000-4000-8000-000000000002",
+      application_id: mockApplications[0].id,
+      from_stage_id: mockPipelineStages[0].id,
+      to_stage_id: mockPipelineStages[1].id,
+      reason: "Strong match on required skills.",
+      moved_by: MOCK_USER_ID,
+      moved_at: "2026-10-05T11:20:00Z",
+    },
+  ],
+  [mockApplications[1].id]: [
+    {
+      id: "e1000000-0000-4000-8000-000000000003",
+      application_id: mockApplications[1].id,
+      from_stage_id: null,
+      to_stage_id: mockPipelineStages[0].id,
+      reason: null,
+      moved_by: MOCK_USER_ID,
+      moved_at: "2026-10-04T14:30:00Z",
+    },
+    {
+      id: "e1000000-0000-4000-8000-000000000004",
+      application_id: mockApplications[1].id,
+      from_stage_id: mockPipelineStages[0].id,
+      to_stage_id: mockPipelineStages[2].id,
+      reason: null,
+      moved_by: MOCK_USER_ID,
+      moved_at: "2026-10-04T16:45:00Z",
+    },
+  ],
+  [mockApplications[2].id]: [
+    {
+      id: "e1000000-0000-4000-8000-000000000005",
+      application_id: mockApplications[2].id,
+      from_stage_id: null,
+      to_stage_id: mockPipelineStages[0].id,
+      reason: null,
+      moved_by: MOCK_USER_ID,
+      moved_at: "2026-10-06T10:00:00Z",
+    },
+  ],
 };

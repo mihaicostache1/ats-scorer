@@ -1,40 +1,33 @@
 import { http, HttpResponse } from "msw";
-import { mockCandidates } from "../fixtures/candidates";
-import { MOCK_ORG_ID } from "../fixtures/auth";
+import { mockCandidates, mockCvDocuments } from "../fixtures/candidates";
+import { MOCK_ORG_ID, MOCK_USER_ID } from "../fixtures/auth";
 import type { components } from "@/api/generated/schema";
-
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+import { BASE, errorResponse, notFound, paginate, sortItems } from "./utils";
 
 type CandidateResponse = components["schemas"]["CandidateResponse"];
+type CvDocumentResponse = components["schemas"]["CvDocumentResponse"];
 
-/** In-memory store — mutations persist for the browser session. */
+const MAX_CV_SIZE_BYTES = 10 * 1024 * 1024;
+
+/** In-memory stores — mutations persist for the browser session. */
 let candidatesStore: CandidateResponse[] = [...mockCandidates];
+let cvStore: CvDocumentResponse[] = [...mockCvDocuments];
 
-function notFound(id: unknown): Response {
-  return HttpResponse.json(
-    {
-      error: {
-        code: "RESOURCE_NOT_FOUND",
-        message: `Candidate with ID '${id}' was not found.`,
-        timestamp: new Date().toISOString(),
-        request_id: `req_${Date.now()}`,
-      },
-    } satisfies components["schemas"]["ErrorEnvelope"],
-    { status: 404 }
-  );
-}
+/** Minimal valid PDF served by the download endpoint. */
+const MOCK_PDF =
+  "%PDF-1.1\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n" +
+  "2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n" +
+  "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\n" +
+  "trailer<</Root 1 0 R>>\n%%EOF";
 
 export const candidateHandlers = [
   /**
    * GET /candidates
-   * Supports ?search= (full-name / email) and pagination.
+   * Supports ?search= (full name / email), sorting and pagination.
    */
   http.get(`${BASE}/candidates`, ({ request }) => {
     const url = new URL(request.url);
     const search = url.searchParams.get("search")?.toLowerCase() ?? "";
-    const page = Number(url.searchParams.get("page") ?? 1);
-    const perPage = Number(url.searchParams.get("per_page") ?? 20);
-
     const filtered = search
       ? candidatesStore.filter(
           (c) =>
@@ -42,49 +35,38 @@ export const candidateHandlers = [
         )
       : candidatesStore;
 
-    const start = (page - 1) * perPage;
-    const items = filtered.slice(start, start + perPage);
-    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-
-    const response: components["schemas"]["PaginatedCandidatesResponse"] = {
-      items,
-      pagination: {
-        page,
-        per_page: perPage,
-        total_items: filtered.length,
-        total_pages: totalPages,
-        has_next: page < totalPages,
-        has_prev: page > 1,
-      },
-    };
+    const response: components["schemas"]["PaginatedCandidatesResponse"] = paginate(
+      sortItems(filtered, url, "created_at"),
+      url
+    );
     return HttpResponse.json(response);
   }),
 
   /**
-   * POST /candidates/upload
-   * Simulates PDF parsing: returns a CandidateUploadResponse with preset parsed_data.
-   * Adds the new candidate to the in-memory store.
+   * POST /candidates — emails are stored lowercase and unique per organization.
    */
-  http.post(`${BASE}/candidates/upload`, async ({ request }) => {
-    const form = await request.formData();
-    const fullName = (form.get("full_name") as string | null) ?? "Unknown Candidate";
-    const email = (form.get("email") as string | null) ?? `candidate_${Date.now()}@example.com`;
-
-    const newCandidate: CandidateResponse = {
+  http.post(`${BASE}/candidates`, async ({ request }) => {
+    const body = (await request.json()) as components["schemas"]["CreateCandidateRequest"];
+    const email = body.email.toLowerCase();
+    if (candidatesStore.some((c) => c.email.toLowerCase() === email)) {
+      return errorResponse(409, "CONFLICT", "A candidate with this email already exists.");
+    }
+    const now = new Date().toISOString();
+    const candidate: CandidateResponse = {
       id: crypto.randomUUID(),
       org_id: MOCK_ORG_ID,
-      full_name: fullName,
+      full_name: body.full_name,
       email,
-      ocr_used: false,
-      parsed_data: {
-        skills: ["TypeScript", "React", "Node.js"],
-        experience_years: 3.0,
-        education: ["B.Sc. Computer Science"],
-        work_history: [{ title: "Software Engineer", company: "SomeCo", years: 3.0 }],
-      },
+      phone: body.phone ?? null,
+      location: body.location ?? null,
+      cv_file_path: null,
+      parsed_data: {},
+      consent_given_at: body.consent_given_at ?? null,
+      created_at: now,
+      updated_at: now,
     };
-    candidatesStore = [newCandidate, ...candidatesStore];
-    return HttpResponse.json(newCandidate, { status: 201 });
+    candidatesStore = [candidate, ...candidatesStore];
+    return HttpResponse.json(candidate, { status: 201 });
   }),
 
   /**
@@ -92,41 +74,110 @@ export const candidateHandlers = [
    */
   http.get(`${BASE}/candidates/:id`, ({ params }) => {
     const candidate = candidatesStore.find((c) => c.id === params.id);
-    if (!candidate) return notFound(params.id);
-    return HttpResponse.json(candidate);
+    return candidate ? HttpResponse.json(candidate) : notFound("Candidate", params.id);
   }),
 
   /**
-   * PATCH /candidates/:id — partial update of name / email / phone / skills.
+   * PATCH /candidates/:id — partial update; omitted fields are left unchanged.
    */
   http.patch(`${BASE}/candidates/:id`, async ({ params, request }) => {
     const idx = candidatesStore.findIndex((c) => c.id === params.id);
-    if (idx === -1) return notFound(params.id);
+    if (idx === -1) return notFound("Candidate", params.id);
 
     const body = (await request.json()) as components["schemas"]["UpdateCandidateRequest"];
-    const existing = candidatesStore[idx];
+    const patch = Object.fromEntries(
+      Object.entries(body).filter(([, v]) => v !== undefined)
+    ) as Partial<CandidateResponse>;
+    if (typeof patch.email === "string") patch.email = patch.email.toLowerCase();
 
-    const updated: CandidateResponse = {
-      ...existing,
-      full_name: body.full_name ?? existing.full_name,
-      email: body.email ?? existing.email,
-      phone: body.phone ?? existing.phone,
-      parsed_data: {
-        ...existing.parsed_data,
-        skills: body.skills ?? existing.parsed_data.skills,
-      },
+    candidatesStore[idx] = {
+      ...candidatesStore[idx],
+      ...patch,
+      updated_at: new Date().toISOString(),
     };
-    candidatesStore[idx] = updated;
-    return HttpResponse.json(updated);
+    return HttpResponse.json(candidatesStore[idx]);
   }),
 
   /**
-   * DELETE /candidates/:id — GDPR hard delete.
+   * DELETE /candidates/:id — GDPR hard delete, also removes the candidate's CV documents.
    */
   http.delete(`${BASE}/candidates/:id`, ({ params }) => {
     const idx = candidatesStore.findIndex((c) => c.id === params.id);
-    if (idx === -1) return notFound(params.id);
+    if (idx === -1) return notFound("Candidate", params.id);
     candidatesStore.splice(idx, 1);
+    cvStore = cvStore.filter((d) => d.candidate_id !== params.id);
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  /**
+   * GET /candidates/:id/cv — CV documents, newest first.
+   */
+  http.get(`${BASE}/candidates/:id/cv`, ({ params }) => {
+    if (!candidatesStore.some((c) => c.id === params.id)) return notFound("Candidate", params.id);
+    const docs = cvStore
+      .filter((d) => d.candidate_id === params.id)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return HttpResponse.json(docs);
+  }),
+
+  /**
+   * POST /candidates/:id/cv — multipart upload with a `file` field.
+   * Rejects files over 10 MB (413) and files that are not PDFs (415).
+   */
+  http.post(`${BASE}/candidates/:id/cv`, async ({ params, request }) => {
+    if (!candidatesStore.some((c) => c.id === params.id)) return notFound("Candidate", params.id);
+
+    const file = (await request.formData()).get("file");
+    if (!(file instanceof File)) {
+      return errorResponse(422, "VALIDATION_ERROR", "A `file` field is required.");
+    }
+    if (file.size > MAX_CV_SIZE_BYTES) {
+      return errorResponse(413, "FILE_TOO_LARGE", "The file is larger than 10 MB.");
+    }
+    const head = new TextDecoder().decode(await file.slice(0, 5).arrayBuffer());
+    if (head !== "%PDF-") {
+      return errorResponse(415, "UNSUPPORTED_MEDIA_TYPE", "The file content is not a PDF.");
+    }
+
+    const now = new Date().toISOString();
+    const doc: CvDocumentResponse = {
+      id: crypto.randomUUID(),
+      org_id: MOCK_ORG_ID,
+      candidate_id: String(params.id),
+      original_filename: file.name,
+      content_type: "application/pdf",
+      size_bytes: file.size,
+      sha256: Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
+        b.toString(16).padStart(2, "0")
+      ).join(""),
+      status: "queued",
+      uploaded_by: MOCK_USER_ID,
+      created_at: now,
+      updated_at: now,
+    };
+    cvStore = [doc, ...cvStore];
+    return HttpResponse.json(doc, { status: 201 });
+  }),
+
+  /**
+   * GET /candidates/:id/cv/:cvId
+   */
+  http.get(`${BASE}/candidates/:id/cv/:cvId`, ({ params }) => {
+    const doc = cvStore.find((d) => d.id === params.cvId && d.candidate_id === params.id);
+    return doc ? HttpResponse.json(doc) : notFound("CV document", params.cvId);
+  }),
+
+  /**
+   * GET /candidates/:id/cv/:cvId/download — serves a tiny placeholder PDF as an attachment.
+   */
+  http.get(`${BASE}/candidates/:id/cv/:cvId/download`, ({ params }) => {
+    const doc = cvStore.find((d) => d.id === params.cvId && d.candidate_id === params.id);
+    if (!doc) return notFound("CV document", params.cvId);
+    return new HttpResponse(MOCK_PDF, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${doc.original_filename}"`,
+      },
+    });
   }),
 ];

@@ -28,15 +28,14 @@ export function getOrganization() {
 
 // ─── Jobs ─────────────────────────────────────────────────────────────────────
 
-export function listJobs(
-  params?: components["schemas"] extends never
-    ? never
-    : {
-        status?: "draft" | "open" | "paused" | "closed" | "archived";
-        page?: number;
-        per_page?: number;
-      }
-) {
+export function listJobs(params?: {
+  status?: "draft" | "open" | "paused" | "closed" | "archived";
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort_by?: "created_at" | "updated_at" | "title" | "status";
+  sort_order?: "asc" | "desc";
+}) {
   return apiClient.GET("/jobs", { params: { query: params } });
 }
 
@@ -48,30 +47,43 @@ export function getJob(id: string) {
   return apiClient.GET("/jobs/{id}", { params: { path: { id } } });
 }
 
+export function updateJob(id: string, body: components["schemas"]["UpdateJobRequest"]) {
+  return apiClient.PATCH("/jobs/{id}", { params: { path: { id } }, body });
+}
+
+export function updateJobStatus(id: string, body: components["schemas"]["UpdateJobStatusRequest"]) {
+  return apiClient.PATCH("/jobs/{id}/status", { params: { path: { id } }, body });
+}
+
+export function archiveJob(id: string) {
+  return apiClient.POST("/jobs/{id}/archive", { params: { path: { id } } });
+}
+
 export function getJobStages(id: string) {
   return apiClient.GET("/jobs/{id}/stages", { params: { path: { id } } });
 }
 
 // ─── Candidates ───────────────────────────────────────────────────────────────
 
-export function listCandidates(params?: { search?: string; page?: number; per_page?: number }) {
+export function listCandidates(params?: {
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort_by?: "created_at" | "updated_at" | "full_name" | "email";
+  sort_order?: "asc" | "desc";
+}) {
   return apiClient.GET("/candidates", { params: { query: params } });
 }
 
-export function uploadCandidateCV(formData: FormData) {
-  // FormData cannot be typed as the generated binary schema body — cast through unknown.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return apiClient.POST("/candidates/upload", { body: formData as any });
+export function createCandidate(body: components["schemas"]["CreateCandidateRequest"]) {
+  return apiClient.POST("/candidates", { body });
 }
 
 export function getCandidate(id: string) {
   return apiClient.GET("/candidates/{id}", { params: { path: { id } } });
 }
 
-export function updateCandidate(
-  id: string,
-  body: components["schemas"]["UpdateCandidateRequest"]
-) {
+export function updateCandidate(id: string, body: components["schemas"]["UpdateCandidateRequest"]) {
   return apiClient.PATCH("/candidates/{id}", { params: { path: { id } }, body });
 }
 
@@ -79,10 +91,59 @@ export function hardDeleteCandidate(id: string) {
   return apiClient.DELETE("/candidates/{id}", { params: { path: { id } } });
 }
 
+export function listCandidateCvDocuments(id: string) {
+  return apiClient.GET("/candidates/{id}/cv", { params: { path: { id } } });
+}
+
+export function uploadCandidateCV(id: string, file: File) {
+  return apiClient.POST("/candidates/{id}/cv", {
+    params: { path: { id } },
+    body: { file: file as unknown as string },
+    // openapi-fetch cannot serialise File bodies on its own, so build the multipart form here.
+    bodySerializer: () => {
+      const form = new FormData();
+      form.append("file", file);
+      return form;
+    },
+  });
+}
+
+export function getCandidateCvDocument(id: string, cvId: string) {
+  return apiClient.GET("/candidates/{id}/cv/{cv_id}", {
+    params: { path: { id, cv_id: cvId } },
+  });
+}
+
+export function downloadCandidateCV(id: string, cvId: string) {
+  return apiClient.GET("/candidates/{id}/cv/{cv_id}/download", {
+    params: { path: { id, cv_id: cvId } },
+    parseAs: "blob",
+  });
+}
+
 // ─── Applications ─────────────────────────────────────────────────────────────
+
+export function listApplications(params?: {
+  job_id?: string;
+  candidate_id?: string;
+  stage_id?: string;
+  status?: "active" | "hired" | "rejected" | "withdrawn";
+  page?: number;
+  per_page?: number;
+}) {
+  return apiClient.GET("/applications", { params: { query: params } });
+}
 
 export function createApplication(body: components["schemas"]["CreateApplicationRequest"]) {
   return apiClient.POST("/applications", { body });
+}
+
+export function getApplication(id: string) {
+  return apiClient.GET("/applications/{id}", { params: { path: { id } } });
+}
+
+export function getApplicationHistory(id: string) {
+  return apiClient.GET("/applications/{id}/history", { params: { path: { id } } });
 }
 
 export function updateApplicationStage(

@@ -14,3 +14,17 @@ export const worker = setupWorker(
   ...candidateHandlers,
   ...applicationHandlers
 );
+
+const globalForMsw = globalThis as typeof globalThis & { __mswStarted?: Promise<unknown> };
+
+/**
+ * Starts the worker at most once per page load. React Strict Mode runs effects twice in dev,
+ * and MSW throws if `start()` is called on an already enabled worker.
+ */
+export function startWorker() {
+  globalForMsw.__mswStarted ??= worker.start({
+    onUnhandledFrame: "bypass", // let real assets through
+    serviceWorker: { url: "/mockServiceWorker.js" },
+  });
+  return globalForMsw.__mswStarted;
+}

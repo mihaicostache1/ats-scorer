@@ -16,6 +16,7 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["Redis", "PyTorch", "Fairlearn"],
     min_experience_years: 4,
     created_at: "2026-10-01T08:00:00Z",
+    updated_at: "2026-10-01T08:00:00Z",
   },
   {
     id: "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
@@ -31,6 +32,7 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["Storybook", "Playwright", "Figma"],
     min_experience_years: 6,
     created_at: "2026-10-02T09:00:00Z",
+    updated_at: "2026-10-02T09:00:00Z",
   },
   {
     id: "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
@@ -46,6 +48,7 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["Fairlearn", "ONNX", "Triton"],
     min_experience_years: 5,
     created_at: "2026-10-03T10:00:00Z",
+    updated_at: "2026-10-03T10:00:00Z",
   },
   {
     id: "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a",
@@ -60,6 +63,7 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["Datadog", "ArgoCD"],
     min_experience_years: 5,
     created_at: "2026-09-28T07:30:00Z",
+    updated_at: "2026-09-28T07:30:00Z",
   },
   {
     id: "e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b",
@@ -74,6 +78,7 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["SQL", "Figma", "OKR frameworks"],
     min_experience_years: 4,
     created_at: "2026-10-04T11:00:00Z",
+    updated_at: "2026-10-04T11:00:00Z",
   },
   {
     id: "f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c",
@@ -88,41 +93,59 @@ export const mockJobs: components["schemas"]["JobResponse"][] = [
     preferred_skills: ["Iceberg", "Flink"],
     min_experience_years: 4,
     created_at: "2026-10-05T08:00:00Z",
+    updated_at: "2026-10-05T08:00:00Z",
   },
 ];
 
+/** Organization-default pipeline stages (job_id null), mirroring the API's DEFAULT_STAGES. */
 export const mockPipelineStages: components["schemas"]["PipelineStageResponse"][] = [
   {
-    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f",
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e06",
     org_id: MOCK_ORG_ID,
-    job_id: mockJobs[0].id,
+    job_id: null,
     name: "Applied",
-    stage_order: 0,
+    stage_order: 1,
     stage_type: "applied",
   },
   {
-    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e70",
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e07",
     org_id: MOCK_ORG_ID,
-    job_id: mockJobs[0].id,
-    name: "Screening",
-    stage_order: 1,
+    job_id: null,
+    name: "Shortlisted",
+    stage_order: 2,
     stage_type: "screening",
   },
   {
-    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e71",
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e08",
     org_id: MOCK_ORG_ID,
-    job_id: mockJobs[0].id,
-    name: "Technical Interview",
-    stage_order: 2,
+    job_id: null,
+    name: "Interview",
+    stage_order: 3,
     stage_type: "interview",
   },
   {
-    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e72",
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e09",
     org_id: MOCK_ORG_ID,
-    job_id: mockJobs[0].id,
+    job_id: null,
     name: "Offer",
-    stage_order: 3,
+    stage_order: 4,
     stage_type: "offer",
+  },
+  {
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e0a",
+    org_id: MOCK_ORG_ID,
+    job_id: null,
+    name: "Hired",
+    stage_order: 5,
+    stage_type: "hired",
+  },
+  {
+    id: "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e0b",
+    org_id: MOCK_ORG_ID,
+    job_id: null,
+    name: "Rejected",
+    stage_order: 6,
+    stage_type: "rejected",
   },
 ];
 

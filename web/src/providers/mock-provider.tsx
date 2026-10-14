@@ -21,13 +21,8 @@ export function MockProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     async function startWorker() {
-      const { worker } = await import("@/mocks/browser");
-      await worker.start({
-        onUnhandledFrame: "bypass", // let real assets through
-        serviceWorker: {
-          url: "/mockServiceWorker.js",
-        },
-      });
+      const { startWorker } = await import("@/mocks/browser");
+      await startWorker();
       if (mounted) setReady(true);
     }
 

@@ -1,60 +1,68 @@
 import { http, HttpResponse } from "msw";
-import { mockJobs, mockPipelineStages, mockPaginatedJobs } from "../fixtures/jobs";
+import { mockJobs, mockPipelineStages } from "../fixtures/jobs";
+import { MOCK_ORG_ID } from "../fixtures/auth";
 import type { components } from "@/api/generated/schema";
+import { BASE, notFound, paginate, sortItems } from "./utils";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+type JobResponse = components["schemas"]["JobResponse"];
 
 /** In-memory store — mutations persist for the browser session. */
-let jobsStore: components["schemas"]["JobResponse"][] = [...mockJobs];
+let jobsStore: JobResponse[] = [...mockJobs];
+
+function updateJob(id: unknown, patch: Partial<JobResponse>): Response {
+  const idx = jobsStore.findIndex((j) => j.id === id);
+  if (idx === -1) return notFound("Job", id);
+  jobsStore[idx] = { ...jobsStore[idx], ...patch, updated_at: new Date().toISOString() };
+  return HttpResponse.json(jobsStore[idx]);
+}
 
 export const jobHandlers = [
   /**
    * GET /jobs
-   * Supports optional ?status= filter and pagination query params (mocked).
+   * Supports ?status=, ?search=, sorting and pagination. Archived jobs are hidden
+   * unless ?status=archived is requested.
    */
   http.get(`${BASE}/jobs`, ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
-    const page = Number(url.searchParams.get("page") ?? 1);
-    const perPage = Number(url.searchParams.get("per_page") ?? 20);
+    const search = url.searchParams.get("search")?.toLowerCase() ?? "";
 
-    const filtered = status ? jobsStore.filter((j) => j.status === status) : jobsStore;
-    const start = (page - 1) * perPage;
-    const items = filtered.slice(start, start + perPage);
-    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    let filtered = status
+      ? jobsStore.filter((j) => j.status === status)
+      : jobsStore.filter((j) => j.status !== "archived");
+    if (search) {
+      filtered = filtered.filter((j) =>
+        [j.title, j.department, j.location].some((f) => f?.toLowerCase().includes(search))
+      );
+    }
 
-    const response: components["schemas"]["PaginatedJobsResponse"] = {
-      items,
-      pagination: {
-        page,
-        per_page: perPage,
-        total_items: filtered.length,
-        total_pages: totalPages,
-        has_next: page < totalPages,
-        has_prev: page > 1,
-      },
-    };
+    const response: components["schemas"]["PaginatedJobsResponse"] = paginate(
+      sortItems(filtered, url, "created_at"),
+      url
+    );
     return HttpResponse.json(response);
   }),
 
   /**
-   * POST /jobs — creates a new job and prepends it to the in-memory store.
+   * POST /jobs — creates a draft job and prepends it to the in-memory store.
    */
   http.post(`${BASE}/jobs`, async ({ request }) => {
     const body = (await request.json()) as components["schemas"]["CreateJobRequest"];
-    const newJob: components["schemas"]["JobResponse"] = {
+    const now = new Date().toISOString();
+    const newJob: JobResponse = {
       id: crypto.randomUUID(),
-      org_id: mockPaginatedJobs.items[0].org_id,
+      org_id: MOCK_ORG_ID,
       title: body.title,
-      department: body.department,
-      location: body.location,
-      employment_type: body.employment_type,
-      status: "open",
+      department: body.department ?? null,
+      location: body.location ?? null,
+      employment_type: body.employment_type ?? "full_time",
+      status: "draft",
       description: body.description,
       required_skills: body.required_skills ?? [],
       preferred_skills: body.preferred_skills ?? [],
-      min_experience_years: body.min_experience_years,
-      created_at: new Date().toISOString(),
+      min_experience_years: body.min_experience_years ?? 0,
+      created_at: now,
+      updated_at: now,
     };
     jobsStore = [newJob, ...jobsStore];
     return HttpResponse.json(newJob, { status: 201 });
@@ -65,43 +73,43 @@ export const jobHandlers = [
    */
   http.get(`${BASE}/jobs/:id`, ({ params }) => {
     const job = jobsStore.find((j) => j.id === params.id);
-    if (!job) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: "RESOURCE_NOT_FOUND",
-            message: `Job with ID '${params.id}' was not found.`,
-            timestamp: new Date().toISOString(),
-            request_id: `req_${Date.now()}`,
-          },
-        } satisfies components["schemas"]["ErrorEnvelope"],
-        { status: 404 }
-      );
-    }
-    return HttpResponse.json(job);
+    return job ? HttpResponse.json(job) : notFound("Job", params.id);
   }),
 
   /**
+   * PATCH /jobs/:id — partial update; status is changed via /status and /archive.
+   */
+  http.patch(`${BASE}/jobs/:id`, async ({ params, request }) => {
+    const body = (await request.json()) as components["schemas"]["UpdateJobRequest"];
+    // Drop undefined keys so omitted fields stay unchanged.
+    const patch = Object.fromEntries(
+      Object.entries(body).filter(([, v]) => v !== undefined)
+    ) as Partial<JobResponse>;
+    return updateJob(params.id, patch);
+  }),
+
+  /**
+   * PATCH /jobs/:id/status — move to draft, open or closed.
+   */
+  http.patch(`${BASE}/jobs/:id/status`, async ({ params, request }) => {
+    const body = (await request.json()) as components["schemas"]["UpdateJobStatusRequest"];
+    return updateJob(params.id, { status: body.status });
+  }),
+
+  /**
+   * POST /jobs/:id/archive — idempotent.
+   */
+  http.post(`${BASE}/jobs/:id/archive`, ({ params }) =>
+    updateJob(params.id, { status: "archived" })
+  ),
+
+  /**
    * GET /jobs/:id/stages
-   * Returns the shared pipeline stages for whichever job is requested.
+   * Jobs without their own stages fall back to the organization defaults (job_id null).
    */
   http.get(`${BASE}/jobs/:id/stages`, ({ params }) => {
     const job = jobsStore.find((j) => j.id === params.id);
-    if (!job) {
-      return HttpResponse.json(
-        {
-          error: {
-            code: "RESOURCE_NOT_FOUND",
-            message: `Job with ID '${params.id}' was not found.`,
-            timestamp: new Date().toISOString(),
-            request_id: `req_${Date.now()}`,
-          },
-        } satisfies components["schemas"]["ErrorEnvelope"],
-        { status: 404 }
-      );
-    }
-    // Return stages associated with first mock job; job_id rewritten to the requested one.
-    const stages = mockPipelineStages.map((s) => ({ ...s, job_id: job.id }));
-    return HttpResponse.json(stages);
+    if (!job) return notFound("Job", params.id);
+    return HttpResponse.json(mockPipelineStages);
   }),
 ];
