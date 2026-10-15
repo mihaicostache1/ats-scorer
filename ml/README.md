@@ -5,6 +5,7 @@
 | `ats_scoring/` | The scoring package the backend imports. Installed with `pip install -e ml/` |
 | `tests/` | Unit tests for `ats_scoring` |
 | `benchmarks/` | Speed measurement for the scorer |
+| `evaluation/` | Hand-rated candidate/job pairs and evaluation results ([how it works](../docs/ml/evaluation.md)) |
 | `synthetic/` | Script that generates the synthetic CV and job dataset ([README](synthetic/README.md)) |
 | `embedding_spike/` | Experiments behind the embedding-model decision ([README](embedding_spike/README.md)) |
 
@@ -78,6 +79,10 @@ score(candidate, job)
 - Experience and job-title fit are not scored yet.
 
 Change `MODEL_VERSION` in `ats_scoring/scoring.py` whenever the same input could get a different score, for example when the weights or the alias table change.
+
+### Evaluate
+
+`python -m ats_scoring.evaluate` compares a scorer's results with human ratings of 30 candidate/job pairs, and reports Spearman correlation and NDCG@10. See [docs/ml/evaluation.md](../docs/ml/evaluation.md).
 
 ### Speed
 

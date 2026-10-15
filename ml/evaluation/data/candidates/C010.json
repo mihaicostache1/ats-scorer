@@ -1,0 +1,73 @@
+{
+  "schema_version": "0.1",
+  "headline": "Marketing Specialist",
+  "summary": "My most recent role is Marketing Specialist; most of my work involves Paid Search, Market Research and Marketing Automation. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Google Analytics",
+    "Public Relations",
+    "Market Research",
+    "Android",
+    "Brand Strategy",
+    "SEO",
+    "Marketing Automation",
+    "Paid Search"
+  ],
+  "experience_years": 4.2,
+  "work_history": [
+    {
+      "title": "Marketing Specialist",
+      "company": "Tidewater Robotics",
+      "years": 1.2,
+      "summary": "Grew organic traffic by 25% through content and technical improvements (Brand Strategy, SEO)",
+      "start": "2025-07",
+      "end": null,
+      "bullets": [
+        "Grew organic traffic by 25% through content and technical improvements (Brand Strategy, SEO)",
+        "Coordinated 8 product launches with sales and product teams (Market Research, SEO)",
+        "Wrote and edited copy for web pages, newsletters and social posts (SEO, Paid Search)",
+        "Planned and ran campaigns across search, social and email"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Lumenfold Digital",
+      "years": 1.1,
+      "summary": "Wrote and edited copy for web pages, newsletters and social posts",
+      "start": "2024-06",
+      "end": "2025-07",
+      "bullets": [
+        "Wrote and edited copy for web pages, newsletters and social posts",
+        "Managed a monthly budget and reported results to leadership (Public Relations, SEO)",
+        "Coordinated 4 product launches with sales and product teams (Marketing Automation, Market Research)"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Vantaro Group",
+      "years": 2.0,
+      "summary": "Managed a monthly budget and reported results to leadership (Brand Strategy, Public Relations)",
+      "start": "2022-06",
+      "end": "2024-06",
+      "bullets": [
+        "Managed a monthly budget and reported results to leadership (Brand Strategy, Public Relations)",
+        "Wrote and edited copy for web pages, newsletters and social posts",
+        "Planned and ran campaigns across search, social and email"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Communication",
+      "institution": "Westmark University of Applied Sciences",
+      "grad_year": 2021
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Portuguese (fluent)",
+    "Polish (intermediate)"
+  ],
+  "certifications": [
+    "HubSpot Content Marketing Certification"
+  ]
+}

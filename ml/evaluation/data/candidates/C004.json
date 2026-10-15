@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.1",
+  "headline": "DevOps Engineer",
+  "summary": "5 years of hands-on work with Linux and Bash, most recently as DevOps Engineer. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Bash",
+    "Grafana",
+    "Linux",
+    "Mentoring",
+    "Docker",
+    "Terraform",
+    "Scrum",
+    "Vault",
+    "Prometheus",
+    "Monitoring",
+    "GitHub Actions"
+  ],
+  "experience_years": 5.0,
+  "work_history": [
+    {
+      "title": "DevOps Engineer",
+      "company": "Tidewater Robotics",
+      "years": 1.2,
+      "summary": "Hardened build pipelines and moved secrets into a managed store (Monitoring, GitHub Actions)",
+      "start": "2025-07",
+      "end": null,
+      "bullets": [
+        "Hardened build pipelines and moved secrets into a managed store (Monitoring, GitHub Actions)",
+        "Wrote infrastructure as code and reviewed changes from other teams",
+        "Ran and monitored production clusters serving 5 services"
+      ]
+    },
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Solstice Energy Labs",
+      "years": 1.8,
+      "summary": "Wrote infrastructure as code and reviewed changes from other teams",
+      "start": "2023-10",
+      "end": "2025-07",
+      "bullets": [
+        "Wrote infrastructure as code and reviewed changes from other teams",
+        "Automated deployments, reducing release time by 10%",
+        "Ran and monitored production clusters serving 7 services (Vault, Linux)",
+        "Cut the monthly cloud bill by 20% by right-sizing workloads (Linux, Terraform)"
+      ]
+    },
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Saffron Street Bank",
+      "years": 2.1,
+      "summary": "Wrote infrastructure as code and reviewed changes from other teams (GitHub Actions, Terraform)",
+      "start": "2021-07",
+      "end": "2023-08",
+      "bullets": [
+        "Wrote infrastructure as code and reviewed changes from other teams (GitHub Actions, Terraform)",
+        "Automated deployments, reducing release time by 15%",
+        "Ran and monitored production clusters serving 2 services",
+        "Introduced alerting and dashboards that shortened incident response by 45%"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Software Engineering",
+      "institution": "Westmark University of Applied Sciences",
+      "grad_year": 2020
+    },
+    {
+      "degree": "B.Sc. Information Systems",
+      "institution": "Dunmore Institute of Design",
+      "grad_year": 2018
+    }
+  ],
+  "languages": [
+    "English (C1)",
+    "French (basic)"
+  ],
+  "certifications": []
+}

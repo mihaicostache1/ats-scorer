@@ -1,0 +1,92 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Backend Engineer",
+  "summary": "7 years of hands-on work with FastAPI and Python, most recently as Senior Backend Engineer. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Microservices",
+    "REST APIs",
+    "Java",
+    "Docker",
+    "Kafka",
+    "Python",
+    "Kubernetes",
+    "FastAPI",
+    "PostgreSQL",
+    "Next.js",
+    "SQL",
+    "Go",
+    "Scrum",
+    "CI/CD"
+  ],
+  "experience_years": 7.8,
+  "work_history": [
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Quartzline Software",
+      "years": 1.5,
+      "summary": "Migrated a legacy module to a new stack together with QA and product (Java, FastAPI)",
+      "start": "2025-03",
+      "end": null,
+      "bullets": [
+        "Migrated a legacy module to a new stack together with QA and product (Java, FastAPI)",
+        "Built and maintained backend services used by 5 internal teams",
+        "Reviewed pull requests and supported 5 newer developers (REST APIs, PostgreSQL)",
+        "Wrote unit and integration tests, raising coverage by 35 percentage points"
+      ]
+    },
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Brightloom Studio",
+      "years": 1.2,
+      "summary": "Designed REST endpoints and data models for new product features (Python, SQL)",
+      "start": "2023-09",
+      "end": "2024-12",
+      "bullets": [
+        "Designed REST endpoints and data models for new product features (Python, SQL)",
+        "Reviewed pull requests and supported 6 newer developers (PostgreSQL, FastAPI)",
+        "Cut average response time by 20% by profiling queries and adding caching"
+      ]
+    },
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Oakhaven Analytics",
+      "years": 3.2,
+      "summary": "Wrote unit and integration tests, raising coverage by 45 percentage points",
+      "start": "2020-05",
+      "end": "2023-08",
+      "bullets": [
+        "Wrote unit and integration tests, raising coverage by 45 percentage points",
+        "Cut average response time by 40% by profiling queries and adding caching"
+      ]
+    },
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Northgate Devices",
+      "years": 1.8,
+      "summary": "Migrated a legacy module to a new stack together with QA and product (Docker, Java)",
+      "start": "2018-05",
+      "end": "2020-03",
+      "bullets": [
+        "Migrated a legacy module to a new stack together with QA and product (Docker, Java)",
+        "Reviewed pull requests and supported 2 newer developers (SQL, Kafka)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Software Engineering",
+      "institution": "Eastbridge Institute of Technology",
+      "grad_year": 2017
+    },
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Dunmore Institute of Design",
+      "grad_year": 2015
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Spanish (fluent)"
+  ],
+  "certifications": []
+}

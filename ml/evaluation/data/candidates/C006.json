@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior Mobile Developer",
+  "summary": "Junior Mobile Developer with under a year of experience in REST APIs, Android and Firebase. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Git",
+    "Problem Solving",
+    "Kotlin",
+    "Firebase",
+    "Android",
+    "Objective-C",
+    "Scrum",
+    "REST APIs"
+  ],
+  "experience_years": 0.7,
+  "work_history": [
+    {
+      "title": "Junior Mobile Developer",
+      "company": "Glasswing Bio",
+      "years": 0.7,
+      "summary": "Integrated REST back ends, offline storage and push notifications (Objective-C, Android)",
+      "start": "2025-11",
+      "end": "2026-07",
+      "bullets": [
+        "Integrated REST back ends, offline storage and push notifications (Objective-C, Android)",
+        "Refactored legacy screens, improving start-up time by 20%",
+        "Reduced crash rate by 15% through better error handling and monitoring"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Valmont University",
+      "grad_year": 2024
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Spanish (basic)",
+    "German (professional)"
+  ],
+  "certifications": [
+    "Associate Android Developer",
+    "iOS App Development Certificate"
+  ]
+}

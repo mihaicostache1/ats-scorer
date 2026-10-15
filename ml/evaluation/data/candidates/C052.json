@@ -1,0 +1,92 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Frontend Engineer",
+  "summary": "My most recent role is Senior Frontend Engineer; most of my work involves Tailwind CSS, Responsive Design and Vue.js. Enjoys mentoring and clear documentation.",
+  "skills": [
+    "Next.js",
+    "Storybook",
+    "Tailwind CSS",
+    "React",
+    "TypeScript",
+    "Jest",
+    "Responsive Design",
+    "Sketch",
+    "HTML",
+    "Vue.js",
+    "JavaScript",
+    "Node.js"
+  ],
+  "experience_years": 7.2,
+  "work_history": [
+    {
+      "title": "Senior Frontend Engineer",
+      "company": "Stonebridge Health",
+      "years": 1.5,
+      "summary": "Built reusable UI components for the main web application",
+      "start": "2025-03",
+      "end": null,
+      "bullets": [
+        "Built reusable UI components for the main web application",
+        "Improved page load time by 35% through code splitting and image optimisation (JavaScript, Tailwind CSS)",
+        "Added automated tests that caught regressions before release (JavaScript, Node.js)",
+        "Led the move of 3 legacy screens to a modern framework (Tailwind CSS, TypeScript)"
+      ]
+    },
+    {
+      "title": "Frontend Developer",
+      "company": "Quartzline Software",
+      "years": 2.8,
+      "summary": "Maintained a shared component library used across 4 products",
+      "start": "2022-04",
+      "end": "2025-01",
+      "bullets": [
+        "Maintained a shared component library used across 4 products",
+        "Worked with designers to turn mock-ups into accessible, responsive pages (Next.js, JavaScript)",
+        "Added automated tests that caught regressions before release (TypeScript, Next.js)",
+        "Led the move of 6 legacy screens to a modern framework"
+      ]
+    },
+    {
+      "title": "Junior Frontend Developer",
+      "company": "Solstice Energy Labs",
+      "years": 1.1,
+      "summary": "Built reusable UI components for the main web application (Responsive Design, HTML)",
+      "start": "2021-02",
+      "end": "2022-03",
+      "bullets": [
+        "Built reusable UI components for the main web application (Responsive Design, HTML)",
+        "Maintained a shared component library used across 4 products"
+      ]
+    },
+    {
+      "title": "Junior Frontend Developer",
+      "company": "Brightloom Studio",
+      "years": 1.9,
+      "summary": "Worked with designers to turn mock-ups into accessible, responsive pages (Node.js, HTML)",
+      "start": "2019-03",
+      "end": "2021-02",
+      "bullets": [
+        "Worked with designers to turn mock-ups into accessible, responsive pages (Node.js, HTML)",
+        "Led the move of 3 legacy screens to a modern framework (TypeScript, Tailwind CSS)",
+        "Built reusable UI components for the main web application (Responsive Design, Storybook)",
+        "Improved page load time by 30% through code splitting and image optimisation (JavaScript, TypeScript)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Westmark University of Applied Sciences",
+      "grad_year": 2018
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "German (C1)",
+    "Romanian (fluent)"
+  ],
+  "certifications": [
+    "Web Accessibility Fundamentals",
+    "Front-End Web Development Certificate"
+  ]
+}

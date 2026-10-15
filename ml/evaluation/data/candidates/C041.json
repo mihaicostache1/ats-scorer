@@ -1,0 +1,77 @@
+{
+  "schema_version": "0.1",
+  "headline": "Lead Backend Engineer",
+  "summary": "Lead Backend Engineer with 12 years of experience in SQL, PostgreSQL and Java. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Microservices",
+    "Python",
+    "Java",
+    "Go",
+    "Django",
+    "Celery",
+    "AWS",
+    "Backlog Prioritization",
+    "Spring Boot",
+    "PostgreSQL",
+    "SQL"
+  ],
+  "experience_years": 12.3,
+  "work_history": [
+    {
+      "title": "Lead Backend Engineer",
+      "company": "Brightloom Studio",
+      "years": 3.5,
+      "summary": "Cut average response time by 30% by profiling queries and adding caching (Java, Microservices)",
+      "start": "2023-03",
+      "end": null,
+      "bullets": [
+        "Cut average response time by 30% by profiling queries and adding caching (Java, Microservices)",
+        "Built and maintained backend services used by 5 internal teams"
+      ]
+    },
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Northgate Devices",
+      "years": 5.0,
+      "summary": "Designed REST endpoints and data models for new product features",
+      "start": "2018-01",
+      "end": "2023-01",
+      "bullets": [
+        "Designed REST endpoints and data models for new product features",
+        "Reviewed pull requests and supported 3 newer developers",
+        "Cut average response time by 35% by profiling queries and adding caching",
+        "Migrated a legacy module to a new stack together with QA and product (Java, Go)"
+      ]
+    },
+    {
+      "title": "Backend Developer",
+      "company": "Pinecrest Mobility",
+      "years": 3.8,
+      "summary": "Designed REST endpoints and data models for new product features (AWS, Java)",
+      "start": "2014-03",
+      "end": "2018-01",
+      "bullets": [
+        "Designed REST endpoints and data models for new product features (AWS, Java)",
+        "Wrote unit and integration tests, raising coverage by 15 percentage points",
+        "Built and maintained backend services used by 8 internal teams (AWS, Python)",
+        "Cut average response time by 45% by profiling queries and adding caching (Celery, Django)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Computer Science",
+      "institution": "Saint Albrecht University",
+      "grad_year": 2013
+    },
+    {
+      "degree": "B.Sc. Software Engineering",
+      "institution": "Valmont University",
+      "grad_year": 2011
+    }
+  ],
+  "languages": [
+    "English (fluent)"
+  ],
+  "certifications": []
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "headline": "Head of Marketing",
+  "summary": "Head of Marketing with 11 years of experience in Content Marketing, Marketing Automation and Digital Marketing. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Brand Strategy",
+    "Marketing Automation",
+    "Content Marketing",
+    "Campaign Management",
+    "Bash",
+    "Presentation Skills",
+    "Copywriting",
+    "Video Production",
+    "Market Research",
+    "CI/CD",
+    "Digital Marketing",
+    "CRM",
+    "Google Analytics",
+    "Scrum",
+    "Email Marketing"
+  ],
+  "experience_years": 11.5,
+  "work_history": [
+    {
+      "title": "Head of Marketing",
+      "company": "Solstice Energy Labs",
+      "years": 2.3,
+      "summary": "Wrote and edited copy for web pages, newsletters and social posts (Brand Strategy, Email Marketing)",
+      "start": "2024-01",
+      "end": "2026-05",
+      "bullets": [
+        "Wrote and edited copy for web pages, newsletters and social posts (Brand Strategy, Email Marketing)",
+        "Planned and ran campaigns across search, social and email",
+        "Managed a monthly budget and reported results to leadership"
+      ]
+    },
+    {
+      "title": "Head of Marketing",
+      "company": "Kestrelworks",
+      "years": 4.1,
+      "summary": "Grew organic traffic by 45% through content and technical improvements (Brand Strategy, CRM)",
+      "start": "2019-09",
+      "end": "2023-10",
+      "bullets": [
+        "Grew organic traffic by 45% through content and technical improvements (Brand Strategy, CRM)",
+        "Managed a monthly budget and reported results to leadership",
+        "Coordinated 3 product launches with sales and product teams",
+        "Planned and ran campaigns across search, social and email"
+      ]
+    },
+    {
+      "title": "Senior Marketing Manager",
+      "company": "Aurelia Payments",
+      "years": 3.2,
+      "summary": "Managed a monthly budget and reported results to leadership",
+      "start": "2016-03",
+      "end": "2019-06",
+      "bullets": [
+        "Managed a monthly budget and reported results to leadership",
+        "Grew organic traffic by 25% through content and technical improvements",
+        "Planned and ran campaigns across search, social and email (Digital Marketing, Content Marketing)"
+      ]
+    },
+    {
+      "title": "Marketing Specialist",
+      "company": "Skylark Education",
+      "years": 1.8,
+      "summary": "Wrote and edited copy for web pages, newsletters and social posts",
+      "start": "2014-05",
+      "end": "2016-03",
+      "bullets": [
+        "Wrote and edited copy for web pages, newsletters and social posts",
+        "Managed a monthly budget and reported results to leadership (CRM, Market Research)",
+        "Coordinated 7 product launches with sales and product teams"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Business Administration",
+      "institution": "Saint Albrecht University",
+      "grad_year": 2014
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Polish (basic)",
+    "Romanian (intermediate)"
+  ],
+  "certifications": []
+}

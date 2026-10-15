@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior UX Designer",
+  "summary": "7 years of hands-on work with User Research and User Flows, most recently as Senior UX Designer. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "User Research",
+    "CSS",
+    "Interaction Design",
+    "Accessibility",
+    "Figma",
+    "Information Architecture",
+    "Networking",
+    "Communication",
+    "Journey Mapping",
+    "Design Thinking",
+    "User Flows",
+    "Wireframing"
+  ],
+  "experience_years": 7.5,
+  "work_history": [
+    {
+      "title": "Senior UX Designer",
+      "company": "Kestrelworks",
+      "years": 2.4,
+      "summary": "Contributed components and guidelines to the design system (Wireframing, Accessibility)",
+      "start": "2024-04",
+      "end": null,
+      "bullets": [
+        "Contributed components and guidelines to the design system (Wireframing, Accessibility)",
+        "Redesigned a key journey, lifting task completion by 30% (User Flows, Design Thinking)",
+        "Worked with developers to ship accessible interfaces",
+        "Designed user flows, wireframes and interactive prototypes (Design Thinking, Information Architecture)"
+      ]
+    },
+    {
+      "title": "UX Designer",
+      "company": "Wavecrest Telecom",
+      "years": 2.1,
+      "summary": "Redesigned a key journey, lifting task completion by 45% (Information Architecture, Journey Mapping)",
+      "start": "2022-03",
+      "end": "2024-04",
+      "bullets": [
+        "Redesigned a key journey, lifting task completion by 45% (Information Architecture, Journey Mapping)",
+        "Facilitated 7 discovery workshops with stakeholders (Design Thinking, Figma)",
+        "Ran usability tests with 4 participants and iterated on the results (Accessibility, User Flows)",
+        "Worked with developers to ship accessible interfaces"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Hollowell Foods",
+      "years": 3.0,
+      "summary": "Designed user flows, wireframes and interactive prototypes (Interaction Design, Accessibility)",
+      "start": "2018-12",
+      "end": "2021-12",
+      "bullets": [
+        "Designed user flows, wireframes and interactive prototypes (Interaction Design, Accessibility)",
+        "Facilitated 6 discovery workshops with stakeholders (Design Thinking, Figma)",
+        "Redesigned a key journey, lifting task completion by 30%",
+        "Worked with developers to ship accessible interfaces"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Psychology",
+      "institution": "Valmont University",
+      "grad_year": 2018
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Spanish (B2)"
+  ],
+  "certifications": [
+    "Certified Usability Analyst"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1",
+  "headline": "Data Scientist",
+  "summary": "3 years of hands-on work with Machine Learning and NLP, most recently as Data Scientist. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Machine Learning",
+    "PyTorch",
+    "A/B Testing",
+    "NLP",
+    "Airflow",
+    "SQL",
+    "Statistics",
+    "TensorFlow",
+    "Java"
+  ],
+  "experience_years": 3.7,
+  "work_history": [
+    {
+      "title": "Data Scientist",
+      "company": "Northgate Devices",
+      "years": 0.9,
+      "summary": "Improved model precision by 30% through feature work and error analysis",
+      "start": "2025-10",
+      "end": null,
+      "bullets": [
+        "Improved model precision by 30% through feature work and error analysis",
+        "Designed and analysed 3 online experiments",
+        "Trained and evaluated models for a ranking problem",
+        "Built data pipelines and notebooks used by 8 analysts (A/B Testing, TensorFlow)"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Corvid Logic",
+      "years": 1.2,
+      "summary": "Built data pipelines and notebooks used by 8 analysts (Airflow, Machine Learning)",
+      "start": "2024-08",
+      "end": "2025-10",
+      "bullets": [
+        "Built data pipelines and notebooks used by 8 analysts (Airflow, Machine Learning)",
+        "Improved model precision by 30% through feature work and error analysis (Machine Learning, Statistics)"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Oakhaven Analytics",
+      "years": 1.6,
+      "summary": "Presented findings to non-technical stakeholders and turned them into roadmap items (A/B Testing, TensorFlow)",
+      "start": "2022-12",
+      "end": "2024-07",
+      "bullets": [
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (A/B Testing, TensorFlow)",
+        "Built data pipelines and notebooks used by 7 analysts (PyTorch, Machine Learning)",
+        "Improved model precision by 40% through feature work and error analysis (TensorFlow, Statistics)",
+        "Trained and evaluated models for a ranking problem"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Computer Science",
+      "institution": "Saint Albrecht University",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.Sc. Applied Mathematics",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "French (C1)"
+  ],
+  "certifications": [
+    "Machine Learning Specialization"
+  ]
+}

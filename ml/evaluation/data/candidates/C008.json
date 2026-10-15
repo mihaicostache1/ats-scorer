@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.1",
+  "headline": "Product Manager",
+  "summary": "Product Manager with 4 years of experience in A/B Testing, Data Analysis and Roadmapping. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "KPI Definition",
+    "Data Analysis",
+    "Agile",
+    "Figma",
+    "Roadmapping",
+    "Go-to-Market",
+    "A/B Testing",
+    "Product Analytics",
+    "User Research",
+    "JIRA",
+    "Backlog Prioritization"
+  ],
+  "experience_years": 4.5,
+  "work_history": [
+    {
+      "title": "Product Manager",
+      "company": "Stonebridge Health",
+      "years": 1.3,
+      "summary": "Launched a feature that raised activation by 25%",
+      "start": "2025-05",
+      "end": null,
+      "bullets": [
+        "Launched a feature that raised activation by 25%",
+        "Owned the roadmap and backlog for a product used by 7 customer teams (Agile, Data Analysis)",
+        "Defined success metrics and reviewed them with stakeholders every month (A/B Testing, Go-to-Market)"
+      ]
+    },
+    {
+      "title": "Associate Product Manager",
+      "company": "Marlowe Retail",
+      "years": 1.9,
+      "summary": "Ran user interviews and turned the findings into prioritised user stories (KPI Definition, Product Analytics)",
+      "start": "2023-03",
+      "end": "2025-02",
+      "bullets": [
+        "Ran user interviews and turned the findings into prioritised user stories (KPI Definition, Product Analytics)",
+        "Owned the roadmap and backlog for a product used by 4 customer teams (Product Analytics, Backlog Prioritization)",
+        "Defined success metrics and reviewed them with stakeholders every month",
+        "Coordinated 5 releases across engineering, sales and support (JIRA, Data Analysis)"
+      ]
+    },
+    {
+      "title": "Associate Product Manager",
+      "company": "Pinecrest Mobility",
+      "years": 1.2,
+      "summary": "Owned the roadmap and backlog for a product used by 8 customer teams (Backlog Prioritization, Roadmapping)",
+      "start": "2021-11",
+      "end": "2023-02",
+      "bullets": [
+        "Owned the roadmap and backlog for a product used by 8 customer teams (Backlog Prioritization, Roadmapping)",
+        "Ran user interviews and turned the findings into prioritised user stories (Product Analytics, Backlog Prioritization)",
+        "Defined success metrics and reviewed them with stakeholders every month (Agile, Backlog Prioritization)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Economics",
+      "institution": "Lakeshore University",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.A. Information Systems",
+      "institution": "Valmont University",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (C1)",
+    "French (basic)",
+    "Italian (intermediate)"
+  ],
+  "certifications": [
+    "Product Management Certificate"
+  ]
+}

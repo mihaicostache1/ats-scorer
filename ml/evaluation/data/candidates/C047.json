@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior Data Analyst",
+  "summary": "My most recent role is Junior Data Analyst; most of my work involves Power BI, Data Cleaning and Stakeholder Communication. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Power BI",
+    "Stakeholder Communication",
+    "BigQuery",
+    "SQL",
+    "React",
+    "Redux",
+    "Data Cleaning"
+  ],
+  "experience_years": 1.6,
+  "work_history": [
+    {
+      "title": "Junior Data Analyst",
+      "company": "Driftwood Media",
+      "years": 1.6,
+      "summary": "Built dashboards and recurring reports for sales and operations",
+      "start": "2025-02",
+      "end": null,
+      "bullets": [
+        "Built dashboards and recurring reports for sales and operations",
+        "Cleaned and combined data from 5 sources for monthly reporting",
+        "Analysed campaign and product data and presented recommendations (Data Cleaning, Stakeholder Communication)",
+        "Automated a manual report, saving about 30 hours per month"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Economics",
+      "institution": "Harcastle University",
+      "grad_year": 2025
+    }
+  ],
+  "languages": [
+    "English (C1)"
+  ],
+  "certifications": [
+    "Microsoft Power BI Data Analyst Associate",
+    "Google Data Analytics Certificate"
+  ]
+}

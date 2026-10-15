@@ -1,0 +1,105 @@
+{
+  "schema_version": "0.1",
+  "headline": "Analytics Lead",
+  "summary": "Analytics Lead with 10 years of experience in Dashboards, Power BI and pandas. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Power BI",
+    "Stakeholder Communication",
+    "Data Visualization",
+    "Snowflake",
+    "scikit-learn",
+    "Dashboards",
+    "BigQuery",
+    "Statistics",
+    "Python",
+    "Reporting",
+    "Data Cleaning",
+    "pandas",
+    "Presentation Skills",
+    "SQL"
+  ],
+  "experience_years": 10.8,
+  "work_history": [
+    {
+      "title": "Analytics Lead",
+      "company": "Stonebridge Health",
+      "years": 2.9,
+      "summary": "Built dashboards and recurring reports for sales and operations (Snowflake, Dashboards)",
+      "start": "2023-10",
+      "end": null,
+      "bullets": [
+        "Built dashboards and recurring reports for sales and operations (Snowflake, Dashboards)",
+        "Automated a manual report, saving about 20 hours per month (Power BI, BigQuery)",
+        "Cleaned and combined data from 6 sources for monthly reporting (Dashboards, Snowflake)"
+      ]
+    },
+    {
+      "title": "Analytics Lead",
+      "company": "Tidewater Robotics",
+      "years": 1.6,
+      "summary": "Trained 7 colleagues to build their own reports",
+      "start": "2021-12",
+      "end": "2023-07",
+      "bullets": [
+        "Trained 7 colleagues to build their own reports",
+        "Defined metrics with stakeholders and documented how they are calculated (SQL, pandas)",
+        "Cleaned and combined data from 6 sources for monthly reporting"
+      ]
+    },
+    {
+      "title": "Analytics Lead",
+      "company": "Quartzline Software",
+      "years": 2.8,
+      "summary": "Built dashboards and recurring reports for sales and operations (Data Cleaning, pandas)",
+      "start": "2018-12",
+      "end": "2021-10",
+      "bullets": [
+        "Built dashboards and recurring reports for sales and operations (Data Cleaning, pandas)",
+        "Cleaned and combined data from 5 sources for monthly reporting",
+        "Automated a manual report, saving about 20 hours per month (BigQuery, SQL)",
+        "Trained 3 colleagues to build their own reports"
+      ]
+    },
+    {
+      "title": "Senior Data Analyst",
+      "company": "Ferrowind Technologies",
+      "years": 2.2,
+      "summary": "Cleaned and combined data from 5 sources for monthly reporting (Statistics, Stakeholder Communication)",
+      "start": "2016-10",
+      "end": "2018-12",
+      "bullets": [
+        "Cleaned and combined data from 5 sources for monthly reporting (Statistics, Stakeholder Communication)",
+        "Trained 7 colleagues to build their own reports (SQL, BigQuery)",
+        "Defined metrics with stakeholders and documented how they are calculated (SQL, Data Visualization)",
+        "Analysed campaign and product data and presented recommendations (pandas, Statistics)"
+      ]
+    },
+    {
+      "title": "Data Analyst",
+      "company": "Halcyon Freight",
+      "years": 1.2,
+      "summary": "Trained 3 colleagues to build their own reports",
+      "start": "2015-04",
+      "end": "2016-07",
+      "bullets": [
+        "Trained 3 colleagues to build their own reports",
+        "Automated a manual report, saving about 40 hours per month (Python, Data Visualization)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Mathematics",
+      "institution": "Riverton College",
+      "grad_year": 2015
+    }
+  ],
+  "languages": [
+    "English (C1)",
+    "German (B2)",
+    "Polish (professional)"
+  ],
+  "certifications": [
+    "Microsoft Power BI Data Analyst Associate"
+  ]
+}

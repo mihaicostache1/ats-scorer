@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1",
+  "headline": "Marketing Specialist",
+  "summary": "Marketing Specialist with 4 years of experience in Campaign Management, Digital Marketing and Brand Strategy. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Google Ads",
+    "Brand Strategy",
+    "Google Analytics",
+    "Digital Marketing",
+    "Scrum",
+    "Campaign Management",
+    "Market Research",
+    "SEO"
+  ],
+  "experience_years": 4.2,
+  "work_history": [
+    {
+      "title": "Marketing Specialist",
+      "company": "Tidewater Robotics",
+      "years": 0.9,
+      "summary": "Coordinated 7 product launches with sales and product teams (Google Ads, Market Research)",
+      "start": "2025-10",
+      "end": null,
+      "bullets": [
+        "Coordinated 7 product launches with sales and product teams (Google Ads, Market Research)",
+        "Raised newsletter click-through by 40% with segmented content (Digital Marketing, Google Ads)",
+        "Wrote and edited copy for web pages, newsletters and social posts"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Wavecrest Telecom",
+      "years": 1.6,
+      "summary": "Managed a monthly budget and reported results to leadership",
+      "start": "2024-03",
+      "end": "2025-10",
+      "bullets": [
+        "Managed a monthly budget and reported results to leadership",
+        "Grew organic traffic by 10% through content and technical improvements (Market Research, Campaign Management)",
+        "Planned and ran campaigns across search, social and email (SEO, Google Analytics)"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Lumenfold Digital",
+      "years": 1.8,
+      "summary": "Coordinated 3 product launches with sales and product teams (Campaign Management, SEO)",
+      "start": "2022-05",
+      "end": "2024-02",
+      "bullets": [
+        "Coordinated 3 product launches with sales and product teams (Campaign Management, SEO)",
+        "Wrote and edited copy for web pages, newsletters and social posts",
+        "Managed a monthly budget and reported results to leadership"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Communication",
+      "institution": "Harcastle University",
+      "grad_year": 2022
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Dutch (intermediate)",
+    "German (C1)"
+  ],
+  "certifications": []
+}
