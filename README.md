@@ -34,6 +34,7 @@ docker compose down -v        # stop AND delete all data
 ### Run the apps
 - API: `uvicorn app.main:app --reload` (from the backend folder)
 - Web: `npm run dev` (from the web folder)
+- Web tests: `npm test` and `npm run test:e2e` (from the web folder). See [web/README.md](web/README.md#testing).
 
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:

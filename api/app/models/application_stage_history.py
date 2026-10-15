@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Index, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -46,6 +46,9 @@ class ApplicationStageHistory(Base):
         nullable=False,
     )
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # The application's latest score when the move was made; NULL if it had none.
+    overall_score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
+    model_version: Mapped[str | None] = mapped_column(String(50), nullable=True)
     moved_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

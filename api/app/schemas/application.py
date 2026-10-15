@@ -82,6 +82,8 @@ class StageHistoryResponse(BaseModel):
     from_stage_id: uuid.UUID | None
     to_stage_id: uuid.UUID
     reason: str | None
+    overall_score: float | None
+    model_version: str | None
     moved_by: uuid.UUID | None
     moved_at: datetime
 
