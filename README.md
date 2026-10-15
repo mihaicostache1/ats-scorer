@@ -69,3 +69,4 @@ make seed
 - [Synthetic CV and job dataset](ml/synthetic/README.md)
 - [Embedding model and skill matching](docs/ml/embedding-model-and-skill-matching.md)
 - [Scoring package](ml/README.md) and [parsed-CV schema](docs/ml/parsed-cv-schema.md)
+- [Evaluation harness and rating process](docs/ml/evaluation.md)
