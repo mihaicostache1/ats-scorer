@@ -1,0 +1,73 @@
+{
+  "schema_version": "0.1",
+  "headline": "Data Analyst",
+  "summary": "Data Analyst with 4 years of experience in Excel, Reporting and SQL. Enjoys mentoring and clear documentation.",
+  "skills": [
+    "Reporting",
+    "Excel",
+    "Python",
+    "Snowflake",
+    "Looker",
+    "Tableau",
+    "SQL",
+    "Stakeholder Communication"
+  ],
+  "experience_years": 4.8,
+  "work_history": [
+    {
+      "title": "Data Analyst",
+      "company": "Hollowell Foods",
+      "years": 1.3,
+      "summary": "Automated a manual report, saving about 25 hours per month (Snowflake, SQL)",
+      "start": "2025-05",
+      "end": null,
+      "bullets": [
+        "Automated a manual report, saving about 25 hours per month (Snowflake, SQL)",
+        "Trained 7 colleagues to build their own reports (Reporting, Snowflake)",
+        "Cleaned and combined data from 2 sources for monthly reporting"
+      ]
+    },
+    {
+      "title": "Junior Data Analyst",
+      "company": "Ferrowind Technologies",
+      "years": 1.7,
+      "summary": "Built dashboards and recurring reports for sales and operations (Tableau, Excel)",
+      "start": "2023-06",
+      "end": "2025-02",
+      "bullets": [
+        "Built dashboards and recurring reports for sales and operations (Tableau, Excel)",
+        "Automated a manual report, saving about 10 hours per month (Reporting, Snowflake)"
+      ]
+    },
+    {
+      "title": "Junior Data Analyst",
+      "company": "Northgate Devices",
+      "years": 1.8,
+      "summary": "Analysed campaign and product data and presented recommendations (SQL, Excel)",
+      "start": "2021-07",
+      "end": "2023-05",
+      "bullets": [
+        "Analysed campaign and product data and presented recommendations (SQL, Excel)",
+        "Cleaned and combined data from 8 sources for monthly reporting"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Economics",
+      "institution": "Greyfield College",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.Sc. Business Informatics",
+      "institution": "Ardenne Business School",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Portuguese (intermediate)",
+    "Dutch (C1)"
+  ],
+  "certifications": []
+}

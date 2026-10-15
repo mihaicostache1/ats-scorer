@@ -1,0 +1,58 @@
+{
+  "schema_version": "0.1",
+  "headline": "Marketing Assistant",
+  "summary": "My most recent role is Marketing Assistant; most of my work involves Campaign Management, Email Marketing and Copywriting. Enjoys mentoring and clear documentation.",
+  "skills": [
+    "User Stories",
+    "Campaign Management",
+    "Copywriting",
+    "HubSpot",
+    "Google Analytics",
+    "Content Marketing",
+    "Email Marketing",
+    "Scrum"
+  ],
+  "experience_years": 1.4,
+  "work_history": [
+    {
+      "title": "Marketing Assistant",
+      "company": "Pinecrest Mobility",
+      "years": 0.7,
+      "summary": "Managed a monthly budget and reported results to leadership (Campaign Management, Email Marketing)",
+      "start": "2026-01",
+      "end": null,
+      "bullets": [
+        "Managed a monthly budget and reported results to leadership (Campaign Management, Email Marketing)",
+        "Coordinated 2 product launches with sales and product teams (Campaign Management, Copywriting)",
+        "Raised newsletter click-through by 40% with segmented content",
+        "Grew organic traffic by 35% through content and technical improvements"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Halcyon Freight",
+      "years": 0.8,
+      "summary": "Coordinated 7 product launches with sales and product teams (Content Marketing, Copywriting)",
+      "start": "2025-03",
+      "end": "2025-12",
+      "bullets": [
+        "Coordinated 7 product launches with sales and product teams (Content Marketing, Copywriting)",
+        "Grew organic traffic by 15% through content and technical improvements (Campaign Management, Google Analytics)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Marketing",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2024
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Dutch (intermediate)"
+  ],
+  "certifications": [
+    "HubSpot Content Marketing Certification"
+  ]
+}

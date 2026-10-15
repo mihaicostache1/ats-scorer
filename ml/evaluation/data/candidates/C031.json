@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1",
+  "headline": "Backend Developer",
+  "summary": "My most recent role is Backend Developer; most of my work involves PostgreSQL, Python and REST APIs. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "AWS",
+    "Spring Boot",
+    "Test Planning",
+    "RabbitMQ",
+    "SQL",
+    "Django",
+    "Python",
+    "REST APIs",
+    "Scrum",
+    "PostgreSQL",
+    "Cypress"
+  ],
+  "experience_years": 4.2,
+  "work_history": [
+    {
+      "title": "Backend Developer",
+      "company": "Copperfield Insurance",
+      "years": 2.8,
+      "summary": "Migrated a legacy module to a new stack together with QA and product (PostgreSQL, Python)",
+      "start": "2023-12",
+      "end": null,
+      "bullets": [
+        "Migrated a legacy module to a new stack together with QA and product (PostgreSQL, Python)",
+        "Wrote unit and integration tests, raising coverage by 40 percentage points"
+      ]
+    },
+    {
+      "title": "Junior Backend Developer",
+      "company": "Halcyon Freight",
+      "years": 1.4,
+      "summary": "Designed REST endpoints and data models for new product features",
+      "start": "2022-07",
+      "end": "2023-12",
+      "bullets": [
+        "Designed REST endpoints and data models for new product features",
+        "Reviewed pull requests and supported 4 newer developers (SQL, AWS)",
+        "Cut average response time by 40% by profiling queries and adding caching (Django, SQL)",
+        "Wrote unit and integration tests, raising coverage by 30 percentage points"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Computer Science",
+      "institution": "Northfield Technical University",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (native)"
+  ],
+  "certifications": [
+    "AWS Certified Developer - Associate"
+  ]
+}

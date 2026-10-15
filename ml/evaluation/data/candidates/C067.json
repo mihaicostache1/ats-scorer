@@ -1,0 +1,62 @@
+{
+  "schema_version": "0.1",
+  "headline": "Data Analyst",
+  "summary": "4 years of hands-on work with Data Cleaning and Power BI, most recently as Data Analyst. Enjoys mentoring and clear documentation.",
+  "skills": [
+    "pandas",
+    "Statistics",
+    "A/B Testing",
+    "Java",
+    "SQL",
+    "Power BI",
+    "Data Cleaning",
+    "Test Automation",
+    "Mentoring"
+  ],
+  "experience_years": 4.4,
+  "work_history": [
+    {
+      "title": "Data Analyst",
+      "company": "Ironbark Logistics",
+      "years": 2.2,
+      "summary": "Trained 6 colleagues to build their own reports",
+      "start": "2024-07",
+      "end": null,
+      "bullets": [
+        "Trained 6 colleagues to build their own reports",
+        "Analysed campaign and product data and presented recommendations"
+      ]
+    },
+    {
+      "title": "Junior Data Analyst",
+      "company": "Brightloom Studio",
+      "years": 2.2,
+      "summary": "Cleaned and combined data from 2 sources for monthly reporting",
+      "start": "2022-02",
+      "end": "2024-05",
+      "bullets": [
+        "Cleaned and combined data from 2 sources for monthly reporting",
+        "Analysed campaign and product data and presented recommendations",
+        "Built dashboards and recurring reports for sales and operations (A/B Testing, Power BI)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Business Informatics",
+      "institution": "Valmont University",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.Sc. Business Informatics",
+      "institution": "Dunmore Institute of Design",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (native)"
+  ],
+  "certifications": [
+    "Google Data Analytics Certificate"
+  ]
+}

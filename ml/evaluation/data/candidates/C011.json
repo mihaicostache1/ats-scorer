@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior Backend Developer",
+  "summary": "Under a year of hands-on work with Go and Microservices, most recently as Junior Backend Developer. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Agile",
+    "AWS",
+    "Java",
+    "PostgreSQL",
+    "Go",
+    "Stakeholder Communication",
+    "Microservices"
+  ],
+  "experience_years": 0.7,
+  "work_history": [
+    {
+      "title": "Junior Backend Developer",
+      "company": "Solstice Energy Labs",
+      "years": 0.7,
+      "summary": "Reviewed pull requests and supported 8 newer developers (AWS, Go)",
+      "start": "2026-01",
+      "end": null,
+      "bullets": [
+        "Reviewed pull requests and supported 8 newer developers (AWS, Go)",
+        "Cut average response time by 20% by profiling queries and adding caching"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Lakeshore University",
+      "grad_year": 2025
+    }
+  ],
+  "languages": [
+    "English (C1)"
+  ],
+  "certifications": [
+    "AWS Certified Developer - Associate",
+    "Oracle Certified Professional: Java SE Programmer"
+  ]
+}

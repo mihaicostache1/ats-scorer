@@ -1,0 +1,443 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Times-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C021) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 1 /Kids [ 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 7958
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 57.02362 768.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18.5 Tf 22.5 TL (Maggie Pottier) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 750.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F3 11.5 Tf 15.5 TL (Senior Backend Engineer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 735.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (maggie.pottier@example.org | +1-512-555-0198 | Lisbon, Portugal) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 711.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Summary) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 682.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16.5 Tm /F3 9.5 Tf 13 TL (7 years of hands-on work with FastAPI and Python, most recently as Senior Backend Engineer. Comfortable working in) Tj T* (cross-functional agile teams.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 659.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Experience) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 643.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Backend Engineer) Tj /F3 9.5 Tf (, Quartzline Software) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 631.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (2025 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 618.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Migrated a legacy module to a new stack together with QA and product \(Java, FastAPI\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 605.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Built and maintained backend services used by 5 internal teams) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 592.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Reviewed pull requests and supported 5 newer developers \(REST APIs, PostgreSQL\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 579.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Wrote unit and integration tests, raising coverage by 35 percentage points) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 574.5354 cm
+Q
+q
+1 0 0 1 57.02362 561.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Backend Engineer) Tj /F3 9.5 Tf (, Brightloom Studio) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 550.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (2023 - 2024) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 537.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Designed REST endpoints and data models for new product features \(Python, SQL\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 524.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Reviewed pull requests and supported 6 newer developers \(PostgreSQL, FastAPI\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 511.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Cut average response time by 20% by profiling queries and adding caching) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 506.0354 cm
+Q
+q
+1 0 0 1 57.02362 493.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Backend Engineer) Tj /F3 9.5 Tf (, Oakhaven Analytics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 481.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (2020 - 2023) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 468.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Wrote unit and integration tests, raising coverage by 45 percentage points) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 455.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Cut average response time by 40% by profiling queries and adding caching) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 450.5354 cm
+Q
+q
+1 0 0 1 57.02362 437.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Backend Engineer) Tj /F3 9.5 Tf (, Northgate Devices) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 426.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (2018 - 2020) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 413.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Migrated a legacy module to a new stack together with QA and product \(Docker, Java\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 400.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Reviewed pull requests and supported 2 newer developers \(SQL, Kafka\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 395.0354 cm
+Q
+q
+1 0 0 1 57.02362 371.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Technical Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 355.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Microservices) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 342.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (REST APIs) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 329.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Java) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 316.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Docker) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 303.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Kafka) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 290.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Python) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 277.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Kubernetes) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 264.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (FastAPI) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 251.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (PostgreSQL) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 238.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Next.js) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 225.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (SQL) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 212.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Go) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 199.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (Scrum) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 186.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL (CI/CD) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 163.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 14.5 TL /F2 11 Tf 0 0 0 rg (Education & Training) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 147.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (M.Sc. Software Engineering) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 135.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Eastbridge Institute of Technology, 2017) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 122.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (B.Sc. Computer Science) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 111.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Dunmore Institute of Design, 2015) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 87.53543 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Language Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 71.53543 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 9.5 Tf 13 TL (English \(fluent\), Spanish \(fluent\)) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000061 00000 n 
+0000000112 00000 n 
+0000000219 00000 n 
+0000000327 00000 n 
+0000000436 00000 n 
+0000000639 00000 n 
+0000000707 00000 n 
+0000001037 00000 n 
+0000001096 00000 n 
+trailer
+<<
+/ID 
+[<94778ca4babbc7b8f5e480bae7e6997e><94778ca4babbc7b8f5e480bae7e6997e>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 10
+>>
+startxref
+9105
+%%EOF
