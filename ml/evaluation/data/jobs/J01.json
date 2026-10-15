@@ -1,0 +1,20 @@
+{
+  "title": "Senior Backend Engineer",
+  "department": "Engineering",
+  "location": "Bucharest, Romania",
+  "employment_type": "part_time",
+  "description": "Our Engineering team is growing and we are looking for a Senior Backend Engineer. You will monitor production and fix issues quickly, write automated tests and take part in code reviews, model data and write efficient queries and work with product, frontend and QA to ship features end to end. At least 6 years of relevant experience. You should be confident with Microservices, Python, Docker, Java, Spring Boot and FastAPI. Experience with Go and SQL is a plus. Location: Bucharest, Romania.",
+  "required_skills": [
+    "Microservices",
+    "Python",
+    "Docker",
+    "Java",
+    "Spring Boot",
+    "FastAPI"
+  ],
+  "preferred_skills": [
+    "Go",
+    "SQL"
+  ],
+  "min_experience_years": 6
+}

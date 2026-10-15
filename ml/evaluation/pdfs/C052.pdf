@@ -1,0 +1,449 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Times-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C052) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 1 /Kids [ 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 8385
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 51.35433 744.5354 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 0 20.5 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18.5 Tf 22.5 TL (Jason Roberts) Tj T* ET
+Q
+Q
+q
+1 0 0 1 0 3 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F3 11.5 Tf 15.5 TL (Senior Frontend Engineer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 305.3915 8.5 cm
+q
+BT 1 0 0 1 0 26 Tm 90.36393 0 Td 11.5 TL /F3 8.5 Tf 0 0 0 rg (jason.roberts@example.net) Tj  T* 32.776 0 Td (+1-512-555-0134) Tj  T* 14.71353 0 Td (Lyon, France) Tj T* -137.8534 0 Td ET
+Q
+Q
+q
+1 J
+1 j
+0 0 0 RG
+.8 w
+n 0 0 m 492.5669 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 51.35433 721.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (About Me) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 692.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16.5 Tm /F3 9.5 Tf 13 TL (My most recent role is Senior Frontend Engineer; most of my work involves Tailwind CSS, Responsive Design and Vue.js.) Tj T* (Enjoys mentoring and clear documentation.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 668.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Experience) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 319.5354 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 0 330.5 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Mar 2025 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 329 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Senior Frontend Engineer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 317.5 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Stonebridge Health) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 304.5 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Built reusable UI components for the main web application) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 278.5 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Improved page load time by 35% through code splitting and image optimisation \(JavaScript,) Tj T* -0.025 0 Td (Tailwind CSS\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 265.5 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Added automated tests that caught regressions before release \(JavaScript, Node.js\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 252.5 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Led the move of 3 legacy screens to a modern framework \(Tailwind CSS, TypeScript\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 0 231 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Apr 2022 - Jan 2025) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 229.5 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Frontend Developer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 218 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Quartzline Software) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 205 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Maintained a shared component library used across 4 products) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 192 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Worked with designers to turn mock-ups into accessible, responsive pages \(Next.js, JavaScript\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 179 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Added automated tests that caught regressions before release \(TypeScript, Next.js\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 166 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Led the move of 6 legacy screens to a modern framework) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 0 144.5 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Feb 2021 - Mar 2022) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 143 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Junior Frontend Developer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 131.5 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Solstice Energy Labs) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 118.5 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Built reusable UI components for the main web application \(Responsive Design, HTML\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 105.5 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Maintained a shared component library used across 4 products) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 0 84 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Mar 2019 - Feb 2021) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 82.5 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Junior Frontend Developer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 71 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8.5 Tf 11.5 TL (Brightloom Studio) Tj T* ET
+Q
+Q
+q
+1 0 0 1 102.0472 58 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Worked with designers to turn mock-ups into accessible, responsive pages \(Node.js, HTML\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 45 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Led the move of 3 legacy screens to a modern framework \(TypeScript, Tailwind CSS\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 32 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Built reusable UI components for the main web application \(Responsive Design, Storybook\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 102.0472 6 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F3 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F3 9.5 Tf 13 TL .025 0 Td (Improved page load time by 30% through code splitting and image optimisation \(JavaScript,) Tj T* -0.025 0 Td (TypeScript\)) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.827451 .827451 .827451 RG
+.25 w
+n 0 246.5 m 492.5669 246.5 l S
+n 0 160 m 492.5669 160 l S
+n 0 99.5 m 492.5669 99.5 l S
+n 0 0 m 492.5669 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 51.35433 296.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Core Competencies) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 225.8354 cm
+q
+0 0 0 rg
+BT /F3 9 Tf 10.8 TL ET
+BT 1 0 0 1 6 55.2 Tm (Next.js) Tj T* ET
+BT 1 0 0 1 170.189 55.2 Tm (Storybook) Tj T* ET
+BT 1 0 0 1 334.378 55.2 Tm (Tailwind CSS) Tj T* ET
+BT 1 0 0 1 6 38.4 Tm (React) Tj T* ET
+BT 1 0 0 1 170.189 38.4 Tm (TypeScript) Tj T* ET
+BT 1 0 0 1 334.378 38.4 Tm (Jest) Tj T* ET
+BT 1 0 0 1 6 21.6 Tm (Responsive Design) Tj T* ET
+BT 1 0 0 1 170.189 21.6 Tm (Sketch) Tj T* ET
+BT 1 0 0 1 334.378 21.6 Tm (HTML) Tj T* ET
+BT 1 0 0 1 6 4.8 Tm (Vue.js) Tj T* ET
+BT 1 0 0 1 170.189 4.8 Tm (JavaScript) Tj T* ET
+BT 1 0 0 1 334.378 4.8 Tm (Node.js) Tj T* ET
+q
+1 J
+1 j
+.827451 .827451 .827451 RG
+.25 w
+n 0 67.2 m 492.5669 67.2 l S
+n 0 0 m 492.5669 0 l S
+n 0 0 m 0 67.2 l S
+n 492.5669 0 m 492.5669 67.2 l S
+n 0 50.4 m 492.5669 50.4 l S
+n 0 33.6 m 492.5669 33.6 l S
+n 0 16.8 m 492.5669 16.8 l S
+n 164.189 0 m 164.189 67.2 l S
+n 328.378 0 m 328.378 67.2 l S
+Q
+Q
+Q
+q
+1 0 0 1 51.35433 202.3354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 14.5 TL /F2 11 Tf 0 0 0 rg (Education & Training) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 180.3354 cm
+q
+0 0 0 rg
+BT /F3 8.5 Tf 10.2 TL ET
+BT 1 0 0 1 0 7.5 Tm (2018) Tj T* ET
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 102.0472 3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 9.5 Tf 13 TL (B.Sc. Computer Science, Westmark University of Applied Sciences) Tj T* ET
+Q
+Q
+q
+Q
+Q
+Q
+q
+1 0 0 1 51.35433 156.8354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Languages) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 140.8354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 9.5 Tf 13 TL (English \(fluent\), German \(C1\), Romanian \(fluent\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 117.3354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 14.5 TL /F2 11 Tf 0 0 0 rg (Courses & Certificates) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 101.3354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 9.5 Tf 13 TL (Web Accessibility Fundamentals) Tj T* ET
+Q
+Q
+q
+1 0 0 1 51.35433 88.33543 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 9.5 Tf 13 TL (Front-End Web Development Certificate) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000061 00000 n 
+0000000112 00000 n 
+0000000219 00000 n 
+0000000327 00000 n 
+0000000436 00000 n 
+0000000639 00000 n 
+0000000707 00000 n 
+0000001037 00000 n 
+0000001096 00000 n 
+trailer
+<<
+/ID 
+[<e6d947c4be86a05eff3beb0252184143><e6d947c4be86a05eff3beb0252184143>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 10
+>>
+startxref
+9532
+%%EOF

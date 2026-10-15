@@ -1,0 +1,80 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Data Scientist",
+  "summary": "8 years of hands-on work with Machine Learning and PyTorch, most recently as Senior Data Scientist. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Backlog Prioritization",
+    "pandas",
+    "User Research",
+    "NLP",
+    "Airflow",
+    "Technical Writing",
+    "Machine Learning",
+    "Jupyter",
+    "Docker",
+    "scikit-learn",
+    "PyTorch",
+    "Data Visualization",
+    "Communication",
+    "TensorFlow"
+  ],
+  "experience_years": 8.7,
+  "work_history": [
+    {
+      "title": "Senior Data Scientist",
+      "company": "Bluepeak Systems",
+      "years": 2.0,
+      "summary": "Presented findings to non-technical stakeholders and turned them into roadmap items (PyTorch, pandas)",
+      "start": "2024-09",
+      "end": null,
+      "bullets": [
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (PyTorch, pandas)",
+        "Designed and analysed 8 online experiments (TensorFlow, Machine Learning)",
+        "Improved model precision by 40% through feature work and error analysis (Data Visualization, PyTorch)",
+        "Built data pipelines and notebooks used by 8 analysts (Jupyter, Data Visualization)"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Saffron Street Bank",
+      "years": 3.8,
+      "summary": "Presented findings to non-technical stakeholders and turned them into roadmap items (Data Visualization, NLP)",
+      "start": "2020-09",
+      "end": "2024-06",
+      "bullets": [
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (Data Visualization, NLP)",
+        "Built data pipelines and notebooks used by 3 analysts (TensorFlow, Airflow)",
+        "Improved model precision by 25% through feature work and error analysis (pandas, Data Visualization)"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Ferrowind Technologies",
+      "years": 2.9,
+      "summary": "Built data pipelines and notebooks used by 4 analysts (PyTorch, TensorFlow)",
+      "start": "2017-08",
+      "end": "2020-07",
+      "bullets": [
+        "Built data pipelines and notebooks used by 4 analysts (PyTorch, TensorFlow)",
+        "Set up experiment tracking and reproducible training runs (pandas, Data Visualization)",
+        "Trained and evaluated models for a ranking problem",
+        "Improved model precision by 35% through feature work and error analysis (Data Visualization, Machine Learning)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Data Science",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2017
+    }
+  ],
+  "languages": [
+    "English (C1)",
+    "Italian (intermediate)"
+  ],
+  "certifications": [
+    "TensorFlow Developer Certificate",
+    "Machine Learning Specialization"
+  ]
+}

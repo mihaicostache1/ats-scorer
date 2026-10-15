@@ -1,0 +1,21 @@
+{
+  "title": "Data Analyst",
+  "department": "Data",
+  "location": "Berlin, Germany (hybrid)",
+  "employment_type": "contract",
+  "description": "About the role\nWe are hiring a Data Analyst for our Data team (Berlin, Germany (hybrid)).\n\nWhat you will do\n- Build dashboards and reports for business teams\n- Define and document metrics with stakeholders\n- Answer business questions with clear analysis\n\nWhat you bring\n- At least 2 years of relevant experience\n- Solid working knowledge of Data Visualization, pandas, Power BI, Python and Excel\n\nNice to have\n- Data Cleaning, Stakeholder Communication, Looker and Dashboards",
+  "required_skills": [
+    "Data Visualization",
+    "pandas",
+    "Power BI",
+    "Python",
+    "Excel"
+  ],
+  "preferred_skills": [
+    "Data Cleaning",
+    "Stakeholder Communication",
+    "Looker",
+    "Dashboards"
+  ],
+  "min_experience_years": 2
+}
