@@ -16,7 +16,6 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -260,7 +259,7 @@ export default function DevComponentsPage() {
   ];
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-12 pb-16">
         {/* Page Header */}
         <div className="border-border border-b pb-6">
@@ -769,6 +768,6 @@ export default function DevComponentsPage() {
           </div>
         </section>
       </div>
-    </AppShell>
+    </>
   );
 }

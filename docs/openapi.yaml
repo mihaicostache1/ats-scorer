@@ -11,10 +11,45 @@ servers:
     description: Local Development FastAPI Server
 
 paths:
+  /auth/register:
+    post:
+      summary: Register Organization and First Admin
+      description: |
+        Create a new organization and its first admin user, then sign them in.
+        Tokens are set as httpOnly cookies; the body carries identity only.
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Organization created and admin signed in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '409':
+          description: Organization slug or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+
   /auth/login:
     post:
       summary: User Login
-      description: Authenticate user credentials and return JWT access token with user profile.
+      description: |
+        Authenticate user credentials. The access and refresh tokens are set as httpOnly
+        cookies and are never returned in the body. Rate limited per IP.
       operationId: login
       requestBody:
         required: true
@@ -28,9 +63,69 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthTokenResponse'
+                $ref: '#/components/schemas/TokenResponse'
         '401':
-          $ref: '#/components/responses/401Unauthorized'
+          description: Incorrect email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '429':
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+
+  /auth/refresh:
+    post:
+      summary: Refresh Access Token
+      description: Issue a new access token from the httpOnly refresh cookie.
+      operationId: refreshSession
+      responses:
+        '200':
+          description: Session refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Missing, invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+
+  /auth/logout:
+    post:
+      summary: Logout
+      description: Expire the auth cookies.
+      operationId: logout
+      security:
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
 
   /auth/me:
     get:
@@ -38,7 +133,7 @@ paths:
       description: Retrieve current user, role, and organization context.
       operationId: getCurrentUser
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       responses:
         '200':
           description: User profile details
@@ -47,7 +142,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserProfileResponse'
         '401':
-          $ref: '#/components/responses/401Unauthorized'
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
 
   /orgs/current:
     get:
@@ -55,7 +154,7 @@ paths:
       description: Retrieve details for the authenticated tenant workspace.
       operationId: getOrganization
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       responses:
         '200':
           description: Organization workspace details
@@ -72,7 +171,7 @@ paths:
         Archived jobs are excluded unless `status=archived` is requested.
       operationId: listJobs
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - name: status
           in: query
@@ -131,7 +230,7 @@ paths:
         The job starts in `draft`. Requires the `admin` or `recruiter` role.
       operationId: createJob
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       requestBody:
         required: true
         content:
@@ -156,7 +255,7 @@ paths:
       description: Retrieve specific job details including pipeline stages.
       operationId: getJob
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -178,7 +277,7 @@ paths:
         Requires the `admin` or `recruiter` role.
       operationId: updateJob
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       requestBody:
@@ -209,7 +308,7 @@ paths:
         Requires the `admin` or `recruiter` role.
       operationId: updateJobStatus
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       requestBody:
@@ -240,7 +339,7 @@ paths:
         Idempotent. Requires the `admin` or `recruiter` role.
       operationId: archiveJob
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -265,7 +364,7 @@ paths:
         or the organization's default stages (`job_id` null) when it has none.
       operationId: getJobStages
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -288,7 +387,7 @@ paths:
       description: Retrieve paginated candidate pool for tenant workspace.
       operationId: listCandidates
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - name: search
           in: query
@@ -341,7 +440,7 @@ paths:
         consent is recorded. Requires the `admin` or `recruiter` role.
       operationId: createCandidate
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       requestBody:
         required: true
         content:
@@ -368,7 +467,7 @@ paths:
       description: Retrieve a candidate profile.
       operationId: getCandidate
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -389,7 +488,7 @@ paths:
         Requires the `admin` or `recruiter` role.
       operationId: updateCandidate
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       requestBody:
@@ -421,7 +520,7 @@ paths:
         Requires the `admin` role.
       operationId: hardDeleteCandidate
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -440,7 +539,7 @@ paths:
       description: Retrieve the candidate's CV documents with their status, newest first.
       operationId: listCandidateCvDocuments
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -465,7 +564,7 @@ paths:
         Requires the `admin` or `recruiter` role.
       operationId: uploadCandidateCV
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       requestBody:
@@ -513,7 +612,7 @@ paths:
       description: Retrieve one CV document, including its processing status.
       operationId: getCandidateCvDocument
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
         - $ref: '#/components/parameters/CvIdPathParam'
@@ -566,7 +665,7 @@ paths:
         candidate can download it. Files are not served from any public path.
       operationId: downloadCandidateCV
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
         - $ref: '#/components/parameters/CvIdPathParam'
@@ -589,7 +688,7 @@ paths:
       description: Retrieve a paginated list of applications, newest first.
       operationId: listApplications
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - name: job_id
           in: query
@@ -646,7 +745,7 @@ paths:
         closed or archived. Requires the `admin` or `recruiter` role.
       operationId: createApplication
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       requestBody:
         required: true
         content:
@@ -674,7 +773,7 @@ paths:
       summary: Get Application
       operationId: getApplication
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -697,7 +796,7 @@ paths:
         initial placement and has a null `from_stage_id`.
       operationId: getApplicationHistory
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -724,7 +823,7 @@ paths:
         pipeline returns 404. Requires the `admin` or `recruiter` role.
       operationId: updateApplicationStage
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       requestBody:
@@ -753,7 +852,7 @@ paths:
       description: Retrieve AI hybrid fit score, component scores, model version, and matched/missing skills.
       operationId: getApplicationScore
       security:
-        - BearerAuth: []
+        - CookieAuth: []
       parameters:
         - $ref: '#/components/parameters/UUIDPathParam'
       responses:
@@ -765,10 +864,11 @@ paths:
 
 components:
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: httpOnly access-token cookie set by /auth/login and /auth/register.
 
   parameters:
     UUIDPathParam:
@@ -841,21 +941,90 @@ components:
           type: string
           example: SecretPass123!
 
-    AuthTokenResponse:
+    DetailError:
+      description: FastAPI error body. `detail` is a message, or a list of field errors for 422.
       type: object
       required:
-        - access_token
-        - token_type
-        - user
+        - detail
       properties:
-        access_token:
+        detail:
+          oneOf:
+            - type: string
+              example: Incorrect email or password
+            - type: array
+              items:
+                type: object
+                properties:
+                  loc:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: integer
+                  msg:
+                    type: string
+                  type:
+                    type: string
+
+    RegisterRequest:
+      type: object
+      required:
+        - org_name
+        - org_slug
+        - admin_full_name
+        - admin_email
+        - admin_password
+      properties:
+        org_name:
           type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          minLength: 2
+          maxLength: 255
+          example: Acme Corp
+        org_slug:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: '^[a-z0-9-]+$'
+          example: acme-corp
+        admin_full_name:
+          type: string
+          minLength: 2
+          maxLength: 255
+          example: Sarah Jenkins
+        admin_email:
+          type: string
+          format: email
+          example: sarah@acme.com
+        admin_password:
+          type: string
+          minLength: 8
+          example: SecretPass123!
+
+    TokenResponse:
+      type: object
+      description: Identity of the signed-in user. Tokens are only ever sent as httpOnly cookies.
+      required:
+        - token_type
+        - user_id
+        - org_id
+        - role
+        - message
+      properties:
         token_type:
           type: string
-          example: Bearer
-        user:
-          $ref: '#/components/schemas/UserProfileResponse'
+          example: bearer
+        user_id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [admin, recruiter, viewer]
+        message:
+          type: string
+          example: Tokens issued via httpOnly cookies
 
     UserProfileResponse:
       type: object
@@ -865,6 +1034,7 @@ components:
         - email
         - full_name
         - role
+        - is_active
       properties:
         id:
           type: string
@@ -884,6 +1054,9 @@ components:
           type: string
           enum: [admin, recruiter, viewer]
           example: recruiter
+        is_active:
+          type: boolean
+          example: true
 
     OrganizationResponse:
       type: object
@@ -1203,6 +1376,7 @@ components:
           example: null
         parsed_data:
           type: object
+          additionalProperties: true
         consent_given_at:
           type: [string, 'null']
           format: date-time
@@ -1436,6 +1610,8 @@ components:
               example: ["Docker"]
             weights:
               type: object
+              additionalProperties:
+                type: number
               example: {"skill_overlap": 0.4, "semantic": 0.3, "experience": 0.2, "title_fit": 0.1}
             explanations:
               type: array

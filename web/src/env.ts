@@ -4,16 +4,16 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    // Add server-side environment variables here
   },
   client: {
-    // Add client-side environment variables here
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8000/api/v1"),
+    NEXT_PUBLIC_MOCK_API: z
+      .enum(["true", "false"])
+      .default("true")
+      .transform((v) => v === "true"),
   },
-  // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
-  // For Next.js >= 13.4.4, you can use experimental__runtimeEnv
   experimental__runtimeEnv: {
-    NODE_ENV: process.env.NODE_ENV,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_MOCK_API: process.env.NEXT_PUBLIC_MOCK_API,
   },
 });
