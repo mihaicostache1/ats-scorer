@@ -1,0 +1,42 @@
+# Render Blueprint for staging. Render deploys the API from main on every push.
+# The database is Supabase (Postgres + pgvector). No secret values live in this file:
+# every `sync: false` variable is entered once in the Render dashboard.
+# Setup steps: docs/staging-deploy.md
+services:
+  - type: web
+    name: ats-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: commit
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    # Free instances have no pre-deploy step, so migrate on start. Alembic is idempotent.
+    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: ENVIRONMENT
+        value: staging
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL # Supabase session-pooler URL, see docs/staging-deploy.md
+        sync: false
+      - key: CORS_ORIGINS # JSON list, e.g. ["https://ats-web.example.com"]
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: ats-redis
+          property: connectionString
+
+  - type: keyvalue
+    name: ats-redis
+    plan: free
+    region: frankfurt
+    maxmemoryPolicy: noeviction
+    ipAllowList: [] # internal connections only
