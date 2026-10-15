@@ -1,2 +1,5 @@
 # Never convert line endings inside PDFs (test fixtures would be corrupted).
 *.pdf binary
+
+# Shell scripts run in Linux containers, so they must keep LF line endings.
+*.sh text eol=lf

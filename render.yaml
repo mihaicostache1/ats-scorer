@@ -14,7 +14,7 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     # Free instances have no pre-deploy step, so migrate on start. Alembic is idempotent.
-    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    dockerCommand: sh start-staging.sh
     envVars:
       - key: PORT
         value: "8000"
