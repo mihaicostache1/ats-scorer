@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ats-scoring"
+version = "0.1.0"
+description = "Candidate-to-job scoring for the AI-Assisted ATS Platform"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "scikit-learn>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.3.0",
+    "jsonschema>=4.20.0",
+]
+
+[tool.setuptools]
+# ml/ also holds script folders (synthetic, embedding_spike) that are not part of the package.
+packages = ["ats_scoring"]
+
+[tool.setuptools.package-data]
+ats_scoring = ["py.typed", "schemas/*.json"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+# Stand-alone scripts with their own requirements. They are not linted in CI yet.
+extend-exclude = ["embedding_spike", "synthetic"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ats_scoring"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]

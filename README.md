@@ -34,6 +34,7 @@ docker compose down -v        # stop AND delete all data
 ### Run the apps
 - API: `uvicorn app.main:app --reload` (from the backend folder)
 - Web: `npm run dev` (from the web folder)
+- Web tests: `npm test` and `npm run test:e2e` (from the web folder). See [web/README.md](web/README.md#testing).
 
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:
@@ -48,9 +49,9 @@ make seed
 
 - `/api` - Python FastAPI backend service, containing domain logic and vector store logic.
 - `/web` - Next.js (App Router) frontend application using TypeScript, Tailwind CSS, and shadcn/ui.
-- `/ml` - Machine-learning code and data tools. `/ml/synthetic` generates the synthetic CV and job dataset.
+- `/ml` - Machine-learning code and data tools. `/ml/ats_scoring` is the scoring package, `/ml/synthetic` generates the synthetic CV and job dataset.
 - `/docs` - Project documentation.
-- `.github/workflows` - CI pipelines for testing the API and Web services.
+- `.github/workflows` - CI pipelines for testing the API, Web and ML code.
 
 ## Documentation
 
@@ -61,3 +62,4 @@ make seed
 - [UI wireframes](docs/ui_wireframes.md)
 - [Synthetic CV and job dataset](ml/synthetic/README.md)
 - [Embedding model and skill matching](docs/ml/embedding-model-and-skill-matching.md)
+- [Scoring package](ml/README.md) and [parsed-CV schema](docs/ml/parsed-cv-schema.md)

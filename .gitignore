@@ -1,6 +1,7 @@
 .env
 __pycache__/
 .venv/
+*.egg-info/
 node_modules/
 # Uploaded CV files (local-disk storage in development)
 api/storage/
