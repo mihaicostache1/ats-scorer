@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 COPY app ./app
 COPY alembic ./alembic
 COPY tests ./tests
-COPY alembic.ini pyproject.toml ./
+COPY alembic.ini pyproject.toml start-staging.sh ./
 
 EXPOSE 8000
 
