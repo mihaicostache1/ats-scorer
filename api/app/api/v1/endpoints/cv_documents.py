@@ -16,6 +16,7 @@ from app.models.cv_document import CvDocument
 from app.models.user import User
 from app.schemas.cv_document import CvDocumentResponse, CvStatus
 from app.services.audit_service import log_audit_event
+from app.services.job_queue import JobQueue, QueueUnavailableError, get_job_queue
 from app.services.storage import Storage, StorageError, get_storage, new_cv_storage_key
 
 router = APIRouter(prefix="/candidates/{id}/cv", tags=["CV Documents"])
@@ -26,6 +27,7 @@ _PDF_EOF_MARKER = b"%%EOF"
 # PDF readers look for the end-of-file marker in the last 1024 bytes.
 _PDF_EOF_WINDOW = 1024
 _DEFAULT_FILENAME = "cv.pdf"
+_RETRYABLE = (CvStatus.FAILED.value, CvStatus.QUEUED.value, CvStatus.EXTRACTING.value)
 
 
 def _is_pdf(data: bytes) -> bool:
@@ -39,6 +41,21 @@ def _safe_filename(filename: str | None) -> str:
     name = PureWindowsPath(filename or "").name
     name = "".join(ch for ch in name if ch.isprintable()).strip()
     return name[:255] or _DEFAULT_FILENAME
+
+
+def _enqueue_extraction(db: Session, queue: JobQueue, document: CvDocument) -> None:
+    """Hand the document to the worker; if the queue is down, fail it with a clear reason."""
+    try:
+        queue.enqueue_cv_extraction(document.id)
+    except QueueUnavailableError:
+        logger.exception("Could not queue cv_document=%s for extraction", document.id)
+        document.status = CvStatus.FAILED.value
+        document.error_code = "queue_unavailable"
+        document.error_message = (
+            "The file was saved but could not be queued for processing. Retry it later."
+        )
+        db.commit()
+        db.refresh(document)
 
 
 def _get_candidate_or_404(db: Session, candidate_id: uuid.UUID) -> Candidate:
@@ -80,6 +97,7 @@ def upload_cv(
     file: UploadFile = File(...),
     db: Session = Depends(get_tenant_db),
     storage: Storage = Depends(get_storage),
+    queue: JobQueue = Depends(get_job_queue),
     current_user: User = Depends(get_current_recruiter_or_admin),
 ) -> CvDocument:
     """Store a PDF CV and queue it for processing. Admin or recruiter only.
@@ -134,6 +152,8 @@ def upload_cv(
         storage.delete(document.storage_key)
         raise
     db.refresh(document)
+    # Queued only after the commit, so the worker always finds the record.
+    _enqueue_extraction(db, queue, document)
     return document
 
 
@@ -170,6 +190,57 @@ def get_cv_document(
 ) -> CvDocument:
     """Return one CV document, including its processing status."""
     return _get_document_or_404(db, id, cv_id)
+
+
+@router.post(
+    "/{cv_id}/retry",
+    response_model=CvDocumentResponse,
+    summary="Queue a CV document for text extraction again",
+)
+def retry_cv_extraction(
+    id: uuid.UUID,
+    cv_id: uuid.UUID,
+    request: Request,
+    db: Session = Depends(get_tenant_db),
+    queue: JobQueue = Depends(get_job_queue),
+    current_user: User = Depends(get_current_recruiter_or_admin),
+) -> CvDocument:
+    """Queue a failed document again, with a fresh set of attempts. Admin or recruiter only.
+
+    A document still waiting or in progress is queued again as it is, which recovers
+    one whose job was lost. A document that already has its text returns 409.
+    """
+    document = _get_document_or_404(db, id, cv_id)
+    if document.status not in _RETRYABLE:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"A CV document with status '{document.status}' cannot be retried.",
+        )
+
+    if document.status == CvStatus.FAILED.value:
+        log_audit_event(
+            db=db,
+            org_id=document.org_id,
+            action="retry_cv",
+            target_entity="cv_document",
+            target_id=document.id,
+            user_id=current_user.id,
+            details={
+                "candidate_id": str(document.candidate_id),
+                "error_code": document.error_code,
+            },
+            request=request,
+        )
+        document.status = CvStatus.QUEUED.value
+        document.error_code = None
+        document.error_message = None
+        document.attempts = 0
+        document.processed_at = None
+        db.commit()
+        db.refresh(document)
+
+    _enqueue_extraction(db, queue, document)
+    return document
 
 
 @router.get(

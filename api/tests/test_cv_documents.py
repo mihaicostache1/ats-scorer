@@ -20,7 +20,7 @@ from app.services.storage import LocalDiskStorage, StorageError, new_cv_storage_
 
 CANDIDATES_URL = "/api/v1/candidates"
 
-# Three layouts (classic, two-column, table) from the L-5 generator, seed 42.
+# One CV per layout (classic, two-column, table, plain) from the L-5 generator, seed 42.
 FIXTURES = Path(__file__).parent / "fixtures" / "cvs"
 L5_PDFS = sorted(FIXTURES.glob("*.pdf"))
 PDF_BYTES = (FIXTURES / "C001.pdf").read_bytes()
@@ -67,7 +67,7 @@ def _cv_events(db: Session, cv_id: str) -> list[AuditEvent]:
 
 def test_l5_fixtures_are_present() -> None:
     """The L-5 PDFs these tests rely on are in the repo."""
-    assert [path.name for path in L5_PDFS] == ["C001.pdf", "C002.pdf", "C003.pdf"]
+    assert [path.name for path in L5_PDFS] == ["C001.pdf", "C002.pdf", "C003.pdf", "C005.pdf"]
 
 
 @pytest.mark.asyncio
@@ -139,8 +139,8 @@ async def test_upload_every_l5_layout_and_list(
     again = await _upload(async_client, candidate["id"], L5_PDFS[0].read_bytes(), L5_PDFS[0].name)
     assert again.status_code == 201
     uploaded.append(again.json())
-    assert len({doc["id"] for doc in uploaded}) == 4
-    assert len(_stored_files(tmp_path / "storage")) == 4
+    assert len({doc["id"] for doc in uploaded}) == len(L5_PDFS) + 1
+    assert len(_stored_files(tmp_path / "storage")) == len(L5_PDFS) + 1
 
     listing = await async_client.get(f"{CANDIDATES_URL}/{candidate['id']}/cv")
     assert listing.status_code == 200

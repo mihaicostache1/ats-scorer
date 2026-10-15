@@ -173,7 +173,14 @@ Uploaded CV files and their processing status. The file itself lives in file sto
 | `content_type` | VARCHAR(100) | NOT NULL | Always `application/pdf` |
 | `size_bytes` | INT | NOT NULL | File size (at most 10 MB) |
 | `sha256` | VARCHAR(64) | NOT NULL | SHA-256 of the file content |
-| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'queued'`, CHECK IN (`queued`, `extracting`, `parsed`, `needs_review`, `failed`) | Processing status |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'queued'`, CHECK IN (`queued`, `extracting`, `extracted`, `parsed`, `needs_review`, `failed`) | Processing status |
+| `extracted_text` | TEXT | NULLABLE | Text extracted by the worker, in reading order; never returned by the status endpoints |
+| `page_count` | INT | NULLABLE | Pages in the PDF, set on extraction |
+| `ocr_used` | BOOLEAN | NOT NULL, DEFAULT `FALSE` | Whether any page was read with OCR |
+| `error_code` | VARCHAR(50) | NULLABLE | Why the document failed, or why its last attempt was retried |
+| `error_message` | TEXT | NULLABLE | The same reason in words |
+| `attempts` | INT | NOT NULL, DEFAULT `0` | Extraction attempts made |
+| `processed_at` | TIMESTAMPTZ | NULLABLE | When extraction finished |
 | `uploaded_by` | UUID | NULLABLE, FK -> `users(id)` SET NULL | User who uploaded the file |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Upload timestamp |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT `NOW()` | Last status change |

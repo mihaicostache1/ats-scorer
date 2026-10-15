@@ -12,6 +12,7 @@ class CvStatus(StrEnum):
 
     QUEUED = "queued"
     EXTRACTING = "extracting"
+    EXTRACTED = "extracted"
     PARSED = "parsed"
     NEEDS_REVIEW = "needs_review"
     FAILED = "failed"
@@ -28,6 +29,12 @@ class CvDocumentResponse(BaseModel):
     size_bytes: int
     sha256: str
     status: str
+    page_count: int | None
+    ocr_used: bool
+    error_code: str | None
+    error_message: str | None
+    attempts: int
+    processed_at: datetime | None
     uploaded_by: uuid.UUID | None
     created_at: datetime
     updated_at: datetime

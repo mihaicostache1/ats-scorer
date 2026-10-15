@@ -17,6 +17,7 @@ from app.models.audit_event import AuditEvent
 from app.models.cv_document import CvDocument
 from app.models.organization import Organization
 from app.models.user import User
+from tests.conftest import RecordingJobQueue
 
 # Synthetic CVs from the L-5 generator.
 L5_CVS = Path(__file__).parent / "fixtures" / "cvs"
@@ -356,10 +357,11 @@ async def test_org_b_cannot_read_or_write_org_a_cv_documents(
     async_client: AsyncClient,
     committed_db: Session,
     tmp_path: Path,
+    job_queue: RecordingJobQueue,
     create_user: Callable[..., User],
     login_as: Callable[[User], None],
 ) -> None:
-    """CV upload, list, status and download never cross organizations (L-5 PDFs)."""
+    """CV upload, list, status, retry and download never cross organizations (L-5 PDFs)."""
     pdf_a = (L5_CVS / "C001.pdf").read_bytes()
     pdf_b = (L5_CVS / "C002.pdf").read_bytes()
     storage_root = tmp_path / "storage"
@@ -413,6 +415,10 @@ async def test_org_b_cannot_read_or_write_org_a_cv_documents(
     )
     assert upload.status_code == 404
     assert stored_files() == files_before
+    queued_before = list(job_queue.cv_extractions)
+    retry = await async_client.post(f"{base_a}/{document_a['id']}/retry")
+    assert retry.status_code == 404
+    assert job_queue.cv_extractions == queued_before
 
     # Org B still gets its own file, and only that.
     own = await async_client.get(f"{base_b}/{document_b['id']}/download")
