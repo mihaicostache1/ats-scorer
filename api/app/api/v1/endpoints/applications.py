@@ -11,6 +11,7 @@ from app.models.application import Application
 from app.models.application_stage_history import ApplicationStageHistory
 from app.models.candidate import Candidate
 from app.models.job import Job
+from app.models.score import Score
 from app.models.user import User
 from app.schemas.application import (
     ApplicationResponse,
@@ -241,12 +242,21 @@ def move_application_stage(
         target.stage_type, ApplicationStatus.ACTIVE.value
     )
     application.rejection_reason = payload.reason if target.stage_type == "rejected" else None
+    # Copied into the history row because a re-score replaces the row in scores.
+    latest_score = (
+        db.query(Score)
+        .filter(Score.application_id == application.id)
+        .order_by(Score.calculated_at.desc(), Score.id)
+        .first()
+    )
     application.stage_history.append(
         ApplicationStageHistory(
             org_id=application.org_id,
             from_stage_id=previous.id,
             to_stage_id=target.id,
             reason=payload.reason,
+            overall_score=latest_score.overall_score if latest_score else None,
+            model_version=latest_score.model_version if latest_score else None,
             moved_by=current_user.id,
         )
     )

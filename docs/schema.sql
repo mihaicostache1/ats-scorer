@@ -143,6 +143,8 @@ CREATE TABLE IF NOT EXISTS application_stage_history (
     from_stage_id UUID REFERENCES pipeline_stages(id) ON DELETE RESTRICT, -- NULL for the initial placement
     to_stage_id UUID NOT NULL REFERENCES pipeline_stages(id) ON DELETE RESTRICT,
     reason TEXT,
+    overall_score NUMERIC(5, 2), -- The application's latest score at the time of the move
+    model_version VARCHAR(50),
     moved_by UUID REFERENCES users(id) ON DELETE SET NULL,
     moved_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -158,10 +160,11 @@ CREATE TABLE IF NOT EXISTS scores (
     job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
     candidate_id UUID NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
     overall_score NUMERIC(5, 2) NOT NULL CHECK (overall_score >= 0 AND overall_score <= 100),
-    skill_overlap_score NUMERIC(5, 2) NOT NULL CHECK (skill_overlap_score >= 0 AND skill_overlap_score <= 100),
+    skill_overlap_score NUMERIC(5, 2) CHECK (skill_overlap_score >= 0 AND skill_overlap_score <= 100),
     semantic_score NUMERIC(5, 2) NOT NULL CHECK (semantic_score >= 0 AND semantic_score <= 100),
-    experience_score NUMERIC(5, 2) NOT NULL CHECK (experience_score >= 0 AND experience_score <= 100),
-    title_fit_score NUMERIC(5, 2) NOT NULL CHECK (title_fit_score >= 0 AND title_fit_score <= 100),
+    experience_score NUMERIC(5, 2) CHECK (experience_score >= 0 AND experience_score <= 100),
+    title_fit_score NUMERIC(5, 2) CHECK (title_fit_score >= 0 AND title_fit_score <= 100),
+    -- skill_overlap, experience and title_fit are NULL when the model does not compute them
     model_version VARCHAR(50) NOT NULL, -- Version identifier of ranking model/algorithm used
     component_breakdown JSONB NOT NULL DEFAULT '{}'::jsonb, -- Matched/missing skills list, score weightings, breakdown explanation
     calculated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

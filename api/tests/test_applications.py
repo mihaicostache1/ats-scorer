@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.models.audit_event import AuditEvent
 from app.models.pipeline_stage import PipelineStage
+from app.models.score import Score
 from app.models.user import User
 
 APPLICATIONS_URL = "/api/v1/applications"
@@ -297,6 +299,81 @@ async def test_move_application_stage(
         ("Shortlisted", "Rejected"),
         ("Rejected", "Hired"),
         ("Hired", "Interview"),
+    ]
+
+
+@pytest.mark.asyncio
+async def test_stage_move_keeps_the_score_shown_at_the_time(
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    """Each move records the application's latest score, and a later re-score does not change it."""
+    admin = create_user("admin")
+    login_as(admin)
+    job = await _create_job(async_client)
+    candidate = await _create_candidate(async_client)
+    application = await _apply(async_client, job, candidate)
+    stages = await _stages(async_client, job)
+    application_url = f"{APPLICATIONS_URL}/{application['id']}"
+
+    async def move(stage: str) -> None:
+        response = await async_client.patch(
+            f"{application_url}/stage", json={"stage_id": stages[stage]}
+        )
+        assert response.status_code == 200, response.text
+
+    async def snapshots() -> list[tuple[float | None, str | None]]:
+        history = (await async_client.get(f"{application_url}/history")).json()
+        return [(h["overall_score"], h["model_version"]) for h in history]
+
+    # No score yet: the move is recorded without one.
+    await move("Shortlisted")
+    assert await snapshots() == [(None, None), (None, None)]
+
+    # A baseline score that does not compute every component.
+    score = Score(
+        id=uuid.uuid4(),
+        org_id=admin.org_id,
+        application_id=uuid.UUID(application["id"]),
+        job_id=uuid.UUID(job["id"]),
+        candidate_id=uuid.UUID(candidate["id"]),
+        overall_score=72.5,
+        skill_overlap_score=None,
+        semantic_score=72.5,
+        experience_score=None,
+        title_fit_score=None,
+        model_version="tfidf-skills-0.1.0",
+    )
+    committed_db.add(score)
+    committed_db.commit()
+    await move("Interview")
+    assert (await snapshots())[-1] == (72.5, "tfidf-skills-0.1.0")
+
+    # Re-scoring with the same model replaces the row; a newer model adds one.
+    score.overall_score = 40.0
+    committed_db.add(
+        Score(
+            id=uuid.uuid4(),
+            org_id=admin.org_id,
+            application_id=score.application_id,
+            job_id=score.job_id,
+            candidate_id=score.candidate_id,
+            overall_score=91.25,
+            semantic_score=88.0,
+            model_version="tfidf-skills-0.2.0",
+            calculated_at=datetime.now(UTC) + timedelta(minutes=1),
+        )
+    )
+    committed_db.commit()
+    await move("Offer")
+
+    assert await snapshots() == [
+        (None, None),
+        (None, None),
+        (72.5, "tfidf-skills-0.1.0"),
+        (91.25, "tfidf-skills-0.2.0"),
     ]
 
 
