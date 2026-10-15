@@ -109,7 +109,14 @@ CREATE TABLE IF NOT EXISTS cv_documents (
     content_type VARCHAR(100) NOT NULL,
     size_bytes INT NOT NULL,
     sha256 VARCHAR(64) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'extracting', 'parsed', 'needs_review', 'failed')),
+    status VARCHAR(20) NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'extracting', 'extracted', 'parsed', 'needs_review', 'failed')),
+    extracted_text TEXT, -- Written by the extraction worker
+    page_count INT,
+    ocr_used BOOLEAN NOT NULL DEFAULT FALSE,
+    error_code VARCHAR(50), -- Why it failed, or why the last attempt was retried
+    error_message TEXT,
+    attempts INT NOT NULL DEFAULT 0,
+    processed_at TIMESTAMPTZ,
     uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

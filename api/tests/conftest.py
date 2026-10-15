@@ -19,6 +19,7 @@ from app.models.job import Job
 from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.user import User
+from app.services.job_queue import QueueUnavailableError, get_job_queue
 from app.services.pipeline_service import seed_default_stages
 from app.services.storage import LocalDiskStorage, get_storage
 
@@ -217,6 +218,28 @@ def cv_storage(tmp_path: Path) -> Generator[LocalDiskStorage, None, None]:
     app.dependency_overrides[get_storage] = lambda: storage
     yield storage
     app.dependency_overrides.pop(get_storage, None)
+
+
+class RecordingJobQueue:
+    """Stands in for Redis: remembers what was queued, and can be made to fail."""
+
+    def __init__(self) -> None:
+        self.cv_extractions: list[uuid.UUID] = []
+        self.available = True
+
+    def enqueue_cv_extraction(self, cv_document_id: uuid.UUID) -> None:
+        if not self.available:
+            raise QueueUnavailableError("Redis is down")
+        self.cv_extractions.append(cv_document_id)
+
+
+@pytest.fixture(autouse=True)
+def job_queue() -> Generator[RecordingJobQueue, None, None]:
+    """Replace the app's job queue for every test, so no test needs Redis."""
+    queue = RecordingJobQueue()
+    app.dependency_overrides[get_job_queue] = lambda: queue
+    yield queue
+    app.dependency_overrides.pop(get_job_queue, None)
 
 
 @pytest.fixture

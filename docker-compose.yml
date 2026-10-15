@@ -58,6 +58,29 @@ services:
       timeout: 5s
       retries: 10
 
+  # Background jobs (CV text extraction). Same image as the api, different command.
+  worker:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: ats-worker
+    restart: unless-stopped
+    command: ["arq", "app.worker.WorkerSettings"]
+    environment:
+      - DATABASE_URL=postgresql+psycopg://ats:ats@postgres:5432/ats
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - STORAGE_LOCAL_DIR=/data/storage
+    volumes:
+      # The same volume as the api, which writes the files the worker reads.
+      - cvdata:/data/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   web:
     build:
       context: ./web

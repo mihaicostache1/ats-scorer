@@ -55,6 +55,15 @@ class Settings(BaseSettings):
     STORAGE_LOCAL_DIR: str = Field(default="storage", alias="STORAGE_LOCAL_DIR")
     MAX_CV_SIZE_BYTES: int = 10 * 1024 * 1024
 
+    # CV text extraction (Arq worker)
+    CV_EXTRACTION_MAX_TRIES: int = 3
+    CV_EXTRACTION_TIMEOUT_SECONDS: float = 120
+    CV_EXTRACTION_RETRY_DELAY_SECONDS: int = 10
+    # Full path to the tesseract binary; empty = find it on PATH.
+    TESSERACT_CMD: str = Field(default="", alias="TESSERACT_CMD")
+    OCR_LANGUAGE: str = "eng"
+    OCR_PAGE_TIMEOUT_SECONDS: int = 30
+
     # Logging Settings
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
 

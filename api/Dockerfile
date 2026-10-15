@@ -2,9 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install curl for Docker health checks
+# curl for Docker health checks, Tesseract for OCR of scanned CVs (used by the worker)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency specifications

@@ -558,7 +558,8 @@ paths:
     post:
       summary: Upload PDF CV
       description: |
-        Upload a PDF CV for a candidate and queue it for processing.
+        Upload a PDF CV for a candidate and queue it for text extraction by the
+        background worker (queued, extracting, then extracted or failed).
         The file is checked by its content, not its extension, and may be at most 10 MB.
         Requires the `admin` or `recruiter` role.
       operationId: uploadCandidateCV
@@ -626,6 +627,35 @@ paths:
           $ref: '#/components/responses/401Unauthorized'
         '404':
           $ref: '#/components/responses/404NotFound'
+
+  /candidates/{id}/cv/{cv_id}/retry:
+    post:
+      summary: Retry CV Text Extraction
+      description: |
+        Queue a document for text extraction again. A failed document is reset to
+        `queued`; one still queued or extracting is queued again unchanged. Any other
+        status returns 409. Requires the `admin` or `recruiter` role.
+      operationId: retryCandidateCvExtraction
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+        - $ref: '#/components/parameters/CvIdPathParam'
+      responses:
+        '200':
+          description: The document, queued again
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDocumentResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409Conflict'
 
   /candidates/{id}/cv/{cv_id}/download:
     get:
@@ -1231,6 +1261,12 @@ components:
         - size_bytes
         - sha256
         - status
+        - page_count
+        - ocr_used
+        - error_code
+        - error_message
+        - attempts
+        - processed_at
         - uploaded_by
         - created_at
         - updated_at
@@ -1262,8 +1298,32 @@ components:
           description: SHA-256 of the file content.
         status:
           type: string
-          enum: [queued, extracting, parsed, needs_review, failed]
+          enum: [queued, extracting, extracted, parsed, needs_review, failed]
           example: queued
+        page_count:
+          type: [integer, 'null']
+          description: Set once the text has been extracted.
+        ocr_used:
+          type: boolean
+          description: True when at least one page was read with OCR.
+        error_code:
+          type: [string, 'null']
+          description: |
+            Why the document is failed, or why its last attempt had to be retried:
+            invalid_pdf, encrypted_pdf, too_many_pages, no_text_found,
+            ocr_unavailable, file_missing, timeout, internal_error, queue_unavailable.
+          example: null
+        error_message:
+          type: [string, 'null']
+          description: The reason in words, suitable for showing to a user.
+        attempts:
+          type: integer
+          description: Extraction attempts made so far (at most 3 per retry).
+          example: 0
+        processed_at:
+          type: [string, 'null']
+          format: date-time
+          description: When extraction finished, successfully or not.
         uploaded_by:
           type: [string, 'null']
           format: uuid
