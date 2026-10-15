@@ -17,7 +17,7 @@ No secrets are in the repo. Secret values are entered in the Render dashboard. `
 3. **Render.** *New > Blueprint*, pick this repo and branch `main`. Render reads `render.yaml` and asks for the two `sync: false` values:
    - `DATABASE_URL`: the Supabase string from step 1.
    - `CORS_ORIGINS`: a JSON list of the web app's origins. Use `[]` until the web app is deployed.
-4. Wait for the first deploy, then open `https://<service>.onrender.com/health`. It must return `{"status": "healthy", ...}` with `"environment": "staging"`.
+4. Wait for the first deploy, then open `https://ats-api-v9r9.onrender.com/health`. It must return `{"status": "healthy", ...}` with `"environment": "staging"`.
 
 ## Free-tier limits to know about
 
