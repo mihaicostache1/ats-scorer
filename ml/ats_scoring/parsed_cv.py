@@ -1,4 +1,3 @@
-
 """Pydantic models of the parsed-CV schema, version 1.0.
 
 The JSON Schema in `schemas/parsed_cv.schema.json` describes the same shape for
