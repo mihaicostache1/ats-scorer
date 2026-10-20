@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "source": "parser",
+  "contact": {
+    "name": "Alex Mercer",
+    "email": "alex.mercer@example.com",
+    "phone": "+1-555-0199",
+    "location": "Lakeshore, CA",
+    "links": ["https://www.linkedin.com/in/alex-mercer-example", "https://github.com/alex-mercer-example"]
+  },
+  "headline": "Backend Developer",
+  "summary": "Backend developer with 5 years of experience building REST services in Python.",
+  "skills": [
+    { "raw": "Python", "normalized": "Python" },
+    { "raw": "FastAPI", "normalized": "FastAPI" },
+    { "raw": "Postgres", "normalized": "PostgreSQL" },
+    { "raw": "k8s", "normalized": "Kubernetes" },
+    { "raw": "Team player", "normalized": null }
+  ],
+  "experience_years": 5.5,
+  "experiences": [
+    {
+      "title": "Backend Developer",
+      "company": "Nimbuscraft Labs",
+      "start": "2023-03",
+      "end": null,
+      "is_current": true,
+      "summary": "Built and maintained backend services used by 4 internal teams.",
+      "bullets": [
+        "Built and maintained backend services used by 4 internal teams (Python, FastAPI)",
+        "Cut average response time by 30% by profiling queries and adding caching"
+      ]
+    },
+    {
+      "title": "Junior Backend Developer",
+      "company": "Bluepeak Systems",
+      "start": "2021-02",
+      "end": "2023-02",
+      "is_current": false,
+      "summary": "Designed REST endpoints and data models for new product features.",
+      "bullets": ["Designed REST endpoints and data models for new product features"]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Lakeshore University",
+      "grad_year": 2020
+    }
+  ],
+  "languages": [
+    { "language": "English", "level": "fluent" },
+    { "language": "German", "level": "B2" }
+  ],
+  "certifications": ["AWS Certified Developer - Associate"],
+  "confidence": {
+    "/contact/name": 0.99,
+    "/contact/email": 0.98,
+    "/contact/phone": 0.9,
+    "/skills/3/normalized": 0.62,
+    "/experiences/0/title": 0.95,
+    "/experiences/0/start": 0.7,
+    "/experiences/1/end": 0.55,
+    "/education/0/grad_year": 0.8
+  }
+}

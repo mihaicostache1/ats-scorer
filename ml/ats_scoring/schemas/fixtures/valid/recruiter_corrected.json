@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "source": "recruiter",
+  "contact": {
+    "name": "Sam Okafor",
+    "email": "sam.okafor@example.com",
+    "phone": null,
+    "location": "Remote",
+    "links": []
+  },
+  "headline": "Data Analyst",
+  "summary": null,
+  "skills": [
+    { "raw": "SQL", "normalized": "SQL" },
+    { "raw": "Power BI", "normalized": null }
+  ],
+  "experience_years": 3,
+  "experiences": [
+    {
+      "title": "Data Analyst",
+      "company": "Harbor Analytics",
+      "start": "2023-09",
+      "end": null,
+      "is_current": true,
+      "bullets": []
+    }
+  ],
+  "education": [{ "degree": "B.Sc. Statistics", "institution": null, "grad_year": null }],
+  "languages": [{ "language": "English", "level": null }],
+  "certifications": [],
+  "confidence": {
+    "/contact/email": 1,
+    "/headline": 1,
+    "/experiences/0/title": 1
+  }
+}

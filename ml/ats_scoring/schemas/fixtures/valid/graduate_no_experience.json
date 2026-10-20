@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "source": "parser",
+  "contact": { "name": "Jamie Park", "email": "jamie.park@example.com" },
+  "headline": null,
+  "skills": [{ "raw": "Java", "normalized": "Java" }],
+  "experience_years": 0,
+  "experiences": [],
+  "education": [
+    { "degree": "M.Sc. Software Engineering", "institution": "Eastbridge Institute", "grad_year": 2026 }
+  ],
+  "confidence": { "/education/0/degree": 0.93 }
+}

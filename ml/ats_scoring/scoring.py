@@ -5,7 +5,7 @@ from typing import Any
 
 from ats_scoring.schema import ScoreResult
 from ats_scoring.skills import SkillMatch, match_skills
-from ats_scoring.text import candidate_text, job_text, tfidf_similarity
+from ats_scoring.text import candidate_text, job_text, skill_texts, tfidf_similarity
 
 # Stored with every score. Change it whenever the same input could get a different result,
 # for example when the weights or the skill alias table change.
@@ -73,7 +73,9 @@ def score(candidate: Mapping[str, Any], job: Mapping[str, Any]) -> ScoreResult:
         raise NothingToScoreError("job has no title, description or skills to score against")
 
     skills = match_skills(
-        candidate.get("skills"), job.get("required_skills"), job.get("preferred_skills")
+        skill_texts(candidate.get("skills")),
+        job.get("required_skills"),
+        job.get("preferred_skills"),
     )
     similarity = tfidf_similarity(cv_text, posting_text)
     if skills.overlap is None:

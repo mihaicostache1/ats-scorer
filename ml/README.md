@@ -55,7 +55,7 @@ score(candidate, job)
 # }
 ```
 
-`candidate` follows the draft parsed-CV schema, described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). `job` uses the job fields of the API.
+`candidate` follows the parsed-CV schema (version 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
 
 ### How the score is built
 

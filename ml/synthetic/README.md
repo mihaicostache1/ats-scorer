@@ -45,7 +45,7 @@ The dataset covers 10 role families (backend, frontend, data science, DevOps, QA
 | `headline`, `summary`, `languages`, `certifications` | Other text printed in the PDF |
 | `role_family`, `seniority` | What the CV was generated as. Not printed in the PDF |
 | `layout` | `classic`, `two_column`, `table` or `plain` |
-| `parsed_data` | What a perfect parser would return, in the same shape as `candidates.parsed_data` in the API: `skills`, `experience_years`, `education` (`degree`, `institution`, `grad_year`) and `work_history` (`title`, `company`, `years`, `summary`). Each job also carries `start`, `end` (`null` means current) and `bullets` |
+| `parsed_data` | What a perfect parser would return, in the draft 0.1 shape of `candidates.parsed_data` (the final schema 1.0 differs, see [docs/ml/parsed-cv-schema.md](../../docs/ml/parsed-cv-schema.md)): `skills`, `experience_years`, `education` (`degree`, `institution`, `grad_year`) and `work_history` (`title`, `company`, `years`, `summary`). Each job also carries `start`, `end` (`null` means current) and `bullets` |
 | `sensitive_noise` | `null`, or a date of birth and nationality that are printed in the PDF. See below |
 
 ### Job description (`jobs/J01.json`)
