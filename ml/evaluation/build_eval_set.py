@@ -16,7 +16,7 @@ import shutil
 from pathlib import Path
 from typing import Any
 
-from ats_scoring.schema import PARSED_CV_SCHEMA_VERSION
+from ats_scoring.schema import LEGACY_SCHEMA_VERSION
 
 HERE = Path(__file__).resolve().parent
 SYNTHETIC = HERE.parent / "synthetic" / "output"
@@ -37,7 +37,7 @@ def parsed_cv(record: dict[str, Any]) -> dict[str, Any]:
     """Turn a generator record into a parsed CV, as the backend stores it."""
     data = record["parsed_data"]
     return {
-        "schema_version": PARSED_CV_SCHEMA_VERSION,
+        "schema_version": LEGACY_SCHEMA_VERSION,
         "headline": record["headline"],
         "summary": record["summary"],
         "skills": data["skills"],

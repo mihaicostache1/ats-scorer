@@ -28,6 +28,18 @@ def _mappings(value: object) -> list[Mapping[str, Any]]:
     return [item for item in value if isinstance(item, Mapping)]
 
 
+def skill_texts(value: object) -> list[str]:
+    """The skills of a parsed CV as text, from either shape.
+
+    Schema 1.0 lists `{"raw", "normalized"}` objects. The draft 0.1 lists plain strings.
+    The scorer compares what was written in the CV, so it takes `raw`.
+    """
+    if not isinstance(value, list | tuple):
+        return []
+    texts = [item.get("raw") if isinstance(item, Mapping) else item for item in value]
+    return [text for text in texts if isinstance(text, str) and text.strip()]
+
+
 def _join(parts: list[Any]) -> str:
     return "\n".join(part.strip() for part in parts if isinstance(part, str) and part.strip())
 
@@ -36,12 +48,15 @@ def candidate_text(candidate: Mapping[str, Any]) -> str:
     """Build the text the scorer reads from a parsed CV.
 
     Only qualifications are used: headline, summary, skills, job titles and what was done
-    in each job, degrees and certifications. Employer and school names, dates, graduation
-    years and every other field are left out on purpose (user story US-06).
+    in each job, degrees and certifications. Contact details, employer and school names,
+    dates, graduation years, languages, confidence and every other field are left out on
+    purpose (user story US-06). Reads schema 1.0 (`experiences`) and the draft 0.1
+    (`work_history`).
     """
     parts: list[Any] = [candidate.get("headline"), candidate.get("summary")]
-    parts += _strings(candidate.get("skills"))
-    for position in _mappings(candidate.get("work_history")):
+    parts += skill_texts(candidate.get("skills"))
+    positions = candidate.get("experiences", candidate.get("work_history"))
+    for position in _mappings(positions):
         parts += [position.get("title"), position.get("summary")]
         parts += _strings(position.get("bullets"))
     parts += [entry.get("degree") for entry in _mappings(candidate.get("education"))]

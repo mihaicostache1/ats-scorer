@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "source": "parser",
+  "contact": {
+    "name": "Ștefan Țurcanu",
+    "email": "stefan.turcanu@example.com",
+    "phone": "+40 721 000 000",
+    "location": "Iași, România",
+    "links": []
+  },
+  "headline": "Dezvoltator backend",
+  "summary": "Dezvoltator backend cu 4 ani de experiență în servicii REST.",
+  "skills": [
+    { "raw": "Python", "normalized": "Python" },
+    { "raw": "Lucru în echipă", "normalized": null }
+  ],
+  "experience_years": 4,
+  "experiences": [
+    {
+      "title": "Dezvoltator backend",
+      "company": "Carpatia Soft",
+      "start": "2022-06",
+      "end": "2026-06",
+      "summary": "Servicii REST în Python.",
+      "bullets": ["Am redus timpul de răspuns cu 25%"]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Licență în Informatică",
+      "institution": "Universitatea din Iași",
+      "grad_year": 2022
+    }
+  ],
+  "languages": [
+    { "language": "Română", "level": "nativ" },
+    { "language": "Engleză", "level": "C1" }
+  ],
+  "certifications": [],
+  "confidence": { "/skills/1/normalized": 0.4 }
+}

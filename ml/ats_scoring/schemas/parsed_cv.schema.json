@@ -1,14 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Parsed CV",
-  "description": "Draft 0.1. Structured data extracted from one CV, stored in candidates.parsed_data. Name and contact details are not part of it: they stay in their own candidate columns.",
+  "description": "Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.",
   "type": "object",
-  "required": ["skills"],
+  "required": ["schema_version", "source", "skills"],
+  "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "description": "Version of this schema the record was written with. The parser always writes it. Add a version to the list when a change keeps older records valid; a breaking change gets a new schema file instead.",
-      "enum": ["0.1"]
+      "description": "Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.",
+      "enum": ["1.0"]
     },
+    "source": {
+      "description": "Who wrote this version of the record: the CV parser, or a recruiter who corrected it.",
+      "enum": ["parser", "recruiter"]
+    },
+    "contact": { "$ref": "#/$defs/contact" },
     "headline": {
       "description": "Current or most recent job title.",
       "type": ["string", "null"]
@@ -18,58 +24,95 @@
       "type": ["string", "null"]
     },
     "skills": {
-      "description": "Skills as written in the CV, one per entry. May be empty.",
+      "description": "Skills found in the CV. May be empty.",
       "type": "array",
-      "items": { "type": "string", "minLength": 1 }
+      "items": { "$ref": "#/$defs/skill" }
     },
     "experience_years": {
       "description": "Total years of work experience.",
       "type": ["number", "null"],
       "minimum": 0
     },
-    "work_history": {
+    "experiences": {
       "description": "Positions held, most recent first.",
       "type": "array",
-      "items": { "$ref": "#/$defs/position" }
+      "items": { "$ref": "#/$defs/experience" }
     },
     "education": {
       "type": "array",
       "items": { "$ref": "#/$defs/education" }
     },
     "languages": {
-      "description": "Spoken languages, each with its level if given, e.g. 'German (B2)'.",
       "type": "array",
-      "items": { "type": "string" }
+      "items": { "$ref": "#/$defs/language" }
     },
     "certifications": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "confidence": {
+      "description": "Confidence from 0 to 1 per field, keyed by JSON Pointer into this record, e.g. /contact/email or /experiences/0/title. A field with no entry has no confidence value; that is not the same as low confidence.",
+      "type": "object",
+      "propertyNames": { "pattern": "^(/[A-Za-z0-9_-]+)+$" },
+      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
     }
   },
-  "additionalProperties": true,
   "$defs": {
     "year_month": {
       "type": "string",
       "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
     },
-    "position": {
+    "contact": {
+      "description": "Who the CV belongs to, as read from the CV. Never read by the scorer.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "email": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] },
+        "location": { "type": ["string", "null"] },
+        "links": {
+          "description": "Profile and portfolio URLs.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "required": ["raw", "normalized"],
+      "additionalProperties": false,
+      "properties": {
+        "raw": {
+          "description": "The skill as written in the CV.",
+          "type": "string",
+          "minLength": 1
+        },
+        "normalized": {
+          "description": "Canonical name of the skill, or null when it is not recognized.",
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      }
+    },
+    "experience": {
       "type": "object",
       "required": ["title"],
+      "additionalProperties": false,
       "properties": {
         "title": { "type": "string", "minLength": 1 },
         "company": { "type": ["string", "null"] },
         "start": {
-          "description": "First month in the position, as YYYY-MM.",
+          "description": "First month in the position, as YYYY-MM. null: unknown.",
           "anyOf": [{ "$ref": "#/$defs/year_month" }, { "type": "null" }]
         },
         "end": {
-          "description": "Last month in the position, as YYYY-MM. null means the position is current. Leave the field out if unknown.",
+          "description": "Last month in the position, as YYYY-MM. null: unknown, or the position is current (see is_current).",
           "anyOf": [{ "$ref": "#/$defs/year_month" }, { "type": "null" }]
         },
-        "years": {
-          "description": "Length of the position in years.",
-          "type": ["number", "null"],
-          "minimum": 0
+        "is_current": {
+          "description": "True if the candidate still holds the position. Defaults to false.",
+          "type": "boolean"
         },
         "summary": {
           "description": "One-sentence description of the work.",
@@ -80,18 +123,29 @@
           "type": "array",
           "items": { "type": "string" }
         }
-      },
-      "additionalProperties": true
+      }
     },
     "education": {
       "type": "object",
       "required": ["degree"],
+      "additionalProperties": false,
       "properties": {
         "degree": { "type": "string", "minLength": 1 },
         "institution": { "type": ["string", "null"] },
         "grad_year": { "type": ["integer", "null"], "minimum": 1950, "maximum": 2100 }
-      },
-      "additionalProperties": true
+      }
+    },
+    "language": {
+      "type": "object",
+      "required": ["language"],
+      "additionalProperties": false,
+      "properties": {
+        "language": { "type": "string", "minLength": 1 },
+        "level": {
+          "description": "Level as written in the CV, e.g. B2, native, fluent.",
+          "type": ["string", "null"]
+        }
+      }
     }
   }
 }
