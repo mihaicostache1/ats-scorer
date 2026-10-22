@@ -1,30 +1,11 @@
 import * as React from "react";
+import Link from "next/link";
 import { MapPin } from "lucide-react";
-import { Badge, type BadgeProps } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { SkeletonTableRow } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { JOB_PAGE_SIZE, type JobResponse, type JobStatus } from "./use-jobs";
-
-const STATUS_BADGE: Record<JobStatus, { label: string; variant: BadgeProps["variant"] }> = {
-  open: { label: "Open", variant: "success" },
-  draft: { label: "Draft", variant: "warning" },
-  paused: { label: "Paused", variant: "outline" },
-  closed: { label: "Closed", variant: "secondary" },
-  archived: { label: "Archived", variant: "secondary" },
-};
-
-const dateFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-/** "full_time" → "Full-time" */
-function formatEmploymentType(value: string): string {
-  const words = value.replace(/_/g, " ").toLowerCase();
-  return (words.charAt(0).toUpperCase() + words.slice(1)).replace(/^Full time$/, "Full-time");
-}
+import { formatDate, formatEmploymentType, STATUS_BADGE } from "./job-meta";
+import { JOB_PAGE_SIZE, type JobResponse } from "./use-jobs";
 
 /**
  * Columns, in wireframe order. Candidates and Match Avg have no data in the API yet and show a
@@ -92,7 +73,12 @@ export function JobsTable({
               return (
                 <tr key={job.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 align-top">
-                    <div className="text-foreground font-semibold">{job.title}</div>
+                    <Link
+                      href={`/jobs/${job.id}`}
+                      className="text-foreground focus-visible:ring-ring rounded-sm font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                    >
+                      {job.title}
+                    </Link>
                     {job.department && (
                       <Badge variant="secondary" className="mt-1 font-normal">
                         {job.department}
@@ -128,7 +114,7 @@ export function JobsTable({
                     <span title="Not available yet">—</span>
                   </td>
                   <td className="text-muted-foreground hidden px-4 py-3 align-top whitespace-nowrap lg:table-cell">
-                    {dateFormat.format(new Date(job.created_at))}
+                    {formatDate(job.created_at)}
                   </td>
                 </tr>
               );
