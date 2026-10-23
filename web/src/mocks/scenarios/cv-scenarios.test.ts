@@ -1,6 +1,5 @@
 // @vitest-environment node
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { setupServer } from "msw/node";
+import { beforeEach, describe, expect, it } from "vitest";
 import { mockCandidates, mockCvDocuments } from "../fixtures/candidates";
 import { candidateHandlers, resetCvStore } from "../handlers/candidates";
 import { BASE } from "../handlers/utils";
@@ -12,11 +11,22 @@ import { CV_SCENARIOS, scenarioForFile } from "./cv-scenarios";
  * added without a test here, so no state can become impossible to reproduce.
  */
 
-// No session guard: these tests are about the CV routes, not sign-in.
-const server = setupServer(...candidateHandlers);
-beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
-afterAll(() => server.close());
-afterEach(() => server.resetHandlers());
+/**
+ * Calls the mock handlers directly, with no network layer. (`msw/node`'s `setupServer` needs Node 22
+ * or later, and CI runs Node 20.) No session guard is involved: these tests are about the CV routes,
+ * not sign-in. Like a real `fetch`, a dropped connection throws.
+ */
+async function callApi(url: string, init?: RequestInit): Promise<Response> {
+  const request = new Request(url, init);
+  for (const handler of candidateHandlers) {
+    const result = await handler.run({ request: request.clone(), requestId: crypto.randomUUID() });
+    if (!result?.response) continue;
+    if (result.response.type === "error") throw new TypeError("Failed to fetch");
+    return result.response;
+  }
+  throw new Error(`No mock handler for ${request.method} ${url}`);
+}
+
 beforeEach(() => resetCvStore());
 
 const candidateId = mockCandidates[0].id;
@@ -33,7 +43,7 @@ function pdf(name: string, size = 200): File {
 async function upload(file: File) {
   const form = new FormData();
   form.append("file", file);
-  return fetch(cvUrl, { method: "POST", body: form });
+  return callApi(cvUrl, { method: "POST", body: form });
 }
 
 type Cv = {
@@ -53,9 +63,9 @@ async function uploaded(marker: string): Promise<Cv> {
   return response.json();
 }
 
-const poll = (id: string) => fetch(`${cvUrl}/${id}`);
+const poll = (id: string) => callApi(`${cvUrl}/${id}`);
 const pollJson = async (id: string): Promise<Cv> => (await poll(id)).json();
-const retry = (id: string) => fetch(`${cvUrl}/${id}/retry`, { method: "POST" });
+const retry = (id: string) => callApi(`${cvUrl}/${id}/retry`, { method: "POST" });
 
 /** Statuses seen on successive polls, stopping at the first final one (or after `max`). */
 async function pollStatuses(id: string, max = 20): Promise<Cv[]> {
@@ -252,12 +262,12 @@ describe("upload checks (same as the real API)", () => {
   });
 
   it("returns 422 when the file part is missing", async () => {
-    const response = await fetch(cvUrl, { method: "POST", body: new FormData() });
+    const response = await callApi(cvUrl, { method: "POST", body: new FormData() });
     expect(response.status).toBe(422);
   });
 
   it("returns 404 for an unknown candidate", async () => {
-    const response = await fetch(`${BASE}/candidates/${crypto.randomUUID()}/cv`, {
+    const response = await callApi(`${BASE}/candidates/${crypto.randomUUID()}/cv`, {
       method: "POST",
       body: (() => {
         const form = new FormData();
@@ -295,13 +305,13 @@ describe("CVs already in the fixtures", () => {
     const queued = mockCvDocuments.find((d) => d.status === "queued")!;
     const url = `${BASE}/candidates/${queued.candidate_id}/cv/${queued.id}`;
     const statuses: string[] = [];
-    for (let i = 0; i < 3; i++) statuses.push((await (await fetch(url)).json()).status);
+    for (let i = 0; i < 3; i++) statuses.push((await (await callApi(url)).json()).status);
     expect(statuses).toEqual(["extracting", "parsed", "parsed"]);
   });
 
   it("do not move on a plain list request", async () => {
     const queued = mockCvDocuments.find((d) => d.status === "queued")!;
-    const list = await (await fetch(`${BASE}/candidates/${queued.candidate_id}/cv`)).json();
+    const list = await (await callApi(`${BASE}/candidates/${queued.candidate_id}/cv`)).json();
     expect(list.find((d: Cv) => d.id === queued.id).status).toBe("queued");
   });
 });
