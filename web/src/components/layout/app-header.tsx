@@ -24,7 +24,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: Briefcase },
   { label: "Jobs", href: "/jobs", icon: Briefcase },
-  { label: "Candidates", href: "/#candidates", icon: Users },
+  { label: "Candidates", href: "/candidates", icon: Users, requires: "candidate:read" },
   { label: "Audit Logs", href: "/#audit", icon: Shield, requires: "audit:read" },
   { label: "Design System", href: "/dev/components", icon: Sparkles, badge: "UI", devOnly: true },
 ];

@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { delay, http, HttpResponse } from "msw";
 import { mockCandidates, mockCvDocuments } from "../fixtures/candidates";
 import { MOCK_ORG_ID, MOCK_USER_ID } from "../fixtures/auth";
 import type { components } from "@/api/generated/schema";
@@ -25,7 +25,8 @@ export const candidateHandlers = [
    * GET /candidates
    * Supports ?search= (full name / email), sorting and pagination.
    */
-  http.get(`${BASE}/candidates`, ({ request }) => {
+  http.get(`${BASE}/candidates`, async ({ request }) => {
+    await delay(300); // realistic latency so loading states are visible
     const url = new URL(request.url);
     const search = url.searchParams.get("search")?.toLowerCase() ?? "";
     const filtered = search
@@ -72,7 +73,8 @@ export const candidateHandlers = [
   /**
    * GET /candidates/:id
    */
-  http.get(`${BASE}/candidates/:id`, ({ params }) => {
+  http.get(`${BASE}/candidates/:id`, async ({ params }) => {
+    await delay(200);
     const candidate = candidatesStore.find((c) => c.id === params.id);
     return candidate ? HttpResponse.json(candidate) : notFound("Candidate", params.id);
   }),
@@ -112,7 +114,8 @@ export const candidateHandlers = [
   /**
    * GET /candidates/:id/cv — CV documents, newest first.
    */
-  http.get(`${BASE}/candidates/:id/cv`, ({ params }) => {
+  http.get(`${BASE}/candidates/:id/cv`, async ({ params }) => {
+    await delay(300);
     if (!candidatesStore.some((c) => c.id === params.id)) return notFound("Candidate", params.id);
     const docs = cvStore
       .filter((d) => d.candidate_id === params.id)
@@ -151,6 +154,12 @@ export const candidateHandlers = [
         b.toString(16).padStart(2, "0")
       ).join(""),
       status: "queued",
+      page_count: null,
+      ocr_used: false,
+      error_code: null,
+      error_message: null,
+      attempts: 0,
+      processed_at: null,
       uploaded_by: MOCK_USER_ID,
       created_at: now,
       updated_at: now,

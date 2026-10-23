@@ -9,11 +9,41 @@ type JobResponse = components["schemas"]["JobResponse"];
 /** In-memory store — mutations persist for the browser session. */
 let jobsStore: JobResponse[] = [...mockJobs];
 
+/** FastAPI-style 422: `{ detail: [{ loc, msg, type }] }`. */
+function validationError(problems: { field: string; msg: string }[]): Response {
+  return HttpResponse.json(
+    { detail: problems.map((p) => ({ loc: ["body", p.field], msg: p.msg, type: "value_error" })) },
+    { status: 422 }
+  );
+}
+
+/** Mirrors the backend's required-text rules (api/app/schemas/job.py). */
+function textProblems(
+  body: { title?: string; description?: string },
+  required: boolean
+): { field: string; msg: string }[] {
+  const problems: { field: string; msg: string }[] = [];
+  for (const field of ["title", "description"] as const) {
+    const value = body[field];
+    if (value === undefined && !required) continue;
+    if (!value?.trim()) problems.push({ field, msg: "String should have at least 1 character" });
+  }
+  if ((body.title?.length ?? 0) > 255) {
+    problems.push({ field: "title", msg: "String should have at most 255 characters" });
+  }
+  return problems;
+}
+
 function updateJob(id: unknown, patch: Partial<JobResponse>): Response {
   const idx = jobsStore.findIndex((j) => j.id === id);
   if (idx === -1) return notFound("Job", id);
   jobsStore[idx] = { ...jobsStore[idx], ...patch, updated_at: new Date().toISOString() };
   return HttpResponse.json(jobsStore[idx]);
+}
+
+/** Restores the fixtures; for tests that mutate jobs. */
+export function resetJobsStore() {
+  jobsStore = [...mockJobs];
 }
 
 export const jobHandlers = [
@@ -48,7 +78,10 @@ export const jobHandlers = [
    * POST /jobs — creates a draft job and prepends it to the in-memory store.
    */
   http.post(`${BASE}/jobs`, async ({ request }) => {
+    await delay(300);
     const body = (await request.json()) as components["schemas"]["CreateJobRequest"];
+    const problems = textProblems(body, true);
+    if (problems.length) return validationError(problems);
     const now = new Date().toISOString();
     const newJob: JobResponse = {
       id: crypto.randomUUID(),
@@ -72,7 +105,8 @@ export const jobHandlers = [
   /**
    * GET /jobs/:id
    */
-  http.get(`${BASE}/jobs/:id`, ({ params }) => {
+  http.get(`${BASE}/jobs/:id`, async ({ params }) => {
+    await delay(200);
     const job = jobsStore.find((j) => j.id === params.id);
     return job ? HttpResponse.json(job) : notFound("Job", params.id);
   }),
@@ -81,7 +115,10 @@ export const jobHandlers = [
    * PATCH /jobs/:id — partial update; status is changed via /status and /archive.
    */
   http.patch(`${BASE}/jobs/:id`, async ({ params, request }) => {
+    await delay(300);
     const body = (await request.json()) as components["schemas"]["UpdateJobRequest"];
+    const problems = textProblems(body, false);
+    if (problems.length) return validationError(problems);
     // Drop undefined keys so omitted fields stay unchanged.
     const patch = Object.fromEntries(
       Object.entries(body).filter(([, v]) => v !== undefined)
@@ -93,16 +130,23 @@ export const jobHandlers = [
    * PATCH /jobs/:id/status — move to draft, open or closed.
    */
   http.patch(`${BASE}/jobs/:id/status`, async ({ params, request }) => {
+    await delay(300);
     const body = (await request.json()) as components["schemas"]["UpdateJobStatusRequest"];
+    if (!["draft", "open", "closed"].includes(body.status)) {
+      return validationError([
+        { field: "status", msg: "Input should be 'draft', 'open' or 'closed'" },
+      ]);
+    }
     return updateJob(params.id, { status: body.status });
   }),
 
   /**
    * POST /jobs/:id/archive — idempotent.
    */
-  http.post(`${BASE}/jobs/:id/archive`, ({ params }) =>
-    updateJob(params.id, { status: "archived" })
-  ),
+  http.post(`${BASE}/jobs/:id/archive`, async ({ params }) => {
+    await delay(300);
+    return updateJob(params.id, { status: "archived" });
+  }),
 
   /**
    * GET /jobs/:id/stages
