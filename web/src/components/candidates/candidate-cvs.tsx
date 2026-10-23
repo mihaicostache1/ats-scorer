@@ -1,63 +1,32 @@
 "use client";
 
 import * as React from "react";
-import { Download, FileText, Loader2 } from "lucide-react";
 
-import { downloadCandidateCV, listCandidateCvDocuments } from "@/api";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
-import { NETWORK_ERROR_MESSAGE, parseApiFailure } from "@/lib/api-error";
-import { formatBytes, formatDate } from "@/lib/format";
-import { CV_STATUS_BADGE, type CvDocument } from "./cv-status";
+import { listCandidateCvDocuments } from "@/api";
+import { Can } from "@/components/auth/can";
+import { CvDropzone } from "./cv-dropzone";
+import { CvRow } from "./cv-row";
+import { CvUploadItem } from "./cv-upload-item";
+import { describeCvStatus, type CvDocument } from "./cv-status";
 import { ProfileSection, SectionBody, SectionEmpty } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
+import { useCvUploads } from "./use-cv-uploads";
 
-/** CVs are private: they are fetched with the session cookie and saved from memory, never linked. */
-function DownloadButton({ candidateId, cv }: { candidateId: string; cv: CvDocument }) {
-  const [busy, setBusy] = React.useState(false);
-
-  const download = async () => {
-    setBusy(true);
-    try {
-      const { data, error, response } = await downloadCandidateCV(candidateId, cv.id);
-      if (!data) {
-        toast.error(parseApiFailure(error, response.status).message, "Couldn't download CV");
-        return;
-      }
-      const url = URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = cv.original_filename;
-      link.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error(NETWORK_ERROR_MESSAGE, "Couldn't download CV");
-    } finally {
-      setBusy(false);
-    }
-  };
-
+/** Did anything a person would want to hear about change between two copies of a CV? */
+function changedMeaningfully(previous: CvDocument, next: CvDocument): boolean {
   return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      className="gap-1.5"
-      disabled={busy}
-      onClick={download}
-      aria-label={`Download ${cv.original_filename}`}
-    >
-      {busy ? (
-        <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-      ) : (
-        <Download className="size-3.5" aria-hidden="true" />
-      )}
-      Download
-    </Button>
+    previous.status !== next.status ||
+    previous.attempts !== next.attempts ||
+    previous.error_code !== next.error_code
   );
 }
 
+/**
+ * The candidate's CVs, the uploader, and live processing status.
+ *
+ * The fetched list is the starting point; CVs uploaded in this visit and fresher copies from
+ * polling are layered on top by id, so the list never flashes back to a loading state.
+ */
 export function CandidateCvs({ candidateId }: { candidateId: string }) {
   const load = React.useCallback(
     async () => unwrap(await listCandidateCvDocuments(candidateId)),
@@ -65,67 +34,66 @@ export function CandidateCvs({ candidateId }: { candidateId: string }) {
   );
   const { state, refetch } = useResource(load);
 
+  const [added, setAdded] = React.useState<CvDocument[]>([]);
+  const [updates, setUpdates] = React.useState<Record<string, CvDocument>>({});
+  const [announcement, setAnnouncement] = React.useState("");
+
+  const handleUpdate = React.useCallback((next: CvDocument, previous: CvDocument) => {
+    setUpdates((current) => ({ ...current, [next.id]: next }));
+    if (changedMeaningfully(previous, next)) {
+      setAnnouncement(`${next.original_filename}: ${describeCvStatus(next)}`);
+    }
+  }, []);
+
+  const uploads = useCvUploads({
+    candidateId,
+    onUploaded: (cv) => setAdded((current) => [cv, ...current]),
+    announce: setAnnouncement,
+  });
+
   return (
     <ProfileSection
       id="cvs"
       title="CVs"
       description="Uploaded files and how far processing has got, newest first."
     >
+      <Can action="candidate:write">
+        <CvDropzone onFile={uploads.start} />
+      </Can>
+
       <SectionBody state={state} label="CVs" onRetry={refetch}>
-        {(cvs) =>
-          cvs.length === 0 ? (
-            <SectionEmpty>No CVs uploaded yet.</SectionEmpty>
-          ) : (
+        {(fetched) => {
+          const known = new Set(fetched.map((cv) => cv.id));
+          const cvs = [...added.filter((cv) => !known.has(cv.id)), ...fetched].map(
+            (cv) => updates[cv.id] ?? cv
+          );
+
+          if (cvs.length === 0 && uploads.pending.length === 0) {
+            return <SectionEmpty>No CVs uploaded yet.</SectionEmpty>;
+          }
+          return (
             <ul className="divide-border divide-y">
-              {cvs.map((cv) => {
-                const status = CV_STATUS_BADGE[cv.status];
-                return (
-                  <li
-                    key={cv.id}
-                    className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
-                  >
-                    <div className="flex min-w-0 items-start gap-3">
-                      <FileText
-                        className="text-muted-foreground mt-0.5 size-5 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <div className="min-w-0">
-                        <p className="text-foreground text-sm font-semibold break-all">
-                          {cv.original_filename}
-                        </p>
-                        <p className="text-muted-foreground mt-0.5 text-xs">
-                          {[
-                            formatBytes(cv.size_bytes),
-                            cv.page_count
-                              ? `${cv.page_count} ${cv.page_count === 1 ? "page" : "pages"}`
-                              : null,
-                            cv.ocr_used ? "OCR used" : null,
-                            `Uploaded ${formatDate(cv.created_at)}`,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                        {cv.status === "failed" && (
-                          <p className="text-destructive mt-1 text-xs">
-                            {cv.error_message ?? "Processing failed."}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={status.variant}>
-                        <span className="sr-only">Parse status: </span>
-                        {status.label}
-                      </Badge>
-                      <DownloadButton candidateId={candidateId} cv={cv} />
-                    </div>
-                  </li>
-                );
-              })}
+              {uploads.pending.map((upload) => (
+                <CvUploadItem
+                  key={upload.key}
+                  upload={upload}
+                  onCancel={() => uploads.cancel(upload.key)}
+                  onRetry={() => uploads.retry(upload.key)}
+                  onDismiss={() => uploads.dismiss(upload.key)}
+                />
+              ))}
+              {cvs.map((cv) => (
+                <CvRow key={cv.id} candidateId={candidateId} cv={cv} onUpdate={handleUpdate} />
+              ))}
             </ul>
-          )
-        }
+          );
+        }}
       </SectionBody>
+
+      {/* Announces status changes (queued, extracting, parsed, failed…) to screen readers. */}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </p>
     </ProfileSection>
   );
 }

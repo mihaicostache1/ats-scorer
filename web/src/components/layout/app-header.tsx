@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Action } from "@/lib/permissions";
 import { useSession } from "@/providers/session-provider";
+import { ThemeToggle } from "./theme-toggle";
 import { cn } from "@/lib/utils";
 
 export interface NavItem {
@@ -119,6 +120,8 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
           >
             <Bell className="size-4" />
           </Button>
+
+          <ThemeToggle />
 
           <div className="border-border hidden items-center gap-2 border-l pl-2 sm:flex">
             <div

@@ -127,6 +127,12 @@ export function getCandidateCvDocument(id: string, cvId: string) {
   });
 }
 
+export function retryCandidateCvExtraction(id: string, cvId: string) {
+  return apiClient.POST("/candidates/{id}/cv/{cv_id}/retry", {
+    params: { path: { id, cv_id: cvId } },
+  });
+}
+
 export function downloadCandidateCV(id: string, cvId: string) {
   return apiClient.GET("/candidates/{id}/cv/{cv_id}/download", {
     params: { path: { id, cv_id: cvId } },

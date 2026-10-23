@@ -30,8 +30,12 @@ vi.mock("@/api", () => ({
   getJobStages,
   listCandidateCvDocuments,
   downloadCandidateCV: download,
+  getCandidateCvDocument: vi.fn(),
+  retryCandidateCvExtraction: vi.fn(),
 }));
 vi.mock("@/components/ui/toast", () => ({ toast }));
+vi.mock("@/providers/session-provider", () => ({ useSession: () => ({ can: () => true }) }));
+vi.mock("@/api/upload-cv", () => ({ uploadCandidateCvWithProgress: vi.fn() }));
 
 import { CandidateProfile } from "./candidate-profile";
 
