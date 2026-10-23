@@ -455,7 +455,9 @@ export default function HomePage() {
             </div>
             <div className="text-foreground mt-3 text-2xl font-bold">{jobs.length}</div>
             <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-              <span className="font-medium text-emerald-600">+2 this week</span>
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                +2 this week
+              </span>
             </div>
           </div>
 
@@ -468,7 +470,9 @@ export default function HomePage() {
             </div>
             <div className="text-foreground mt-3 text-2xl font-bold">132</div>
             <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-              <span className="font-medium text-emerald-600">98% consent verified</span>
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                98% consent verified
+              </span>
             </div>
           </div>
 

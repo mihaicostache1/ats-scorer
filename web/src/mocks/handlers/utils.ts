@@ -1,4 +1,4 @@
-import { HttpResponse } from "msw";
+import { delay, HttpResponse } from "msw";
 import type { components } from "@/api/generated/schema";
 
 export const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
@@ -16,6 +16,14 @@ export function errorResponse(status: number, code: string, message: string): Re
     },
   };
   return HttpResponse.json(body, { status });
+}
+
+/** Simulated latency so loading states are visible; skipped under Vitest so tests stay fast. */
+export const wait = (ms: number) => delay(process.env.NODE_ENV === "test" ? 0 : ms);
+
+/** FastAPI's own error body, `{ detail }`, which is what the CV routes really return. */
+export function detailResponse(status: number, message: string): Response {
+  return HttpResponse.json({ detail: message }, { status });
 }
 
 export function notFound(resource: string, id: unknown): Response {

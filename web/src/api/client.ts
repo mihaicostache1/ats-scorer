@@ -25,7 +25,7 @@ const pending = new Map<string, Request>();
 let refreshing: Promise<boolean> | null = null;
 
 /** Refreshes the session once, however many requests hit a 401 at the same time. */
-function refreshSession(): Promise<boolean> {
+export function refreshSession(): Promise<boolean> {
   refreshing ??= fetch(`${env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
     method: "POST",
     credentials: "include",
