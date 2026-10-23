@@ -162,7 +162,7 @@ export const authHandlers = [
 
 /**
  * Registered first, ahead of every data handler. Answers 401 without a session and 403 when a
- * viewer attempts a write, then returns nothing so the request falls through to the real handler.
+ * viewer attempts a write or reads candidates, then returns nothing so the request falls through to the real handler.
  * `/auth/*` is exempt (those handlers decide for themselves).
  */
 export const sessionGuard = http.all(`${BASE}/*`, ({ request, cookies }) => {
@@ -171,7 +171,14 @@ export const sessionGuard = http.all(`${BASE}/*`, ({ request, cookies }) => {
   }
   const account = sessionAccount(cookies);
   if (!account) return detail(401, "Not authenticated");
-  if (account.user.role === "viewer" && request.method !== "GET") {
-    return detail(403, "Not enough privileges");
+  if (account.user.role === "viewer") {
+    if (request.method !== "GET") return detail(403, "Not enough privileges");
+    // Viewers only see shortlisted candidates (docs/scope.md §4), never the full list or profiles.
+    // The real API does not enforce this yet; the mock follows the intended policy.
+    if (
+      new URL(request.url).pathname.startsWith(new URL(`${BASE}/candidates`, "http://x").pathname)
+    ) {
+      return detail(403, "Not enough privileges");
+    }
   }
 });

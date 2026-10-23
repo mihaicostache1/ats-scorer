@@ -85,6 +85,8 @@ export const applicationHandlers = [
         from_stage_id: null,
         to_stage_id: newApp.stage_id,
         reason: null,
+        overall_score: null,
+        model_version: null,
         moved_by: MOCK_USER_ID,
         moved_at: now,
       },
@@ -158,6 +160,8 @@ export const applicationHandlers = [
       from_stage_id: current.stage_id,
       to_stage_id: body.stage_id,
       reason: body.reason ?? null,
+      overall_score: null,
+      model_version: null,
       moved_by: MOCK_USER_ID,
       moved_at: now,
     });
