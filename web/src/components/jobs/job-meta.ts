@@ -9,16 +9,7 @@ export const STATUS_BADGE: Record<JobStatus, { label: string; variant: BadgeProp
   archived: { label: "Archived", variant: "secondary" },
 };
 
-const dateFormat = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-export function formatDate(iso: string): string {
-  return dateFormat.format(new Date(iso));
-}
+export { formatDate } from "@/lib/format";
 
 /** "full_time" → "Full-time" */
 export function formatEmploymentType(value: string): string {

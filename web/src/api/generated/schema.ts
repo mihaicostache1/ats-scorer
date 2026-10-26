@@ -312,7 +312,8 @@ export interface paths {
         put?: never;
         /**
          * Upload PDF CV
-         * @description Upload a PDF CV for a candidate and queue it for processing.
+         * @description Upload a PDF CV for a candidate and queue it for text extraction by the
+         *     background worker (queued, extracting, then extracted or failed).
          *     The file is checked by its content, not its extension, and may be at most 10 MB.
          *     Requires the `admin` or `recruiter` role.
          */
@@ -337,6 +338,28 @@ export interface paths {
         get: operations["getCandidateCvDocument"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/candidates/{id}/cv/{cv_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry CV Text Extraction
+         * @description Queue a document for text extraction again. A failed document is reset to
+         *     `queued`; one still queued or extracting is queued again unchanged. Any other
+         *     status returns 409. Requires the `admin` or `recruiter` role.
+         */
+        post: operations["retryCandidateCvExtraction"];
         delete?: never;
         options?: never;
         head?: never;
@@ -736,7 +759,30 @@ export interface components {
              * @example queued
              * @enum {string}
              */
-            status: "queued" | "extracting" | "parsed" | "needs_review" | "failed";
+            status: "queued" | "extracting" | "extracted" | "parsed" | "needs_review" | "failed";
+            /** @description Set once the text has been extracted. */
+            page_count: number | null;
+            /** @description True when at least one page was read with OCR. */
+            ocr_used: boolean;
+            /**
+             * @description Why the document is failed, or why its last attempt had to be retried:
+             *     invalid_pdf, encrypted_pdf, too_many_pages, no_text_found,
+             *     ocr_unavailable, file_missing, timeout, internal_error, queue_unavailable.
+             * @example null
+             */
+            error_code: string | null;
+            /** @description The reason in words, suitable for showing to a user. */
+            error_message: string | null;
+            /**
+             * @description Extraction attempts made so far (at most 3 per retry).
+             * @example 0
+             */
+            attempts: number;
+            /**
+             * Format: date-time
+             * @description When extraction finished, successfully or not.
+             */
+            processed_at: string | null;
             /** Format: uuid */
             uploaded_by: string | null;
             /**
@@ -891,6 +937,10 @@ export interface components {
             /** Format: uuid */
             to_stage_id: string;
             reason: string | null;
+            /** @description The application's latest score when the move was made; null if it had none. */
+            overall_score: number | null;
+            /** @description Model that produced `overall_score`. */
+            model_version: string | null;
             /**
              * Format: uuid
              * @description The user who made the move.
@@ -915,14 +965,23 @@ export interface components {
             application_id: string;
             /** @example 87.5 */
             overall_score: number;
-            /** @example 90 */
-            skill_overlap_score: number;
+            /**
+             * @description Null when the scoring model does not compute this component.
+             * @example 90
+             */
+            skill_overlap_score: number | null;
             /** @example 85 */
             semantic_score: number;
-            /** @example 92 */
-            experience_score: number;
-            /** @example 80 */
-            title_fit_score: number;
+            /**
+             * @description Null when the scoring model does not compute this component.
+             * @example 92
+             */
+            experience_score: number | null;
+            /**
+             * @description Null when the scoring model does not compute this component.
+             * @example 80
+             */
+            title_fit_score: number | null;
             /** @example v1.0.0-baseline-cpu */
             model_version: string;
             component_breakdown: {
@@ -1701,6 +1760,33 @@ export interface operations {
             };
             401: components["responses"]["401Unauthorized"];
             404: components["responses"]["404NotFound"];
+        };
+    };
+    retryCandidateCvExtraction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["UUIDPathParam"];
+                cv_id: components["parameters"]["CvIdPathParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The document, queued again */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CvDocumentResponse"];
+                };
+            };
+            401: components["responses"]["401Unauthorized"];
+            403: components["responses"]["403Forbidden"];
+            404: components["responses"]["404NotFound"];
+            409: components["responses"]["409Conflict"];
         };
     };
     downloadCandidateCV: {

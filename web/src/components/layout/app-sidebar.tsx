@@ -41,7 +41,7 @@ const sections: SidebarSection[] = [
     items: [
       { title: "Dashboard", href: "/", icon: LayoutDashboard },
       { title: "Job Openings", href: "/jobs", icon: Briefcase },
-      { title: "Candidates", href: "/#candidates", icon: Users, badge: "48" },
+      { title: "Candidates", href: "/candidates", icon: Users, requires: "candidate:read" },
       { title: "Pipeline Stages", href: "/#pipeline", icon: Layers },
     ],
   },
