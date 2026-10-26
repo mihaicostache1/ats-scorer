@@ -122,7 +122,7 @@ export function DataTable<T>({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="h-9 pl-9"
+              className="pl-9"
               aria-label={searchPlaceholder}
             />
           </div>
@@ -133,10 +133,10 @@ export function DataTable<T>({
       )}
 
       {/* Table container */}
-      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
+      <div className="glass overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm" role="table">
-            <thead className="border-border bg-muted/40 text-muted-foreground border-b font-medium">
+            <thead className="border-border/60 bg-foreground/[0.03] text-muted-foreground border-b font-medium">
               <tr>
                 {columns.map((col) => {
                   const isCurrentSort = sortKey === col.key;
@@ -145,7 +145,7 @@ export function DataTable<T>({
                       key={col.key}
                       scope="col"
                       className={cn(
-                        "h-10 px-4 text-xs font-semibold tracking-wider uppercase",
+                        "text-footnote h-10 px-4 font-medium",
                         col.sortable && "select-none",
                         col.className
                       )}
@@ -161,7 +161,7 @@ export function DataTable<T>({
                         <button
                           type="button"
                           onClick={() => handleSort(col.key)}
-                          className="hover:text-foreground focus-visible:ring-ring flex items-center gap-1.5 rounded py-1 focus-visible:ring-1 focus-visible:outline-none"
+                          className="hover:text-foreground focus-visible:ring-primary/25 flex items-center gap-1.5 rounded py-1 focus-visible:ring-4 focus-visible:outline-none"
                         >
                           {col.header}
                           {isCurrentSort ? (
@@ -201,7 +201,7 @@ export function DataTable<T>({
                       key={String(record.id ?? idx)}
                       onClick={() => onRowClick?.(row)}
                       className={cn(
-                        "hover:bg-muted/30 focus-within:bg-muted/30 transition-colors",
+                        "hover:bg-foreground/[0.04] focus-within:bg-foreground/[0.04] transition-colors duration-200",
                         onRowClick && "cursor-pointer"
                       )}
                     >
@@ -220,7 +220,7 @@ export function DataTable<T>({
 
         {/* Pagination controls */}
         {!isLoading && filteredData.length > 0 && (
-          <div className="border-border bg-muted/10 flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
+          <div className="border-border/60 bg-foreground/[0.02] flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row">
             <div className="text-muted-foreground flex items-center gap-2 text-xs">
               <span>Rows per page:</span>
               <div className="w-18">
@@ -230,7 +230,7 @@ export function DataTable<T>({
                     setPageSize(Number(e.target.value));
                     setCurrentPage(1);
                   }}
-                  className="h-7 py-0 text-xs"
+                  className="h-8 py-0 text-xs"
                   aria-label="Select page size"
                 >
                   {pageSizeOptions.map((opt) => (

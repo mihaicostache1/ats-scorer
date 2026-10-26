@@ -103,7 +103,7 @@ export function CandidateApplications({ candidateId }: { candidateId: string }) 
                       {row.jobTitle ? (
                         <Link
                           href={`/jobs/${row.jobId}`}
-                          className="text-foreground focus-visible:ring-ring rounded-sm text-sm font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                          className="text-foreground focus-visible:ring-primary/25 rounded-md text-sm font-semibold hover:underline focus-visible:ring-4 focus-visible:outline-none"
                         >
                           {row.jobTitle}
                         </Link>

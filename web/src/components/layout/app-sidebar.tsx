@@ -91,16 +91,13 @@ export function AppSidebar({
 
   return (
     <aside
-      className={cn(
-        "border-border bg-card/60 flex w-64 flex-col border-r backdrop-blur-xs",
-        className
-      )}
+      className={cn("glass-side flex w-64 flex-col", className)}
       aria-label="Sidebar navigation"
     >
-      <div className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
+      <div className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
         {visibleSections.map((section) => (
           <div key={section.title} className="space-y-1">
-            <h4 className="text-muted-foreground/80 px-3 text-[11px] font-semibold tracking-wider uppercase">
+            <h4 className="text-muted-foreground text-footnote px-3 font-semibold">
               {section.title}
             </h4>
             <div className="space-y-0.5 pt-1">
@@ -112,17 +109,17 @@ export function AppSidebar({
                 const content = (
                   <div
                     className={cn(
-                      "group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                      "group flex min-h-10 items-center justify-between rounded-[10px] px-3 py-2 text-[15px] font-medium transition-all duration-200 ease-out",
                       isActive
-                        ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "glass-subtle text-sidebar-accent-foreground ring-primary/25 font-semibold ring-1"
+                        : "text-sidebar-foreground hover:bg-foreground/5 active:scale-[0.99]"
                     )}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       <Icon
                         className={cn(
-                          "size-4 shrink-0 transition-transform group-hover:scale-105",
-                          isActive ? "text-primary-foreground" : "text-muted-foreground"
+                          "size-[18px] shrink-0",
+                          isActive ? "text-sidebar-accent-foreground" : "text-muted-foreground"
                         )}
                       />
                       <span>{item.title}</span>
@@ -130,12 +127,8 @@ export function AppSidebar({
 
                     {item.badge && (
                       <Badge
-                        variant={isActive ? "secondary" : "outline"}
-                        className={cn(
-                          "h-4.5 px-1.5 py-0 text-[10px] font-normal",
-                          isActive &&
-                            "bg-primary-foreground/20 text-primary-foreground border-transparent"
-                        )}
+                        variant={isActive ? "default" : "secondary"}
+                        className="px-2 py-0 text-xs font-medium"
                       >
                         {item.badge}
                       </Badge>
@@ -150,7 +143,7 @@ export function AppSidebar({
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="focus-visible:ring-ring block rounded-lg focus-visible:ring-2 focus-visible:outline-none"
+                      className="focus-visible:ring-primary/25 block rounded-[10px] focus-visible:ring-4 focus-visible:outline-none"
                       onClick={onItemClick}
                     >
                       {content}
@@ -162,7 +155,7 @@ export function AppSidebar({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="focus-visible:ring-ring block rounded-lg focus-visible:ring-2 focus-visible:outline-none"
+                    className="focus-visible:ring-primary/25 block rounded-[10px] focus-visible:ring-4 focus-visible:outline-none"
                     onClick={onItemClick}
                     aria-current={isActive ? "page" : undefined}
                   >
@@ -176,15 +169,14 @@ export function AppSidebar({
       </div>
 
       {/* Footer info box */}
-      <div className="border-border bg-muted/40 m-2 rounded-xl border-t p-3">
+      <div className="glass-subtle m-3 rounded-xl p-3">
         <div className="flex items-center justify-between">
-          <div className="text-foreground text-[11px] font-medium">
-            Environment:{" "}
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">Dev</span>
+          <div className="text-foreground text-footnote font-medium">
+            Environment: <span className="text-success font-semibold">Dev</span>
           </div>
-          <div className="size-2 animate-pulse rounded-full bg-emerald-500" />
+          <div className="bg-success size-2 animate-pulse rounded-full" />
         </div>
-        <p className="text-muted-foreground mt-1 text-[10px]">Connected to PostgreSQL & Redis</p>
+        <p className="text-muted-foreground text-caption mt-1">Connected to PostgreSQL & Redis</p>
       </div>
     </aside>
   );

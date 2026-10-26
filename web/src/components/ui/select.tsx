@@ -13,8 +13,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            "border-input bg-background focus-visible:ring-ring focus-visible:border-ring flex h-9 w-full appearance-none rounded-md border px-3 py-1 pr-8 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-            error && "border-destructive focus-visible:ring-destructive/30",
+            "glass-subtle focus-visible:ring-primary/25 focus-visible:border-primary aria-invalid:border-destructive flex h-10 w-full appearance-none rounded-[10px] px-3 py-1 pr-9 text-[15px] focus-visible:ring-4 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+            error &&
+              "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20",
             className
           )}
           aria-invalid={error ? "true" : undefined}
@@ -22,7 +23,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         >
           {children}
         </select>
-        <ChevronDown className="pointer-events-none absolute top-2.5 right-2.5 size-4 opacity-50" />
+        <ChevronDown className="pointer-events-none absolute top-3 right-3 size-4 opacity-60" />
       </div>
     );
   }

@@ -18,7 +18,7 @@ import { useJob } from "./use-job";
 import type { JobResponse } from "./use-jobs";
 
 const backLink =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-sm text-sm focus-visible:ring-2 focus-visible:outline-none";
+  "text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none";
 
 export function JobDetailSkeleton() {
   return (
@@ -55,9 +55,7 @@ function SkillList({ title, skills }: { title: string; skills: string[] }) {
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-        {label}
-      </dt>
+      <dt className="text-muted-foreground text-footnote font-medium">{label}</dt>
       <dd className="text-foreground mt-1 text-sm">{children}</dd>
     </div>
   );
@@ -82,9 +80,7 @@ function JobDetailView({
         </Link>
         <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <h1 className="text-foreground text-2xl font-bold tracking-tight break-words sm:text-3xl">
-              {job.title}
-            </h1>
+            <h1 className="text-foreground text-large-title break-words">{job.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge variant={status.variant}>
                 <span className="mr-1.5 size-1.5 rounded-full bg-current" aria-hidden="true" />
@@ -115,14 +111,14 @@ function JobDetailView({
       </div>
 
       {(job.status === "closed" || job.status === "archived") && (
-        <p role="status" className="border-border bg-muted/40 rounded-lg border px-4 py-3 text-sm">
+        <p role="status" className="glass-subtle rounded-lg px-4 py-3 text-sm">
           {job.status === "closed"
             ? "This job is closed and no longer accepts new applications."
             : "This job is archived and hidden from the jobs list."}
         </p>
       )}
 
-      <dl className="border-border bg-card grid gap-5 rounded-xl border p-6 shadow-xs sm:grid-cols-2 lg:grid-cols-3">
+      <dl className="glass grid gap-5 rounded-2xl p-6 sm:grid-cols-2 lg:grid-cols-3">
         <Fact label="Location">
           {job.location ? (
             <span className="inline-flex items-center gap-1.5">
@@ -143,14 +139,14 @@ function JobDetailView({
         <Fact label="Last updated">{formatDate(job.updated_at)}</Fact>
       </dl>
 
-      <section className="border-border bg-card space-y-3 rounded-xl border p-6 shadow-xs">
+      <section className="glass space-y-3 rounded-2xl p-6">
         <h2 className="text-foreground text-sm font-semibold">Description</h2>
         <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-wrap">
           {job.description}
         </p>
       </section>
 
-      <div className="border-border bg-card space-y-5 rounded-xl border p-6 shadow-xs">
+      <div className="glass space-y-5 rounded-2xl p-6">
         <SkillList title="Required skills" skills={job.required_skills} />
         <SkillList title="Nice-to-have skills" skills={job.preferred_skills} />
       </div>

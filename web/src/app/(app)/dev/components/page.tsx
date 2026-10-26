@@ -194,10 +194,10 @@ export default function DevComponentsPage() {
           <span
             className={`font-semibold ${
               row.matchScore >= 90
-                ? "text-emerald-600 dark:text-emerald-400"
+                ? "text-success"
                 : row.matchScore >= 75
                   ? "text-blue-600 dark:text-blue-400"
-                  : "text-amber-600 dark:text-amber-400"
+                  : "text-warning"
             }`}
           >
             {row.matchScore}%
@@ -206,10 +206,10 @@ export default function DevComponentsPage() {
             <div
               className={`h-full rounded-full ${
                 row.matchScore >= 90
-                  ? "bg-emerald-500"
+                  ? "bg-success"
                   : row.matchScore >= 75
                     ? "bg-blue-500"
-                    : "bg-amber-500"
+                    : "bg-warning"
               }`}
               style={{ width: `${row.matchScore}%` }}
             />
@@ -263,7 +263,7 @@ export default function DevComponentsPage() {
       <div className="space-y-12 pb-16">
         {/* Page Header */}
         <div className="border-border border-b pb-6">
-          <div className="text-primary flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
+          <div className="text-primary text-footnote flex items-center gap-2 font-medium">
             <Sparkles className="size-4" />
             Design System & Component Showcase
           </div>
@@ -291,7 +291,7 @@ export default function DevComponentsPage() {
           </p>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="border-border bg-card space-y-3 rounded-xl border p-5">
+            <div className="glass space-y-3 rounded-2xl p-5">
               <h3 className="text-sm font-semibold">Button Variants & Sizes</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Button variant="default">Default Button</Button>
@@ -312,7 +312,7 @@ export default function DevComponentsPage() {
               </div>
             </div>
 
-            <div className="border-border bg-card space-y-3 rounded-xl border p-5">
+            <div className="glass space-y-3 rounded-2xl p-5">
               <h3 className="text-sm font-semibold">Status & Categorization Badges</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="default">Default</Badge>
@@ -338,19 +338,16 @@ export default function DevComponentsPage() {
           </div>
           <p className="text-muted-foreground text-xs">
             Using @base-ui/react/dialog. Press{" "}
-            <kbd className="bg-muted rounded px-1 py-0.5 font-mono text-[11px]">Tab</kbd> to cycle
-            focus, or{" "}
-            <kbd className="bg-muted rounded px-1 py-0.5 font-mono text-[11px]">Escape</kbd> to
-            close.
+            <kbd className="bg-muted rounded px-1 py-0.5 font-mono text-xs">Tab</kbd> to cycle
+            focus, or <kbd className="bg-muted rounded px-1 py-0.5 font-mono text-xs">Escape</kbd>{" "}
+            to close.
           </p>
 
-          <div className="border-border bg-card flex flex-wrap items-center gap-4 rounded-xl border p-5">
+          <div className="glass flex flex-wrap items-center gap-4 rounded-2xl p-5">
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-              <DialogTrigger>
-                <Button className="gap-2">
-                  <Plus className="size-4" />
-                  Open Candidate Screening Modal
-                </Button>
+              <DialogTrigger render={<Button className="gap-2" />}>
+                <Plus className="size-4" />
+                Open Candidate Screening Modal
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -378,8 +375,8 @@ export default function DevComponentsPage() {
                 </div>
 
                 <DialogFooter>
-                  <DialogClose>
-                    <Button variant="outline">Cancel</Button>
+                  <DialogClose render={<Button type="button" variant="outline" />}>
+                    Cancel
                   </DialogClose>
                   <Button
                     onClick={() => {
@@ -407,13 +404,13 @@ export default function DevComponentsPage() {
             Accessible live regions with auto-dismiss timers, dismiss buttons, and variant styling.
           </p>
 
-          <div className="border-border bg-card flex flex-wrap items-center gap-3 rounded-xl border p-5">
+          <div className="glass flex flex-wrap items-center gap-3 rounded-2xl p-5">
             <Button
               variant="outline"
               onClick={() => toast.success("Job posting successfully published to careers portal.")}
               className="gap-1.5"
             >
-              <CheckCircle2 className="size-4 text-emerald-500" />
+              <CheckCircle2 className="text-success size-4" />
               Success Toast
             </Button>
 
@@ -442,7 +439,7 @@ export default function DevComponentsPage() {
               onClick={() => toast.warning("Candidate consent expires in 7 days.")}
               className="gap-1.5"
             >
-              <AlertTriangle className="size-4 text-amber-500" />
+              <AlertTriangle className="text-warning size-4" />
               Warning Toast
             </Button>
           </div>
@@ -463,7 +460,7 @@ export default function DevComponentsPage() {
             aria-invalid, aria-describedby, and role=&quot;alert&quot; error messages.
           </p>
 
-          <div className="border-border bg-card max-w-2xl rounded-xl border p-6 shadow-xs">
+          <div className="glass max-w-2xl rounded-2xl p-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -708,7 +705,7 @@ export default function DevComponentsPage() {
             Reusable empty condition display with icon, explanatory copy, and action button.
           </p>
 
-          <div className="border-border bg-card rounded-xl border p-4">
+          <div className="glass rounded-2xl p-4">
             <EmptyState
               icon={FileSearch}
               title="No resumes uploaded yet"
@@ -743,7 +740,7 @@ export default function DevComponentsPage() {
             </Button>
           </div>
 
-          <div className="border-border bg-card rounded-xl border p-4">
+          <div className="glass rounded-2xl p-4">
             <ErrorState
               title={
                 errorSimulated

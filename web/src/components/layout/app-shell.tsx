@@ -16,7 +16,7 @@ export function AppShell({ children, className }: AppShellProps) {
 
   return (
     <ToastProvider>
-      <div className="bg-background text-foreground flex min-h-screen flex-col">
+      <div className="bg-ambient text-foreground flex min-h-screen flex-col">
         <AppHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         <div className="relative flex flex-1 overflow-hidden">
@@ -27,11 +27,12 @@ export function AppShell({ children, className }: AppShellProps) {
           {sidebarOpen && (
             <div className="fixed inset-0 z-50 flex lg:hidden">
               <div
-                className="animate-in fade-in fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+                className="animate-in fade-in fixed inset-0 bg-black/25 backdrop-blur-md transition-opacity"
                 onClick={() => setSidebarOpen(false)}
                 aria-hidden="true"
               />
-              <div className="bg-background animate-in slide-in-from-left relative z-10 flex h-full w-72 max-w-full flex-col shadow-2xl duration-200">
+              {/* No fill of its own: the sidebar inside supplies the glass, so the blur isn't nested. */}
+              <div className="animate-in slide-in-from-left relative z-10 flex h-full w-72 max-w-full flex-col overflow-hidden rounded-r-2xl shadow-2xl duration-200">
                 <AppSidebar
                   className="w-full flex-1 border-r-0"
                   onItemClick={() => setSidebarOpen(false)}
@@ -43,7 +44,7 @@ export function AppShell({ children, className }: AppShellProps) {
           {/* Main Content Area */}
           <main
             className={cn(
-              "mx-auto w-full max-w-7xl flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8",
+              "mx-auto w-full max-w-7xl flex-1 overflow-y-auto px-5 py-8 sm:px-10 sm:py-10",
               className
             )}
           >

@@ -132,9 +132,7 @@ export function JobsList() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-            Jobs Postings
-          </h1>
+          <h1 className="text-foreground text-large-title">Jobs Postings</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Manage job postings, required ESCO skills, and pipeline stages.
           </p>
@@ -159,7 +157,7 @@ export function JobsList() {
           onRetry={refetch}
         />
       ) : (
-        <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
+        <div className="glass overflow-hidden rounded-2xl">
           <JobsTable
             jobs={jobs}
             isLoading={isLoading}

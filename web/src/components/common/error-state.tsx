@@ -30,7 +30,7 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "border-destructive/20 bg-destructive/5 animate-in fade-in-50 flex min-h-[280px] flex-col items-center justify-center rounded-xl border p-8 text-center",
+        "border-destructive/20 bg-destructive/5 animate-in fade-in-50 flex min-h-[280px] flex-col items-center justify-center rounded-2xl border p-8 text-center",
         className
       )}
       {...props}
@@ -46,7 +46,7 @@ export function ErrorState({
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
-            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded text-xs underline underline-offset-4 focus-visible:ring-1 focus-visible:outline-none"
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 rounded text-xs underline underline-offset-4 focus-visible:ring-4 focus-visible:outline-none"
           >
             {showDetails ? "Hide technical details" : "Show technical details"}
           </button>

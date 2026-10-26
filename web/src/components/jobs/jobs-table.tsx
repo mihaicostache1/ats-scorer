@@ -40,14 +40,14 @@ export function JobsTable({
         className={cn("w-full text-left text-sm transition-opacity", isRefreshing && "opacity-60")}
       >
         <caption className="sr-only">Job postings</caption>
-        <thead className="border-border bg-muted/40 text-muted-foreground border-b font-medium">
+        <thead className="border-border/60 bg-foreground/[0.03] text-muted-foreground border-b font-medium">
           <tr>
             {COLUMNS.map((col) => (
               <th
                 key={col.key}
                 scope="col"
                 className={cn(
-                  "h-10 px-4 text-xs font-semibold tracking-wider whitespace-nowrap uppercase",
+                  "text-footnote h-10 px-4 font-medium whitespace-nowrap",
                   "className" in col && col.className
                 )}
               >
@@ -71,11 +71,14 @@ export function JobsTable({
             jobs.map((job) => {
               const status = STATUS_BADGE[job.status];
               return (
-                <tr key={job.id} className="hover:bg-muted/30 transition-colors">
+                <tr
+                  key={job.id}
+                  className="hover:bg-foreground/[0.04] transition-colors duration-200"
+                >
                   <td className="px-4 py-3 align-top">
                     <Link
                       href={`/jobs/${job.id}`}
-                      className="text-foreground focus-visible:ring-ring rounded-sm font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                      className="text-foreground focus-visible:ring-primary/25 rounded-md font-semibold hover:underline focus-visible:ring-4 focus-visible:outline-none"
                     >
                       {job.title}
                     </Link>

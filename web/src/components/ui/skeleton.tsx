@@ -13,12 +13,7 @@ function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
 
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        "border-border/60 bg-card space-y-3 rounded-xl border p-4 shadow-xs",
-        className
-      )}
-    >
+    <div className={cn("glass space-y-3 rounded-2xl p-4", className)}>
       <Skeleton className="h-5 w-2/5" />
       <Skeleton className="h-4 w-4/5" />
       <div className="flex gap-2 pt-2">

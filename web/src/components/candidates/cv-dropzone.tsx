@@ -61,7 +61,7 @@ export function CvDropzone({
         <FileUp className="text-muted-foreground size-6" aria-hidden="true" />
         <p className="text-sm">
           Drag and drop a PDF here, or
-          <label className="focus-within:ring-ring border-input bg-background hover:bg-muted ml-2 inline-flex h-8 cursor-pointer items-center rounded-md border px-3 text-sm font-medium shadow-xs focus-within:ring-2">
+          <label className="focus-within:ring-primary/25 bg-primary/10 text-primary hover:bg-primary/15 ml-2 inline-flex h-9 cursor-pointer items-center rounded-[10px] px-3.5 text-sm font-medium focus-within:ring-4">
             Choose PDF
             <input
               type="file"

@@ -109,8 +109,9 @@ export const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
     return (
       <div
         className={cn(
-          "border-input bg-background focus-within:ring-ring focus-within:border-ring flex min-h-9 w-full flex-wrap items-center gap-1.5 rounded-md border px-2 py-1 text-sm shadow-xs transition-colors focus-within:ring-2",
-          error && "border-destructive focus-within:ring-destructive/30",
+          "glass-subtle focus-within:ring-primary/25 focus-within:border-primary aria-invalid:border-destructive flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[15px] focus-within:ring-4",
+          error &&
+            "border-destructive! focus-within:border-destructive focus-within:ring-destructive/20",
           disabled && "cursor-not-allowed opacity-50",
           className
         )}

@@ -6,9 +6,7 @@ import { ProfileSection, SectionEmpty } from "./profile-section";
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-        {title}
-      </h3>
+      <h3 className="text-muted-foreground text-footnote font-medium">{title}</h3>
       <div className="mt-2">{children}</div>
     </div>
   );

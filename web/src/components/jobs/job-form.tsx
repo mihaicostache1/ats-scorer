@@ -114,14 +114,12 @@ export function JobForm({ job }: { job?: JobResponse }) {
       <div>
         <Link
           href={backHref}
-          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-sm text-sm focus-visible:ring-2 focus-visible:outline-none"
+          className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           {job ? "Back to job" : "Back to jobs"}
         </Link>
-        <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          {job ? "Edit job" : "New job"}
-        </h1>
+        <h1 className="text-foreground text-large-title mt-3">{job ? "Edit job" : "New job"}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           {job
             ? "Changing the requirements refreshes candidate scores."
@@ -132,7 +130,7 @@ export function JobForm({ job }: { job?: JobResponse }) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="border-border bg-card space-y-5 rounded-xl border p-6 shadow-xs"
+          className="glass space-y-5 rounded-2xl p-6"
           noValidate
         >
           <FormField
