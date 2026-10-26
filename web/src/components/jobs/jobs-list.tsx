@@ -20,7 +20,7 @@ import { JOB_PAGE_SIZE, useJobs } from "./use-jobs";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-/** Wireframe action: "+ Create Job" → the job form (planned for week 3). */
+/** Wireframe action: "+ Create Job" → the job form. */
 function NewJobLink({ children }: { children: React.ReactNode }) {
   return (
     <Link href="/jobs/new" className={cn(buttonVariants(), "gap-2")}>
