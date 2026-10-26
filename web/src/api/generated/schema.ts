@@ -4,1882 +4,1970 @@
  */
 
 export interface paths {
-    "/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Register Organization and First Admin
-         * @description Create a new organization and its first admin user, then sign them in.
-         *     Tokens are set as httpOnly cookies; the body carries identity only.
-         */
-        post: operations["register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/auth/register": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * User Login
-         * @description Authenticate user credentials. The access and refresh tokens are set as httpOnly
-         *     cookies and are never returned in the body. Rate limited per IP.
-         */
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Register Organization and First Admin
+     * @description Create a new organization and its first admin user, then sign them in.
+     *     Tokens are set as httpOnly cookies; the body carries identity only.
+     */
+    post: operations["register"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Refresh Access Token
-         * @description Issue a new access token from the httpOnly refresh cookie.
-         */
-        post: operations["refreshSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * User Login
+     * @description Authenticate user credentials. The access and refresh tokens are set as httpOnly
+     *     cookies and are never returned in the body. Rate limited per IP.
+     */
+    post: operations["login"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/refresh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Logout
-         * @description Expire the auth cookies.
-         */
-        post: operations["logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Refresh Access Token
+     * @description Issue a new access token from the httpOnly refresh cookie.
+     */
+    post: operations["refreshSession"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/logout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Current User Profile
-         * @description Retrieve current user, role, and organization context.
-         */
-        get: operations["getCurrentUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Logout
+     * @description Expire the auth cookies.
+     */
+    post: operations["logout"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/orgs/current": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Current Organization Workspace
-         * @description Retrieve details for the authenticated tenant workspace.
-         */
-        get: operations["getOrganization"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get Current User Profile
+     * @description Retrieve current user, role, and organization context.
+     */
+    get: operations["getCurrentUser"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/orgs/current": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Jobs
-         * @description Retrieve paginated list of job postings for the current organization.
-         *     Archived jobs are excluded unless `status=archived` is requested.
-         */
-        get: operations["listJobs"];
-        put?: never;
-        /**
-         * Create Job Posting
-         * @description Create a new job posting with ESCO required and preferred skills.
-         *     The job starts in `draft`. Requires the `admin` or `recruiter` role.
-         */
-        post: operations["createJob"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get Current Organization Workspace
+     * @description Retrieve details for the authenticated tenant workspace.
+     */
+    get: operations["getOrganization"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/jobs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/jobs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Job Details
-         * @description Retrieve specific job details including pipeline stages.
-         */
-        get: operations["getJob"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update Job Posting
-         * @description Partially update a job posting; omitted fields are left unchanged.
-         *     Status is changed through `/jobs/{id}/status` and `/jobs/{id}/archive`.
-         *     Requires the `admin` or `recruiter` role.
-         */
-        patch: operations["updateJob"];
-        trace?: never;
+    /**
+     * List Jobs
+     * @description Retrieve paginated list of job postings for the current organization.
+     *     Archived jobs are excluded unless `status=archived` is requested.
+     */
+    get: operations["listJobs"];
+    put?: never;
+    /**
+     * Create Job Posting
+     * @description Create a new job posting with ESCO required and preferred skills.
+     *     The job starts in `draft`. Requires the `admin` or `recruiter` role.
+     */
+    post: operations["createJob"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/jobs/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/jobs/{id}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Change Job Status
-         * @description Move a job posting to `draft`, `open` or `closed`.
-         *     Requires the `admin` or `recruiter` role.
-         */
-        patch: operations["updateJobStatus"];
-        trace?: never;
+    /**
+     * Get Job Details
+     * @description Retrieve specific job details including pipeline stages.
+     */
+    get: operations["getJob"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update Job Posting
+     * @description Partially update a job posting; omitted fields are left unchanged.
+     *     Status is changed through `/jobs/{id}/status` and `/jobs/{id}/archive`.
+     *     Requires the `admin` or `recruiter` role.
+     */
+    patch: operations["updateJob"];
+    trace?: never;
+  };
+  "/jobs/{id}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/jobs/{id}/archive": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Archive Job Posting
-         * @description Set a job posting's status to `archived`, hiding it from the default job list.
-         *     Idempotent. Requires the `admin` or `recruiter` role.
-         */
-        post: operations["archiveJob"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Change Job Status
+     * @description Move a job posting to `draft`, `open` or `closed`.
+     *     Requires the `admin` or `recruiter` role.
+     */
+    patch: operations["updateJobStatus"];
+    trace?: never;
+  };
+  "/jobs/{id}/archive": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/jobs/{id}/stages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Job Pipeline Stages
-         * @description Retrieve the ordered pipeline stages for a job: the job's own stages,
-         *     or the organization's default stages (`job_id` null) when it has none.
-         */
-        get: operations["getJobStages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Archive Job Posting
+     * @description Set a job posting's status to `archived`, hiding it from the default job list.
+     *     Idempotent. Requires the `admin` or `recruiter` role.
+     */
+    post: operations["archiveJob"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/jobs/{id}/stages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/candidates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Candidates
-         * @description Retrieve paginated candidate pool for tenant workspace.
-         */
-        get: operations["listCandidates"];
-        put?: never;
-        /**
-         * Add Candidate
-         * @description Add a candidate to the organization. `consent_given_at` stays null until
-         *     consent is recorded. Requires the `admin` or `recruiter` role.
-         */
-        post: operations["createCandidate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get Job Pipeline Stages
+     * @description Retrieve the ordered pipeline stages for a job: the job's own stages,
+     *     or the organization's default stages (`job_id` null) when it has none.
+     */
+    get: operations["getJobStages"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/candidates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/candidates/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Candidate Details
-         * @description Retrieve a candidate profile.
-         */
-        get: operations["getCandidate"];
-        put?: never;
-        post?: never;
-        /**
-         * GDPR Hard Delete Candidate
-         * @description Permanently delete a candidate with their applications, stage history, scores
-         *     and stored CV files.
-         *     Requires the `admin` role.
-         */
-        delete: operations["hardDeleteCandidate"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Candidate
-         * @description Partially update a candidate; omitted fields are left unchanged.
-         *     Requires the `admin` or `recruiter` role.
-         */
-        patch: operations["updateCandidate"];
-        trace?: never;
+    /**
+     * List Candidates
+     * @description Retrieve paginated candidate pool for tenant workspace.
+     */
+    get: operations["listCandidates"];
+    put?: never;
+    /**
+     * Add Candidate
+     * @description Add a candidate to the organization. `consent_given_at` stays null until
+     *     consent is recorded. Requires the `admin` or `recruiter` role.
+     */
+    post: operations["createCandidate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/candidates/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/candidates/{id}/cv": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Candidate CV Documents
-         * @description Retrieve the candidate's CV documents with their status, newest first.
-         */
-        get: operations["listCandidateCvDocuments"];
-        put?: never;
-        /**
-         * Upload PDF CV
-         * @description Upload a PDF CV for a candidate and queue it for processing.
-         *     The file is checked by its content, not its extension, and may be at most 10 MB.
-         *     Requires the `admin` or `recruiter` role.
-         */
-        post: operations["uploadCandidateCV"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get Candidate Details
+     * @description Retrieve a candidate profile.
+     */
+    get: operations["getCandidate"];
+    put?: never;
+    post?: never;
+    /**
+     * GDPR Hard Delete Candidate
+     * @description Permanently delete a candidate with their applications, stage history, scores
+     *     and stored CV files.
+     *     Requires the `admin` role.
+     */
+    delete: operations["hardDeleteCandidate"];
+    options?: never;
+    head?: never;
+    /**
+     * Update Candidate
+     * @description Partially update a candidate; omitted fields are left unchanged.
+     *     Requires the `admin` or `recruiter` role.
+     */
+    patch: operations["updateCandidate"];
+    trace?: never;
+  };
+  "/candidates/{id}/cv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/candidates/{id}/cv/{cv_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get CV Document Status
-         * @description Retrieve one CV document, including its processing status.
-         */
-        get: operations["getCandidateCvDocument"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List Candidate CV Documents
+     * @description Retrieve the candidate's CV documents with their status, newest first.
+     */
+    get: operations["listCandidateCvDocuments"];
+    put?: never;
+    /**
+     * Upload PDF CV
+     * @description Upload a PDF CV for a candidate and queue it for text extraction by the
+     *     background worker (queued, extracting, then extracted or failed).
+     *     The file is checked by its content, not its extension, and may be at most 10 MB.
+     *     Requires the `admin` or `recruiter` role.
+     */
+    post: operations["uploadCandidateCV"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/candidates/{id}/cv/{cv_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/candidates/{id}/cv/{cv_id}/download": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Download CV File
-         * @description Download the stored PDF. Only members of the organization that owns the
-         *     candidate can download it. Files are not served from any public path.
-         */
-        get: operations["downloadCandidateCV"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get CV Document Status
+     * @description Retrieve one CV document, including its processing status.
+     */
+    get: operations["getCandidateCvDocument"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/candidates/{id}/cv/{cv_id}/retry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Applications
-         * @description Retrieve a paginated list of applications, newest first.
-         */
-        get: operations["listApplications"];
-        put?: never;
-        /**
-         * Submit Candidate Application
-         * @description Link a candidate to a job. The application starts in the job's first stage.
-         *     Returns 409 if the candidate already applied to the job, or the job is
-         *     closed or archived. Requires the `admin` or `recruiter` role.
-         */
-        post: operations["createApplication"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Retry CV Text Extraction
+     * @description Queue a document for text extraction again. A failed document is reset to
+     *     `queued`; one still queued or extracting is queued again unchanged. Any other
+     *     status returns 409. Requires the `admin` or `recruiter` role.
+     */
+    post: operations["retryCandidateCvExtraction"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/candidates/{id}/cv/{cv_id}/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Application */
-        get: operations["getApplication"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Download CV File
+     * @description Download the stored PDF. Only members of the organization that owns the
+     *     candidate can download it. Files are not served from any public path.
+     */
+    get: operations["downloadCandidateCV"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{id}/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Application Stage History
-         * @description Every stage the application entered, oldest first. The first entry is the
-         *     initial placement and has a null `from_stage_id`.
-         */
-        get: operations["getApplicationHistory"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List Applications
+     * @description Retrieve a paginated list of applications, newest first.
+     */
+    get: operations["listApplications"];
+    put?: never;
+    /**
+     * Submit Candidate Application
+     * @description Link a candidate to a job. The application starts in the job's first stage.
+     *     Returns 409 if the candidate already applied to the job, or the job is
+     *     closed or archived. Requires the `admin` or `recruiter` role.
+     */
+    post: operations["createApplication"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{id}/stage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Move Pipeline Stage (Drag-and-Drop)
-         * @description Move an application to another stage of its job's pipeline, with an optional reason.
-         *     Each move is added to the stage history and recorded as an audit event.
-         *     Moving to the current stage changes nothing. A stage outside the job's
-         *     pipeline returns 404. Requires the `admin` or `recruiter` role.
-         */
-        patch: operations["updateApplicationStage"];
-        trace?: never;
+    /** Get Application */
+    get: operations["getApplication"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{id}/history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{id}/score": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Score & Explanation Breakdown
-         * @description Retrieve AI hybrid fit score, component scores, model version, and matched/missing skills.
-         */
-        get: operations["getApplicationScore"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get Application Stage History
+     * @description Every stage the application entered, oldest first. The first entry is the
+     *     initial placement and has a null `from_stage_id`.
+     */
+    get: operations["getApplicationHistory"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{id}/stage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Move Pipeline Stage (Drag-and-Drop)
+     * @description Move an application to another stage of its job's pipeline, with an optional reason.
+     *     Each move is added to the stage history and recorded as an audit event.
+     *     Moving to the current stage changes nothing. A stage outside the job's
+     *     pipeline returns 404. Requires the `admin` or `recruiter` role.
+     */
+    patch: operations["updateApplicationStage"];
+    trace?: never;
+  };
+  "/applications/{id}/score": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Score & Explanation Breakdown
+     * @description Retrieve AI hybrid fit score, component scores, model version, and matched/missing skills.
+     */
+    get: operations["getApplicationScore"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        ErrorDetail: {
-            field?: string;
-            issue?: string;
-        };
-        ErrorEnvelope: {
-            error: {
-                /** @example RESOURCE_NOT_FOUND */
-                code: string;
-                /** @example Job with ID '123e4567-e89b-12d3-a456-426614174000' was not found. */
-                message: string;
-                details?: components["schemas"]["ErrorDetail"][];
-                /**
-                 * Format: date-time
-                 * @example 2026-10-01T09:17:21Z
-                 */
-                timestamp: string;
-                /** @example req_8f92a1b4 */
-                request_id: string;
-            };
-        };
-        LoginRequest: {
-            /**
-             * Format: email
-             * @example recruiter@acme.com
-             */
-            email: string;
-            /** @example SecretPass123! */
-            password: string;
-        };
-        /** @description FastAPI error body. `detail` is a message, or a list of field errors for 422. */
-        DetailError: {
-            detail: string | {
-                loc?: (string | number)[];
-                msg?: string;
-                type?: string;
-            }[];
-        };
-        RegisterRequest: {
-            /** @example Acme Corp */
-            org_name: string;
-            /** @example acme-corp */
-            org_slug: string;
-            /** @example Sarah Jenkins */
-            admin_full_name: string;
-            /**
-             * Format: email
-             * @example sarah@acme.com
-             */
-            admin_email: string;
-            /** @example SecretPass123! */
-            admin_password: string;
-        };
-        /** @description Identity of the signed-in user. Tokens are only ever sent as httpOnly cookies. */
-        TokenResponse: {
-            /** @example bearer */
-            token_type: string;
-            /** Format: uuid */
-            user_id: string;
-            /** Format: uuid */
-            org_id: string;
-            /** @enum {string} */
-            role: "admin" | "recruiter" | "viewer";
-            /** @example Tokens issued via httpOnly cookies */
-            message: string;
-        };
-        UserProfileResponse: {
-            /**
-             * Format: uuid
-             * @example 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /** @example recruiter@acme.com */
-            email: string;
-            /** @example Sarah Jenkins */
-            full_name: string;
-            /**
-             * @example recruiter
-             * @enum {string}
-             */
-            role: "admin" | "recruiter" | "viewer";
-            /** @example true */
-            is_active: boolean;
-        };
-        OrganizationResponse: {
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            id: string;
-            /** @example Acme Corp Hiring Workspace */
-            name: string;
-            /** @example acme-corp */
-            slug: string;
-        };
-        CreateJobRequest: {
-            /** @example Senior Python Backend Engineer */
-            title: string;
-            /** @example Engineering */
-            department?: string;
-            /** @example Remote (US/EU) */
-            location?: string;
-            /** @example full_time */
-            employment_type?: string;
-            /** @example We are seeking a Senior Python Engineer experienced with FastAPI, PostgreSQL, and LLM/NLP tools. */
-            description: string;
-            /**
-             * @example [
-             *       "Python",
-             *       "FastAPI",
-             *       "PostgreSQL",
-             *       "Docker"
-             *     ]
-             */
-            required_skills?: string[];
-            /**
-             * @example [
-             *       "Redis",
-             *       "PyTorch",
-             *       "Fairlearn"
-             *     ]
-             */
-            preferred_skills?: string[];
-            /** @example 4 */
-            min_experience_years?: number;
-        };
-        /** @description All fields are optional; only the fields sent are changed. */
-        UpdateJobRequest: {
-            /** @example Staff Python Backend Engineer */
-            title?: string;
-            /** @example Engineering */
-            department?: string | null;
-            /** @example Remote (US/EU) */
-            location?: string | null;
-            /** @example full_time */
-            employment_type?: string;
-            description?: string;
-            required_skills?: string[];
-            preferred_skills?: string[];
-            min_experience_years?: number;
-        };
-        UpdateJobStatusRequest: {
-            /**
-             * @example open
-             * @enum {string}
-             */
-            status: "draft" | "open" | "closed";
-        };
-        JobResponse: {
-            /**
-             * Format: uuid
-             * @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /** @example Senior Python Backend Engineer */
-            title: string;
-            /** @example Engineering */
-            department: string | null;
-            /** @example Remote */
-            location: string | null;
-            /** @example full_time */
-            employment_type: string;
-            /**
-             * @example open
-             * @enum {string}
-             */
-            status: "draft" | "open" | "paused" | "closed" | "archived";
-            /** @example We are seeking a Senior Python Engineer... */
-            description: string;
-            /**
-             * @example [
-             *       "Python",
-             *       "FastAPI",
-             *       "PostgreSQL"
-             *     ]
-             */
-            required_skills: string[];
-            /**
-             * @example [
-             *       "Redis",
-             *       "Docker"
-             *     ]
-             */
-            preferred_skills: string[];
-            /** @example 4 */
-            min_experience_years: number;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T08:00:00Z
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @example 2026-10-02T10:30:00Z
-             */
-            updated_at: string;
-        };
-        PipelineStageResponse: {
-            /**
-             * Format: uuid
-             * @example c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /**
-             * Format: uuid
-             * @description Null for an organization-default stage.
-             * @example null
-             */
-            job_id?: string | null;
-            /** @example Technical Interview */
-            name: string;
-            /** @example 2 */
-            stage_order: number;
-            /** @example interview */
-            stage_type: string;
-        };
-        CvDocumentResponse: {
-            /**
-             * Format: uuid
-             * @example 7c9e6679-7425-40de-944b-e07fc1f90ae7
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /**
-             * Format: uuid
-             * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
-             */
-            candidate_id: string;
-            /**
-             * @description The uploaded file's name, for display only.
-             * @example alex-mercer.pdf
-             */
-            original_filename: string;
-            /** @example application/pdf */
-            content_type: string;
-            /** @example 48211 */
-            size_bytes: number;
-            /** @description SHA-256 of the file content. */
-            sha256: string;
-            /**
-             * @example queued
-             * @enum {string}
-             */
-            status: "queued" | "extracting" | "parsed" | "needs_review" | "failed";
-            /** Format: uuid */
-            uploaded_by: string | null;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:15:00Z
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:15:00Z
-             */
-            updated_at: string;
-        };
-        CandidateResponse: {
-            /**
-             * Format: uuid
-             * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /** @example Alex Mercer */
-            full_name: string;
-            /** @example alex.mercer@example.com */
-            email: string;
-            /** @example +1-555-0199 */
-            phone: string | null;
-            /** @example San Francisco, CA */
-            location: string | null;
-            /** @example null */
-            cv_file_path: string | null;
-            parsed_data: {
-                [key: string]: unknown;
-            };
-            /**
-             * Format: date-time
-             * @description When the candidate consented to data processing; null if not recorded.
-             * @example 2026-10-01T09:00:00Z
-             */
-            consent_given_at: string | null;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:15:00Z
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:15:00Z
-             */
-            updated_at: string;
-        };
-        CreateCandidateRequest: {
-            /** @example Alex Mercer */
-            full_name: string;
-            /**
-             * Format: email
-             * @description Stored lowercase; unique per organization.
-             * @example alex.mercer@example.com
-             */
-            email: string;
-            /** @example +1-555-0199 */
-            phone?: string | null;
-            /** @example San Francisco, CA */
-            location?: string | null;
-            /**
-             * Format: date-time
-             * @description Must include a timezone.
-             * @example 2026-10-01T09:00:00Z
-             */
-            consent_given_at?: string | null;
-        };
-        /** @description All fields are optional; only the fields sent are changed. */
-        UpdateCandidateRequest: {
-            full_name?: string;
-            /** Format: email */
-            email?: string;
-            phone?: string | null;
-            location?: string | null;
-            /** Format: date-time */
-            consent_given_at?: string | null;
-        };
-        CreateApplicationRequest: {
-            /** Format: uuid */
-            job_id: string;
-            /** Format: uuid */
-            candidate_id: string;
-        };
-        ApplicationResponse: {
-            /**
-             * Format: uuid
-             * @example b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            org_id: string;
-            /**
-             * Format: uuid
-             * @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
-             */
-            job_id: string;
-            /**
-             * Format: uuid
-             * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
-             */
-            candidate_id: string;
-            /**
-             * Format: uuid
-             * @example c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f
-             */
-            stage_id: string;
-            /**
-             * @description Follows the type of the current stage.
-             * @example active
-             * @enum {string}
-             */
-            status: "active" | "hired" | "rejected" | "withdrawn";
-            /** @description The reason given when the application was moved to a rejected stage. */
-            rejection_reason: string | null;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:00:00Z
-             */
-            applied_at: string;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:17:21Z
-             */
-            updated_at: string;
-        };
-        UpdateStageRequest: {
-            /** Format: uuid */
-            stage_id: string;
-            /** @description Optional reason for the move, stored in the stage history. */
-            reason?: string | null;
-        };
-        StageHistoryResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            application_id: string;
-            /**
-             * Format: uuid
-             * @description Null for the initial placement.
-             */
-            from_stage_id: string | null;
-            /** Format: uuid */
-            to_stage_id: string;
-            reason: string | null;
-            /**
-             * Format: uuid
-             * @description The user who made the move.
-             */
-            moved_by: string | null;
-            /**
-             * Format: date-time
-             * @example 2026-10-01T09:17:21Z
-             */
-            moved_at: string;
-        };
-        ScoreResponse: {
-            /**
-             * Format: uuid
-             * @example d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e
-             */
-            id: string;
-            /**
-             * Format: uuid
-             * @example b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-             */
-            application_id: string;
-            /** @example 87.5 */
-            overall_score: number;
-            /** @example 90 */
-            skill_overlap_score: number;
-            /** @example 85 */
-            semantic_score: number;
-            /** @example 92 */
-            experience_score: number;
-            /** @example 80 */
-            title_fit_score: number;
-            /** @example v1.0.0-baseline-cpu */
-            model_version: string;
-            component_breakdown: {
-                /**
-                 * @example [
-                 *       "Python",
-                 *       "FastAPI",
-                 *       "PostgreSQL"
-                 *     ]
-                 */
-                matched_skills?: string[];
-                /**
-                 * @example [
-                 *       "Docker"
-                 *     ]
-                 */
-                missing_skills?: string[];
-                /**
-                 * @example {
-                 *       "skill_overlap": 0.4,
-                 *       "semantic": 0.3,
-                 *       "experience": 0.2,
-                 *       "title_fit": 0.1
-                 *     }
-                 */
-                weights?: {
-                    [key: string]: number;
-                };
-                /**
-                 * @example [
-                 *       "Candidate matched 3 of 4 required skills.",
-                 *       "Vector semantic similarity cosine distance is 0.85.",
-                 *       "Candidate has 5.5 years experience (exceeds requirement of 4 years)."
-                 *     ]
-                 */
-                explanations?: string[];
-            };
-        };
-        PaginatedJobsResponse: {
-            items: components["schemas"]["JobResponse"][];
-            pagination: components["schemas"]["PaginationMeta"];
-        };
-        PaginatedCandidatesResponse: {
-            items: components["schemas"]["CandidateResponse"][];
-            pagination: components["schemas"]["PaginationMeta"];
-        };
-        PaginatedApplicationsResponse: {
-            items: components["schemas"]["ApplicationResponse"][];
-            pagination: components["schemas"]["PaginationMeta"];
-        };
-        PaginationMeta: {
-            /** @example 1 */
-            page: number;
-            /** @example 20 */
-            per_page: number;
-            /** @example 42 */
-            total_items: number;
-            /** @example 3 */
-            total_pages: number;
-            /** @example true */
-            has_next: boolean;
-            /** @example false */
-            has_prev: boolean;
-        };
+  schemas: {
+    ErrorDetail: {
+      field?: string;
+      issue?: string;
     };
-    responses: {
-        /** @description Authentication credentials missing or invalid */
-        "401Unauthorized": {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "error": {
-                 *         "code": "UNAUTHORIZED",
-                 *         "message": "Missing or expired Authorization Bearer token.",
-                 *         "details": [],
-                 *         "timestamp": "2026-10-01T09:17:21Z",
-                 *         "request_id": "req_auth_01"
-                 *       }
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorEnvelope"];
-            };
-        };
-        /** @description Authenticated user's role lacks the required permission */
-        "403Forbidden": {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "error": {
-                 *         "code": "FORBIDDEN",
-                 *         "message": "Your role does not allow this action.",
-                 *         "details": [],
-                 *         "timestamp": "2026-10-01T09:17:21Z",
-                 *         "request_id": "req_403_03"
-                 *       }
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorEnvelope"];
-            };
-        };
-        /** @description Requested resource was not found */
-        "404NotFound": {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "error": {
-                 *         "code": "RESOURCE_NOT_FOUND",
-                 *         "message": "The requested resource was not found in this organization workspace.",
-                 *         "details": [],
-                 *         "timestamp": "2026-10-01T09:17:21Z",
-                 *         "request_id": "req_404_02"
-                 *       }
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorEnvelope"];
-            };
-        };
-        /** @description The request conflicts with existing data */
-        "409Conflict": {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "error": {
-                 *         "code": "CONFLICT",
-                 *         "message": "This candidate already has an application for this job.",
-                 *         "details": [],
-                 *         "timestamp": "2026-10-01T09:17:21Z",
-                 *         "request_id": "req_409_04"
-                 *       }
-                 *     }
-                 */
-                "application/json": components["schemas"]["ErrorEnvelope"];
-            };
-        };
+    ErrorEnvelope: {
+      error: {
+        /** @example RESOURCE_NOT_FOUND */
+        code: string;
+        /** @example Job with ID '123e4567-e89b-12d3-a456-426614174000' was not found. */
+        message: string;
+        details?: components["schemas"]["ErrorDetail"][];
+        /**
+         * Format: date-time
+         * @example 2026-10-01T09:17:21Z
+         */
+        timestamp: string;
+        /** @example req_8f92a1b4 */
+        request_id: string;
+      };
     };
-    parameters: {
-        UUIDPathParam: string;
-        CvIdPathParam: string;
+    LoginRequest: {
+      /**
+       * Format: email
+       * @example recruiter@acme.com
+       */
+      email: string;
+      /** @example SecretPass123! */
+      password: string;
     };
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    /** @description FastAPI error body. `detail` is a message, or a list of field errors for 422. */
+    DetailError: {
+      detail:
+        | string
+        | {
+            loc?: (string | number)[];
+            msg?: string;
+            type?: string;
+          }[];
+    };
+    RegisterRequest: {
+      /** @example Acme Corp */
+      org_name: string;
+      /** @example acme-corp */
+      org_slug: string;
+      /** @example Sarah Jenkins */
+      admin_full_name: string;
+      /**
+       * Format: email
+       * @example sarah@acme.com
+       */
+      admin_email: string;
+      /** @example SecretPass123! */
+      admin_password: string;
+    };
+    /** @description Identity of the signed-in user. Tokens are only ever sent as httpOnly cookies. */
+    TokenResponse: {
+      /** @example bearer */
+      token_type: string;
+      /** Format: uuid */
+      user_id: string;
+      /** Format: uuid */
+      org_id: string;
+      /** @enum {string} */
+      role: "admin" | "recruiter" | "viewer";
+      /** @example Tokens issued via httpOnly cookies */
+      message: string;
+    };
+    UserProfileResponse: {
+      /**
+       * Format: uuid
+       * @example 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /** @example recruiter@acme.com */
+      email: string;
+      /** @example Sarah Jenkins */
+      full_name: string;
+      /**
+       * @example recruiter
+       * @enum {string}
+       */
+      role: "admin" | "recruiter" | "viewer";
+      /** @example true */
+      is_active: boolean;
+    };
+    OrganizationResponse: {
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      id: string;
+      /** @example Acme Corp Hiring Workspace */
+      name: string;
+      /** @example acme-corp */
+      slug: string;
+    };
+    CreateJobRequest: {
+      /** @example Senior Python Backend Engineer */
+      title: string;
+      /** @example Engineering */
+      department?: string;
+      /** @example Remote (US/EU) */
+      location?: string;
+      /** @example full_time */
+      employment_type?: string;
+      /** @example We are seeking a Senior Python Engineer experienced with FastAPI, PostgreSQL, and LLM/NLP tools. */
+      description: string;
+      /**
+       * @example [
+       *       "Python",
+       *       "FastAPI",
+       *       "PostgreSQL",
+       *       "Docker"
+       *     ]
+       */
+      required_skills?: string[];
+      /**
+       * @example [
+       *       "Redis",
+       *       "PyTorch",
+       *       "Fairlearn"
+       *     ]
+       */
+      preferred_skills?: string[];
+      /** @example 4 */
+      min_experience_years?: number;
+    };
+    /** @description All fields are optional; only the fields sent are changed. */
+    UpdateJobRequest: {
+      /** @example Staff Python Backend Engineer */
+      title?: string;
+      /** @example Engineering */
+      department?: string | null;
+      /** @example Remote (US/EU) */
+      location?: string | null;
+      /** @example full_time */
+      employment_type?: string;
+      description?: string;
+      required_skills?: string[];
+      preferred_skills?: string[];
+      min_experience_years?: number;
+    };
+    UpdateJobStatusRequest: {
+      /**
+       * @example open
+       * @enum {string}
+       */
+      status: "draft" | "open" | "closed";
+    };
+    JobResponse: {
+      /**
+       * Format: uuid
+       * @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /** @example Senior Python Backend Engineer */
+      title: string;
+      /** @example Engineering */
+      department: string | null;
+      /** @example Remote */
+      location: string | null;
+      /** @example full_time */
+      employment_type: string;
+      /**
+       * @example open
+       * @enum {string}
+       */
+      status: "draft" | "open" | "paused" | "closed" | "archived";
+      /** @example We are seeking a Senior Python Engineer... */
+      description: string;
+      /**
+       * @example [
+       *       "Python",
+       *       "FastAPI",
+       *       "PostgreSQL"
+       *     ]
+       */
+      required_skills: string[];
+      /**
+       * @example [
+       *       "Redis",
+       *       "Docker"
+       *     ]
+       */
+      preferred_skills: string[];
+      /** @example 4 */
+      min_experience_years: number;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T08:00:00Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @example 2026-10-02T10:30:00Z
+       */
+      updated_at: string;
+    };
+    PipelineStageResponse: {
+      /**
+       * Format: uuid
+       * @example c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /**
+       * Format: uuid
+       * @description Null for an organization-default stage.
+       * @example null
+       */
+      job_id?: string | null;
+      /** @example Technical Interview */
+      name: string;
+      /** @example 2 */
+      stage_order: number;
+      /** @example interview */
+      stage_type: string;
+    };
+    CvDocumentResponse: {
+      /**
+       * Format: uuid
+       * @example 7c9e6679-7425-40de-944b-e07fc1f90ae7
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /**
+       * Format: uuid
+       * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
+       */
+      candidate_id: string;
+      /**
+       * @description The uploaded file's name, for display only.
+       * @example alex-mercer.pdf
+       */
+      original_filename: string;
+      /** @example application/pdf */
+      content_type: string;
+      /** @example 48211 */
+      size_bytes: number;
+      /** @description SHA-256 of the file content. */
+      sha256: string;
+      /**
+       * @example queued
+       * @enum {string}
+       */
+      status: "queued" | "extracting" | "extracted" | "parsed" | "needs_review" | "failed";
+      /** @description Set once the text has been extracted. */
+      page_count: number | null;
+      /** @description True when at least one page was read with OCR. */
+      ocr_used: boolean;
+      /**
+       * @description Why the document is failed, or why its last attempt had to be retried:
+       *     invalid_pdf, encrypted_pdf, too_many_pages, no_text_found,
+       *     ocr_unavailable, file_missing, timeout, internal_error, queue_unavailable.
+       * @example null
+       */
+      error_code: string | null;
+      /** @description The reason in words, suitable for showing to a user. */
+      error_message: string | null;
+      /**
+       * @description Extraction attempts made so far (at most 3 per retry).
+       * @example 0
+       */
+      attempts: number;
+      /**
+       * Format: date-time
+       * @description When extraction finished, successfully or not.
+       */
+      processed_at: string | null;
+      /** Format: uuid */
+      uploaded_by: string | null;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:15:00Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:15:00Z
+       */
+      updated_at: string;
+    };
+    CandidateResponse: {
+      /**
+       * Format: uuid
+       * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /** @example Alex Mercer */
+      full_name: string;
+      /** @example alex.mercer@example.com */
+      email: string;
+      /** @example +1-555-0199 */
+      phone: string | null;
+      /** @example San Francisco, CA */
+      location: string | null;
+      /** @example null */
+      cv_file_path: string | null;
+      parsed_data: {
+        [key: string]: unknown;
+      };
+      /**
+       * Format: date-time
+       * @description When the candidate consented to data processing; null if not recorded.
+       * @example 2026-10-01T09:00:00Z
+       */
+      consent_given_at: string | null;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:15:00Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:15:00Z
+       */
+      updated_at: string;
+    };
+    CreateCandidateRequest: {
+      /** @example Alex Mercer */
+      full_name: string;
+      /**
+       * Format: email
+       * @description Stored lowercase; unique per organization.
+       * @example alex.mercer@example.com
+       */
+      email: string;
+      /** @example +1-555-0199 */
+      phone?: string | null;
+      /** @example San Francisco, CA */
+      location?: string | null;
+      /**
+       * Format: date-time
+       * @description Must include a timezone.
+       * @example 2026-10-01T09:00:00Z
+       */
+      consent_given_at?: string | null;
+    };
+    /** @description All fields are optional; only the fields sent are changed. */
+    UpdateCandidateRequest: {
+      full_name?: string;
+      /** Format: email */
+      email?: string;
+      phone?: string | null;
+      location?: string | null;
+      /** Format: date-time */
+      consent_given_at?: string | null;
+    };
+    CreateApplicationRequest: {
+      /** Format: uuid */
+      job_id: string;
+      /** Format: uuid */
+      candidate_id: string;
+    };
+    ApplicationResponse: {
+      /**
+       * Format: uuid
+       * @example b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      org_id: string;
+      /**
+       * Format: uuid
+       * @example a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d
+       */
+      job_id: string;
+      /**
+       * Format: uuid
+       * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
+       */
+      candidate_id: string;
+      /**
+       * Format: uuid
+       * @example c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f
+       */
+      stage_id: string;
+      /**
+       * @description Follows the type of the current stage.
+       * @example active
+       * @enum {string}
+       */
+      status: "active" | "hired" | "rejected" | "withdrawn";
+      /** @description The reason given when the application was moved to a rejected stage. */
+      rejection_reason: string | null;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:00:00Z
+       */
+      applied_at: string;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:17:21Z
+       */
+      updated_at: string;
+    };
+    UpdateStageRequest: {
+      /** Format: uuid */
+      stage_id: string;
+      /** @description Optional reason for the move, stored in the stage history. */
+      reason?: string | null;
+    };
+    StageHistoryResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      application_id: string;
+      /**
+       * Format: uuid
+       * @description Null for the initial placement.
+       */
+      from_stage_id: string | null;
+      /** Format: uuid */
+      to_stage_id: string;
+      reason: string | null;
+      /** @description The application's latest score when the move was made; null if it had none. */
+      overall_score: number | null;
+      /** @description Model that produced `overall_score`. */
+      model_version: string | null;
+      /**
+       * Format: uuid
+       * @description The user who made the move.
+       */
+      moved_by: string | null;
+      /**
+       * Format: date-time
+       * @example 2026-10-01T09:17:21Z
+       */
+      moved_at: string;
+    };
+    ScoreResponse: {
+      /**
+       * Format: uuid
+       * @example d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e
+       */
+      id: string;
+      /**
+       * Format: uuid
+       * @example b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+       */
+      application_id: string;
+      /** @example 87.5 */
+      overall_score: number;
+      /**
+       * @description Null when the scoring model does not compute this component.
+       * @example 90
+       */
+      skill_overlap_score: number | null;
+      /** @example 85 */
+      semantic_score: number;
+      /**
+       * @description Null when the scoring model does not compute this component.
+       * @example 92
+       */
+      experience_score: number | null;
+      /**
+       * @description Null when the scoring model does not compute this component.
+       * @example 80
+       */
+      title_fit_score: number | null;
+      /** @example v1.0.0-baseline-cpu */
+      model_version: string;
+      component_breakdown: {
+        /**
+         * @example [
+         *       "Python",
+         *       "FastAPI",
+         *       "PostgreSQL"
+         *     ]
+         */
+        matched_skills?: string[];
+        /**
+         * @example [
+         *       "Docker"
+         *     ]
+         */
+        missing_skills?: string[];
+        /**
+         * @example {
+         *       "skill_overlap": 0.4,
+         *       "semantic": 0.3,
+         *       "experience": 0.2,
+         *       "title_fit": 0.1
+         *     }
+         */
+        weights?: {
+          [key: string]: number;
+        };
+        /**
+         * @example [
+         *       "Candidate matched 3 of 4 required skills.",
+         *       "Vector semantic similarity cosine distance is 0.85.",
+         *       "Candidate has 5.5 years experience (exceeds requirement of 4 years)."
+         *     ]
+         */
+        explanations?: string[];
+      };
+    };
+    PaginatedJobsResponse: {
+      items: components["schemas"]["JobResponse"][];
+      pagination: components["schemas"]["PaginationMeta"];
+    };
+    PaginatedCandidatesResponse: {
+      items: components["schemas"]["CandidateResponse"][];
+      pagination: components["schemas"]["PaginationMeta"];
+    };
+    PaginatedApplicationsResponse: {
+      items: components["schemas"]["ApplicationResponse"][];
+      pagination: components["schemas"]["PaginationMeta"];
+    };
+    PaginationMeta: {
+      /** @example 1 */
+      page: number;
+      /** @example 20 */
+      per_page: number;
+      /** @example 42 */
+      total_items: number;
+      /** @example 3 */
+      total_pages: number;
+      /** @example true */
+      has_next: boolean;
+      /** @example false */
+      has_prev: boolean;
+    };
+  };
+  responses: {
+    /** @description Authentication credentials missing or invalid */
+    "401Unauthorized": {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "error": {
+         *         "code": "UNAUTHORIZED",
+         *         "message": "Missing or expired Authorization Bearer token.",
+         *         "details": [],
+         *         "timestamp": "2026-10-01T09:17:21Z",
+         *         "request_id": "req_auth_01"
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["ErrorEnvelope"];
+      };
+    };
+    /** @description Authenticated user's role lacks the required permission */
+    "403Forbidden": {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "error": {
+         *         "code": "FORBIDDEN",
+         *         "message": "Your role does not allow this action.",
+         *         "details": [],
+         *         "timestamp": "2026-10-01T09:17:21Z",
+         *         "request_id": "req_403_03"
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["ErrorEnvelope"];
+      };
+    };
+    /** @description Requested resource was not found */
+    "404NotFound": {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "error": {
+         *         "code": "RESOURCE_NOT_FOUND",
+         *         "message": "The requested resource was not found in this organization workspace.",
+         *         "details": [],
+         *         "timestamp": "2026-10-01T09:17:21Z",
+         *         "request_id": "req_404_02"
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["ErrorEnvelope"];
+      };
+    };
+    /** @description The request conflicts with existing data */
+    "409Conflict": {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "error": {
+         *         "code": "CONFLICT",
+         *         "message": "This candidate already has an application for this job.",
+         *         "details": [],
+         *         "timestamp": "2026-10-01T09:17:21Z",
+         *         "request_id": "req_409_04"
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["ErrorEnvelope"];
+      };
+    };
+  };
+  parameters: {
+    UUIDPathParam: string;
+    CvIdPathParam: string;
+  };
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterRequest"];
-            };
-        };
-        responses: {
-            /** @description Organization created and admin signed in */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenResponse"];
-                };
-            };
-            /** @description Organization slug or email already exists */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-            /** @description Validation error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-        };
+  register: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Successfully authenticated */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenResponse"];
-                };
-            };
-            /** @description Incorrect email or password */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-            /** @description Validation error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-            /** @description Too many login attempts */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RegisterRequest"];
+      };
     };
-    refreshSession: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Organization created and admin signed in */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Session refreshed */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenResponse"];
-                };
-            };
-            /** @description Missing, invalid or expired refresh token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["TokenResponse"];
         };
+      };
+      /** @description Organization slug or email already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
-    logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Logged out */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example Logged out successfully */
-                        message?: string;
-                    };
-                };
-            };
-            /** @description Not authenticated */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-        };
+  };
+  login: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getCurrentUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description User profile details */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserProfileResponse"];
-                };
-            };
-            /** @description Not authenticated */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailError"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequest"];
+      };
     };
-    getOrganization: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successfully authenticated */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Organization workspace details */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationResponse"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["TokenResponse"];
         };
+      };
+      /** @description Incorrect email or password */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Too many login attempts */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
-    listJobs: {
-        parameters: {
-            query?: {
-                status?: "draft" | "open" | "paused" | "closed" | "archived";
-                /** @description Case-insensitive substring match on title, department and location. */
-                search?: string;
-                page?: number;
-                per_page?: number;
-                sort_by?: "created_at" | "updated_at" | "title" | "status";
-                sort_order?: "asc" | "desc";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Paginated job postings list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedJobsResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-        };
+  };
+  refreshSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    createJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Session refreshed */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateJobRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["TokenResponse"];
         };
-        responses: {
-            /** @description Job posting created successfully */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["JobResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
+      };
+      /** @description Missing, invalid or expired refresh token */
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
-    getJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Job details */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["JobResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  logout: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    updateJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Logged out */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateJobRequest"];
-            };
+        content: {
+          "application/json": {
+            /** @example Logged out successfully */
+            message?: string;
+          };
         };
-        responses: {
-            /** @description Updated job posting */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["JobResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
-    updateJobStatus: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateJobStatusRequest"];
-            };
-        };
-        responses: {
-            /** @description Job posting with the new status */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["JobResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  getCurrentUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    archiveJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description User profile details */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Archived job posting */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["JobResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
+        content: {
+          "application/json": components["schemas"]["UserProfileResponse"];
         };
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
-    getJobStages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of pipeline stages */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PipelineStageResponse"][];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  getOrganization: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    listCandidates: {
-        parameters: {
-            query?: {
-                /** @description Case-insensitive substring match on name and email. */
-                search?: string;
-                page?: number;
-                per_page?: number;
-                sort_by?: "created_at" | "updated_at" | "full_name" | "email";
-                sort_order?: "asc" | "desc";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Organization workspace details */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Paginated candidate list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedCandidatesResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
+        content: {
+          "application/json": components["schemas"]["OrganizationResponse"];
         };
+      };
     };
-    createCandidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCandidateRequest"];
-            };
-        };
-        responses: {
-            /** @description Candidate created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CandidateResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            409: components["responses"]["409Conflict"];
-        };
+  };
+  listJobs: {
+    parameters: {
+      query?: {
+        status?: "draft" | "open" | "paused" | "closed" | "archived";
+        /** @description Case-insensitive substring match on title, department and location. */
+        search?: string;
+        page?: number;
+        per_page?: number;
+        sort_by?: "created_at" | "updated_at" | "title" | "status";
+        sort_order?: "asc" | "desc";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getCandidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Paginated job postings list */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Candidate details */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CandidateResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
+        content: {
+          "application/json": components["schemas"]["PaginatedJobsResponse"];
         };
+      };
+      401: components["responses"]["401Unauthorized"];
     };
-    hardDeleteCandidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Candidate permanently deleted */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  createJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    updateCandidate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateCandidateRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated candidate */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CandidateResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-            409: components["responses"]["409Conflict"];
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateJobRequest"];
+      };
     };
-    listCandidateCvDocuments: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
+    responses: {
+      /** @description Job posting created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description CV documents */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CvDocumentResponse"][];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
+        content: {
+          "application/json": components["schemas"]["JobResponse"];
         };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
     };
-    uploadCandidateCV: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": {
-                    /**
-                     * Format: binary
-                     * @description PDF resume file
-                     */
-                    file: string;
-                };
-            };
-        };
-        responses: {
-            /** @description CV stored and queued */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CvDocumentResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-            /** @description The file is larger than 10 MB */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
-            /** @description The file content is not a PDF */
-            415: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
-        };
+  };
+  getJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
     };
-    getCandidateCvDocument: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-                cv_id: components["parameters"]["CvIdPathParam"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Job details */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description CV document */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CvDocumentResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
+        content: {
+          "application/json": components["schemas"]["JobResponse"];
         };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
     };
-    downloadCandidateCV: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-                cv_id: components["parameters"]["CvIdPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The PDF file, sent as an attachment */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/pdf": string;
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  updateJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
     };
-    listApplications: {
-        parameters: {
-            query?: {
-                job_id?: string;
-                candidate_id?: string;
-                stage_id?: string;
-                status?: "active" | "hired" | "rejected" | "withdrawn";
-                page?: number;
-                per_page?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Paginated application list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedApplicationsResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateJobRequest"];
+      };
     };
-    createApplication: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Updated job posting */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateApplicationRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["JobResponse"];
         };
-        responses: {
-            /** @description Application created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-            409: components["responses"]["409Conflict"];
-        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
     };
-    getApplication: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Application details */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
-        };
+  };
+  updateJobStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
     };
-    getApplicationHistory: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Stage history entries */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageHistoryResponse"][];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            404: components["responses"]["404NotFound"];
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateJobStatusRequest"];
+      };
     };
-    updateApplicationStage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
+    responses: {
+      /** @description Job posting with the new status */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateStageRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["JobResponse"];
         };
-        responses: {
-            /** @description Application in its new stage */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationResponse"];
-                };
-            };
-            401: components["responses"]["401Unauthorized"];
-            403: components["responses"]["403Forbidden"];
-            404: components["responses"]["404NotFound"];
-        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
     };
-    getApplicationScore: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: components["parameters"]["UUIDPathParam"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ScoreResponse"];
-                };
-            };
-        };
+  };
+  archiveJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      /** @description Archived job posting */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["JobResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  getJobStages: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of pipeline stages */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PipelineStageResponse"][];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  listCandidates: {
+    parameters: {
+      query?: {
+        /** @description Case-insensitive substring match on name and email. */
+        search?: string;
+        page?: number;
+        per_page?: number;
+        sort_by?: "created_at" | "updated_at" | "full_name" | "email";
+        sort_order?: "asc" | "desc";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated candidate list */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedCandidatesResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+    };
+  };
+  createCandidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCandidateRequest"];
+      };
+    };
+    responses: {
+      /** @description Candidate created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CandidateResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      409: components["responses"]["409Conflict"];
+    };
+  };
+  getCandidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Candidate details */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CandidateResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  hardDeleteCandidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Candidate permanently deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  updateCandidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCandidateRequest"];
+      };
+    };
+    responses: {
+      /** @description Updated candidate */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CandidateResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      409: components["responses"]["409Conflict"];
+    };
+  };
+  listCandidateCvDocuments: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description CV documents */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CvDocumentResponse"][];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  uploadCandidateCV: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description PDF resume file
+           */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description CV stored and queued */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CvDocumentResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      /** @description The file is larger than 10 MB */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description The file content is not a PDF */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  getCandidateCvDocument: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+        cv_id: components["parameters"]["CvIdPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description CV document */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CvDocumentResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  retryCandidateCvExtraction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+        cv_id: components["parameters"]["CvIdPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The document, queued again */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CvDocumentResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      409: components["responses"]["409Conflict"];
+    };
+  };
+  downloadCandidateCV: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+        cv_id: components["parameters"]["CvIdPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The PDF file, sent as an attachment */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  listApplications: {
+    parameters: {
+      query?: {
+        job_id?: string;
+        candidate_id?: string;
+        stage_id?: string;
+        status?: "active" | "hired" | "rejected" | "withdrawn";
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Paginated application list */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedApplicationsResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+    };
+  };
+  createApplication: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateApplicationRequest"];
+      };
+    };
+    responses: {
+      /** @description Application created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      409: components["responses"]["409Conflict"];
+    };
+  };
+  getApplication: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Application details */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  getApplicationHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stage history entries */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StageHistoryResponse"][];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  updateApplicationStage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateStageRequest"];
+      };
+    };
+    responses: {
+      /** @description Application in its new stage */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+    };
+  };
+  getApplicationScore: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ScoreResponse"];
+        };
+      };
+    };
+  };
 }
