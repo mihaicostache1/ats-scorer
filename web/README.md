@@ -18,6 +18,50 @@ npm run dev          # http://localhost:3000 (or the next free port)
 
 Restart `npm run dev` after changing it.
 
+### CV upload scenarios
+
+With the mocks on, what happens to an uploaded CV is chosen by its **file name**, so every state of the
+upload and processing flow can be reproduced by hand, in a test or in a demo. Put the marker between
+separators (`-`, `_`, space or the dot), in any case: `alex-needs-review.pdf`, `Alex_Encrypted.PDF`. A name
+with no marker takes the default. Status moves one step per status check, not with the clock, so a given
+file always goes through the same states. The file itself must still be a real PDF (it starts with
+`%PDF-` and ends with `%%EOF`), as the real API requires.
+
+| Marker                                                 | What you see                                                                                         |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| _(none)_ or `parsed`                                   | queued, extracting, parsed                                                                           |
+| `needs-review`                                         | queued, extracting, needs review                                                                     |
+| `extracted`                                            | queued, extracting, text extracted (all the real backend can do today)                               |
+| `ocr`                                                  | parsed, with "OCR used" and 4 pages                                                                  |
+| `slow`                                                 | seven checks in extracting before parsed (shows the backoff)                                         |
+| `stuck`                                                | never leaves the queue                                                                               |
+| `timeout`                                              | times out and retries by itself twice ("attempt 2 of 3"…), then fails "Gave up after 3 attempts."    |
+| `encrypted`, `corrupt`, `no-text`, `too-many-pages`    | fails with the backend's exact message and a hint (retrying won't help)                              |
+| `fail-then-ok`                                         | fails with a temporary error; **Retry** works                                                        |
+| `queue-down`                                           | uploaded but already failed (`queue_unavailable`); the first **Retry** fails again, the second works |
+| `poll-error`                                           | the first two status checks fail with a server error, then it recovers                               |
+| `poll-lost`                                            | every status check fails: "We lost contact…" with **Check again**                                    |
+| `upload-413`, `upload-415`, `upload-403`, `upload-404` | the server refuses the upload                                                                        |
+| `upload-500`, `upload-offline`                         | the server fails / the request never arrives                                                         |
+
+Files over 10 MB or that aren't PDFs are refused in the browser before anything is sent. A few CVs in
+the fixtures start mid-processing (`waiting-in-queue.pdf`, `being-extracted.pdf`), so opening those
+candidates shows polling picking up where it left off. The scenarios live in
+`src/mocks/scenarios/cv-scenarios.ts`; `cv-scenarios.test.ts` runs every one through the real handlers
+and fails if a scenario has no test.
+
+## Theme
+
+The sun/moon/monitor button in the header (and in the corner of the login and register pages) switches
+between **Light**, **Dark** and **System**. System follows the operating system and is the default. The
+choice is saved in the browser (`localStorage`, key `ats-theme`) and applied by a small script in `<head>`
+before the first paint, so there is no flash of the wrong theme. Dark mode is the `.dark` palette in
+`src/app/globals.css`, switched on by a `dark` class on `<html>`; use the theme tokens (`bg-background`,
+`text-muted-foreground`, ...) in new components and add a `dark:` variant for any fixed colour.
+
+To reset it, delete `ats-theme` in DevTools > Application > Local Storage. In Playwright, use
+`test.use({ colorScheme: "dark" })` to emulate a dark OS (see `e2e/theme.spec.ts`).
+
 ## Checks
 
 ```bash
@@ -71,10 +115,19 @@ instead (for example `npm.cmd test`).
 - `e2e/login-to-jobs.spec.ts`: the flow from a signed-out visit to the jobs list. Redirect to
   `/login?next=…`, wrong password error, successful login back to `/jobs`, search and paging kept in the
   URL, and the session surviving a reload.
+- `e2e/job-form.spec.ts`: create, edit, close and archive a job, and the list-to-detail link.
+- `e2e/candidates.spec.ts`: the candidates list (search and paging in the URL), a profile, the empty and
+  not-found states, and a viewer being kept out.
+- `e2e/cv-upload.spec.ts`: uploading CVs and following them to parsed, needs review and failed, retry,
+  files refused in the browser, a refused upload, and polling stopping when the page is left.
+- `src/mocks/scenarios/cv-scenarios.test.ts`: every CV upload scenario, run through the real mock
+  handlers in Node. Add a scenario and this fails until it has a test.
+- `src/components/candidates/use-cv-polling.test.tsx`: the backoff schedule and every way polling stops
+  (final status, leaving the page, 404, repeated failures, time budget), with fake timers.
 
-The end-to-end test relies on the mock data: the `admin@demo.com` account
-(`src/mocks/fixtures/auth.ts`) and 25 jobs (`src/mocks/fixtures/jobs.ts`). If you change those
-fixtures, update the numbers in the spec.
+The end-to-end tests rely on the mock data: the demo accounts (`src/mocks/fixtures/auth.ts`), 25 jobs
+(`src/mocks/fixtures/jobs.ts`) and 25 candidates (`src/mocks/fixtures/candidates.ts`). If you change
+those fixtures, update the numbers in the specs.
 
 ### Writing tests
 

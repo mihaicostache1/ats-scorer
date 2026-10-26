@@ -1,17 +1,81 @@
-import { delay, http, HttpResponse } from "msw";
+import { http, HttpResponse } from "msw";
 import { mockCandidates, mockCvDocuments } from "../fixtures/candidates";
 import { MOCK_ORG_ID, MOCK_USER_ID } from "../fixtures/auth";
+import {
+  CV_SCENARIOS,
+  scenarioForFile,
+  type CvPatch,
+  type CvScenario,
+} from "../scenarios/cv-scenarios";
 import type { components } from "@/api/generated/schema";
-import { BASE, errorResponse, notFound, paginate, sortItems } from "./utils";
+import { BASE, detailResponse, errorResponse, notFound, paginate, sortItems, wait } from "./utils";
 
 type CandidateResponse = components["schemas"]["CandidateResponse"];
 type CvDocumentResponse = components["schemas"]["CvDocumentResponse"];
 
 const MAX_CV_SIZE_BYTES = 10 * 1024 * 1024;
+const TERMINAL = ["extracted", "parsed", "needs_review", "failed"];
 
 /** In-memory stores — mutations persist for the browser session. */
 let candidatesStore: CandidateResponse[] = [...mockCandidates];
 let cvStore: CvDocumentResponse[] = [...mockCvDocuments];
+
+/**
+ * Where each CV is in its scenario. A status poll moves it one step on; the clock plays no part, so
+ * what a poll sees is always the same for the same file.
+ */
+interface Runtime {
+  scenario: CvScenario;
+  steps: CvPatch[];
+  step: number;
+  retries: number;
+  pollsSeen: number;
+}
+const runtimes = new Map<string, Runtime>();
+
+const defaultScenario = CV_SCENARIOS[0];
+
+/** CVs already in the fixtures that are mid-processing carry on from where they are. */
+function seedRuntimes() {
+  runtimes.clear();
+  for (const doc of cvStore) {
+    if (TERMINAL.includes(doc.status)) continue;
+    runtimes.set(doc.id, {
+      scenario: defaultScenario,
+      steps: defaultScenario.steps,
+      step: doc.status === "extracting" ? 1 : 0,
+      retries: 0,
+      pollsSeen: 0,
+    });
+  }
+}
+seedRuntimes();
+
+/** Restores the fixtures; for tests that upload or retry CVs. */
+export function resetCvStore() {
+  cvStore = [...mockCvDocuments];
+  seedRuntimes();
+}
+
+function apply(doc: CvDocumentResponse, patch: CvPatch): CvDocumentResponse {
+  const now = new Date().toISOString();
+  const next = { ...doc, ...patch, updated_at: now };
+  if (patch.status && TERMINAL.includes(patch.status)) next.processed_at = now;
+  return next;
+}
+
+function save(doc: CvDocumentResponse) {
+  cvStore = cvStore.map((d) => (d.id === doc.id ? doc : d));
+}
+
+/** The server's check: a `%PDF-` header and a `%%EOF` trailer in the last 1024 bytes. */
+async function looksLikePdf(file: File): Promise<boolean> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const text = (from: number, to: number) => new TextDecoder().decode(bytes.slice(from, to));
+  return (
+    text(0, 5) === "%PDF-" && text(Math.max(0, bytes.length - 1024), bytes.length).includes("%%EOF")
+  );
+}
 
 /** Minimal valid PDF served by the download endpoint. */
 const MOCK_PDF =
@@ -26,7 +90,7 @@ export const candidateHandlers = [
    * Supports ?search= (full name / email), sorting and pagination.
    */
   http.get(`${BASE}/candidates`, async ({ request }) => {
-    await delay(300); // realistic latency so loading states are visible
+    await wait(300); // realistic latency so loading states are visible
     const url = new URL(request.url);
     const search = url.searchParams.get("search")?.toLowerCase() ?? "";
     const filtered = search
@@ -74,7 +138,7 @@ export const candidateHandlers = [
    * GET /candidates/:id
    */
   http.get(`${BASE}/candidates/:id`, async ({ params }) => {
-    await delay(200);
+    await wait(200);
     const candidate = candidatesStore.find((c) => c.id === params.id);
     return candidate ? HttpResponse.json(candidate) : notFound("Candidate", params.id);
   }),
@@ -112,10 +176,10 @@ export const candidateHandlers = [
   }),
 
   /**
-   * GET /candidates/:id/cv — CV documents, newest first.
+   * GET /candidates/:id/cv — CV documents, newest first. Does not move any CV along.
    */
   http.get(`${BASE}/candidates/:id/cv`, async ({ params }) => {
-    await delay(300);
+    await wait(300);
     if (!candidatesStore.some((c) => c.id === params.id)) return notFound("Candidate", params.id);
     const docs = cvStore
       .filter((d) => d.candidate_id === params.id)
@@ -125,55 +189,124 @@ export const candidateHandlers = [
 
   /**
    * POST /candidates/:id/cv — multipart upload with a `file` field.
-   * Rejects files over 10 MB (413) and files that are not PDFs (415).
+   * Checks like the real API (413 over 10 MB, 415 unless the content is a PDF), then picks a
+   * processing scenario from the file name (see web/README.md, "CV upload scenarios").
    */
   http.post(`${BASE}/candidates/:id/cv`, async ({ params, request }) => {
+    await wait(200);
     if (!candidatesStore.some((c) => c.id === params.id)) return notFound("Candidate", params.id);
 
     const file = (await request.formData()).get("file");
     if (!(file instanceof File)) {
-      return errorResponse(422, "VALIDATION_ERROR", "A `file` field is required.");
+      return HttpResponse.json(
+        { detail: [{ loc: ["body", "file"], msg: "Field required", type: "missing" }] },
+        { status: 422 }
+      );
     }
     if (file.size > MAX_CV_SIZE_BYTES) {
-      return errorResponse(413, "FILE_TOO_LARGE", "The file is larger than 10 MB.");
+      return detailResponse(413, "The file is larger than the 10 MB limit.");
     }
-    const head = new TextDecoder().decode(await file.slice(0, 5).arrayBuffer());
-    if (head !== "%PDF-") {
-      return errorResponse(415, "UNSUPPORTED_MEDIA_TYPE", "The file content is not a PDF.");
+    if (!(await looksLikePdf(file))) return detailResponse(415, "Only PDF files are accepted.");
+
+    const scenario = scenarioForFile(file.name);
+    if (scenario.uploadError === "network") return HttpResponse.error();
+    if (scenario.uploadError) {
+      return detailResponse(scenario.uploadError.status, scenario.uploadError.detail);
     }
 
     const now = new Date().toISOString();
-    const doc: CvDocumentResponse = {
-      id: crypto.randomUUID(),
-      org_id: MOCK_ORG_ID,
-      candidate_id: String(params.id),
-      original_filename: file.name,
-      content_type: "application/pdf",
-      size_bytes: file.size,
-      sha256: Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
-        b.toString(16).padStart(2, "0")
-      ).join(""),
-      status: "queued",
-      page_count: null,
-      ocr_used: false,
-      error_code: null,
-      error_message: null,
-      attempts: 0,
-      processed_at: null,
-      uploaded_by: MOCK_USER_ID,
-      created_at: now,
-      updated_at: now,
-    };
+    const doc = apply(
+      {
+        id: crypto.randomUUID(),
+        org_id: MOCK_ORG_ID,
+        candidate_id: String(params.id),
+        original_filename: file.name,
+        content_type: "application/pdf",
+        size_bytes: file.size,
+        sha256: Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) =>
+          b.toString(16).padStart(2, "0")
+        ).join(""),
+        status: "queued",
+        page_count: null,
+        ocr_used: false,
+        error_code: null,
+        error_message: null,
+        attempts: 0,
+        processed_at: null,
+        uploaded_by: MOCK_USER_ID,
+        created_at: now,
+        updated_at: now,
+      },
+      scenario.initial ?? {}
+    );
     cvStore = [doc, ...cvStore];
+    runtimes.set(doc.id, { scenario, steps: scenario.steps, step: 0, retries: 0, pollsSeen: 0 });
     return HttpResponse.json(doc, { status: 201 });
   }),
 
   /**
-   * GET /candidates/:id/cv/:cvId
+   * GET /candidates/:id/cv/:cvId — the status poll. Each call moves the CV one step through its
+   * scenario, until the scenario has nothing left.
    */
-  http.get(`${BASE}/candidates/:id/cv/:cvId`, ({ params }) => {
+  http.get(`${BASE}/candidates/:id/cv/:cvId`, async ({ params }) => {
+    await wait(150);
     const doc = cvStore.find((d) => d.id === params.cvId && d.candidate_id === params.id);
-    return doc ? HttpResponse.json(doc) : notFound("CV document", params.cvId);
+    if (!doc) return notFound("CV document", params.cvId);
+
+    const runtime = runtimes.get(doc.id);
+    if (!runtime) return HttpResponse.json(doc);
+
+    runtime.pollsSeen += 1;
+    const failure = runtime.scenario.pollFailure;
+    if (failure && (failure.count === undefined || runtime.pollsSeen <= failure.count)) {
+      return failure.kind === "network"
+        ? HttpResponse.error()
+        : detailResponse(500, "Internal Server Error");
+    }
+
+    if (runtime.step < runtime.steps.length) {
+      const next = apply(doc, runtime.steps[runtime.step]);
+      runtime.step += 1;
+      save(next);
+      return HttpResponse.json(next);
+    }
+    return HttpResponse.json(doc);
+  }),
+
+  /**
+   * POST /candidates/:id/cv/:cvId/retry — like the real API: a failed CV goes back to the queue,
+   * one that is still queued or extracting is queued again unchanged, anything else is a 409.
+   */
+  http.post(`${BASE}/candidates/:id/cv/:cvId/retry`, async ({ params }) => {
+    await wait(200);
+    const doc = cvStore.find((d) => d.id === params.cvId && d.candidate_id === params.id);
+    if (!doc) return notFound("CV document", params.cvId);
+
+    if (doc.status === "queued" || doc.status === "extracting") return HttpResponse.json(doc);
+    if (doc.status !== "failed") {
+      return detailResponse(409, `A CV document with status '${doc.status}' cannot be retried.`);
+    }
+
+    const runtime = runtimes.get(doc.id);
+    const plans = runtime?.scenario.retries;
+    const plan = plans ? plans[Math.min(runtime?.retries ?? 0, plans.length - 1)] : undefined;
+    // Without a scripted retry, it goes back to the queue and then follows the default scenario.
+    const response: CvPatch = plan?.response ?? {
+      status: "queued",
+      attempts: 0,
+      error_code: null,
+      error_message: null,
+    };
+    const next = apply(doc, response);
+    save(next);
+    runtimes.set(doc.id, {
+      scenario: runtime?.scenario ?? defaultScenario,
+      steps: plan ? plan.steps : defaultScenario.steps,
+      step: 0,
+      retries: (runtime?.retries ?? 0) + 1,
+      pollsSeen: 0,
+    });
+    return HttpResponse.json(next);
   }),
 
   /**
