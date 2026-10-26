@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Action } from "@/lib/permissions";
 import { useSession } from "@/providers/session-provider";
+import { ThemeToggle } from "./theme-toggle";
 import { cn } from "@/lib/utils";
 
 export interface NavItem {
@@ -24,7 +25,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: Briefcase },
   { label: "Jobs", href: "/jobs", icon: Briefcase },
-  { label: "Candidates", href: "/#candidates", icon: Users },
+  { label: "Candidates", href: "/candidates", icon: Users, requires: "candidate:read" },
   { label: "Audit Logs", href: "/#audit", icon: Shield, requires: "audit:read" },
   { label: "Design System", href: "/dev/components", icon: Sparkles, badge: "UI", devOnly: true },
 ];
@@ -119,6 +120,8 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void })
           >
             <Bell className="size-4" />
           </Button>
+
+          <ThemeToggle />
 
           <div className="border-border hidden items-center gap-2 border-l pl-2 sm:flex">
             <div
