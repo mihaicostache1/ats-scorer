@@ -9,12 +9,18 @@ description = "Candidate-to-job scoring for the AI-Assisted ATS Platform"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "numpy>=1.24.0",
     "pydantic>=2.6.0",
+    "rapidfuzz>=3.0.0",
     "scikit-learn>=1.4.0",
     "scipy>=1.10.0",
 ]
 
 [project.optional-dependencies]
+# Embedding suggestions in the skill normalizer (step 5). Pulls in PyTorch, about 2 GB.
+embeddings = [
+    "sentence-transformers>=3.0.0",
+]
 dev = [
     "pytest>=8.0.0",
     "ruff>=0.3.0",
