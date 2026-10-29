@@ -4,17 +4,18 @@ Most tests use a small extract of ESCO in tests/fixtures. The tests marked `real
 use the full download and are skipped without it (see docs/ml/skill-normalization.md).
 """
 
+import logging
 import os
 import random
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ats_scoring.esco import ESCO_ATTRIBUTION, load_esco
+from ats_scoring.esco import ESCO_ATTRIBUTION, EscoIndex, load_esco
 from ats_scoring.parsed_cv import ParsedCV
 from ats_scoring.skill_normalizer import (
     ALIASES,
@@ -213,7 +214,6 @@ def test_weak_or_short_strings_stay_free_text(normalizer: SkillNormalizer, raw: 
 class FakeEmbedder:
     """Maps known phrases to fixed unit vectors. Everything else is a zero vector."""
 
-    name = "fake"
     VECTORS = {
         "perform software unit testing": [1.0, 0.0, 0.0],
         "unit testing": [1.0, 0.0, 0.0],
@@ -226,7 +226,9 @@ class FakeEmbedder:
         "video production": [0.6, 0.0, 0.8],
     }
 
-    def __init__(self) -> None:
+    def __init__(self, name: str = "fake", prefix: str = "") -> None:
+        self.name = name
+        self.prefix = prefix
         self.calls: list[list[str]] = []
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
@@ -266,7 +268,7 @@ def test_alias_and_fuzzy_run_before_the_embedding_model() -> None:
 
 
 def test_label_embeddings_are_computed_once_and_cached(tmp_path: Path) -> None:
-    cache = tmp_path / "esco_fake.npy"
+    cache = tmp_path / "esco_fake.npz"
     first = FakeEmbedder()
     normalizer = SkillNormalizer(
         load_esco(ESCO_SAMPLE), embedder=first, label_embeddings_cache=cache
@@ -274,7 +276,7 @@ def test_label_embeddings_are_computed_once_and_cached(tmp_path: Path) -> None:
     normalizer.normalize_skills(["Unit Testing", "something else entirely"])
     normalizer.normalize_skills(["unit testing again, but unknown"])
 
-    assert cache.is_file()
+    assert [path.name for path in tmp_path.iterdir()] == ["esco_fake.npz"]  # at that path
     assert len(first.calls) == 3  # labels once, then one batch per call
 
     second = FakeEmbedder()
@@ -283,6 +285,97 @@ def test_label_embeddings_are_computed_once_and_cached(tmp_path: Path) -> None:
     )
     assert one(reloaded, "Unit Testing").method == "embedding"
     assert second.calls == [["unit testing"]]  # the labels came from the cache
+
+
+def reordered(esco: EscoIndex) -> EscoIndex:
+    """The same concepts in reverse order."""
+    index = EscoIndex()
+    for concept in reversed(esco.concepts):
+        index.add_concept(concept.uri, concept.preferred_label)
+    return index
+
+
+def relabelled(esco: EscoIndex) -> EscoIndex:
+    """As many concepts, one with another preferred label, as in another ESCO version."""
+    index = EscoIndex()
+    for concept in esco.concepts:
+        label = "perform unit testing" if concept.uri == UNIT_TESTING else concept.preferred_label
+        index.add_concept(concept.uri, label)
+    return index
+
+
+def test_reordered_concepts_do_not_reuse_the_cache(tmp_path: Path) -> None:
+    # Row i of the cache belongs to concept i. Accepted on its row count alone, the cache
+    # gave "Unit Testing" the concept that moved into that row (L-11 review).
+    cache = tmp_path / "labels.npz"
+    esco = load_esco(ESCO_SAMPLE)
+    SkillNormalizer(esco, embedder=FakeEmbedder(), label_embeddings_cache=cache).normalize_skills(
+        ["Unit Testing"]
+    )
+
+    normalizer = SkillNormalizer(
+        reordered(esco), embedder=FakeEmbedder(), label_embeddings_cache=cache
+    )
+    result = one(normalizer, "Unit Testing")
+
+    assert result.esco_uri == UNIT_TESTING
+    assert result.suggestion == "perform software unit testing"
+
+
+@pytest.mark.parametrize(
+    ("settings", "change_esco"),
+    [
+        ({"name": "another-model"}, None),
+        ({"prefix": "passage: "}, None),
+        ({}, reordered),
+        ({}, relabelled),
+    ],
+    ids=["model", "prefix", "concept order", "label"],
+)
+def test_label_cache_is_computed_again_for_other_input(
+    tmp_path: Path,
+    settings: dict[str, str],
+    change_esco: Callable[[EscoIndex], EscoIndex] | None,
+) -> None:
+    cache = tmp_path / "labels.npz"
+    esco = load_esco(ESCO_SAMPLE)
+    SkillNormalizer(esco, embedder=FakeEmbedder(), label_embeddings_cache=cache).normalize_skills(
+        ["Unit Testing"]
+    )
+    if change_esco is not None:
+        esco = change_esco(esco)
+
+    embedder = FakeEmbedder(**settings)
+    SkillNormalizer(esco, embedder=embedder, label_embeddings_cache=cache).normalize_skills(
+        ["Unit Testing"]
+    )
+
+    assert embedder.calls[0] == [concept.preferred_label for concept in esco.concepts]
+    # The file now holds the new vectors, so a third normalizer reuses them.
+    again = FakeEmbedder(**settings)
+    SkillNormalizer(esco, embedder=again, label_embeddings_cache=cache).normalize_skills(
+        ["Unit Testing"]
+    )
+    assert again.calls == [["unit testing"]]
+
+
+def test_an_unreadable_label_cache_is_replaced(tmp_path: Path) -> None:
+    cache = tmp_path / "labels.npz"
+    cache.write_bytes(b"not a numpy file")
+    embedder = FakeEmbedder()
+    normalizer = SkillNormalizer(
+        load_esco(ESCO_SAMPLE), embedder=embedder, label_embeddings_cache=cache
+    )
+
+    assert one(normalizer, "Unit Testing").esco_uri == UNIT_TESTING
+    assert len(embedder.calls) == 2  # the labels, then the skill
+    assert [path.name for path in tmp_path.iterdir()] == ["labels.npz"]
+
+
+def test_label_cache_must_be_an_npz_file(tmp_path: Path) -> None:
+    # np.savez adds ".npz" to any other name, so such a cache was written on every run.
+    with pytest.raises(ValueError, match=r"\.npz"):
+        SkillNormalizer(embedder=FakeEmbedder(), label_embeddings_cache=tmp_path / "labels.npy")
 
 
 # --- Input handling --------------------------------------------------------------------
@@ -346,6 +439,32 @@ def test_module_functions_use_the_esco_files_in_the_environment(
         default_normalizer.cache_clear()
 
 
+def test_module_functions_warn_when_no_esco_file_is_set(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    monkeypatch.delenv(ESCO_SKILLS_ENV, raising=False)
+    default_normalizer.cache_clear()
+    try:
+        with caplog.at_level(logging.WARNING, logger="ats_scoring.skill_normalizer"):
+            assert normalize_skills(["JS"])[0].esco_uri is None
+    finally:
+        default_normalizer.cache_clear()
+
+    assert ESCO_SKILLS_ENV in caplog.text
+
+
+def test_module_functions_fail_on_a_missing_esco_file(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv(ESCO_SKILLS_ENV, str(tmp_path / "skills_en.csv"))
+    default_normalizer.cache_clear()
+    try:
+        with pytest.raises(FileNotFoundError):
+            normalize_skills(["JS"])
+    finally:
+        default_normalizer.cache_clear()
+
+
 # --- Extraction from free text ---------------------------------------------------------
 
 
@@ -368,6 +487,11 @@ def names(skills: list[NormalizedSkill]) -> list[str | None]:
         ("Frontend in TypeScript, C++ tooling and CI/CD.", ["TypeScript", "C++", "CI/CD"]),
         ("APIs in Node.js", ["Node.js"]),
         ("Java and Python", ["Java", "Python"]),
+        ("Python/Java", ["Python", "Java"]),
+        ("SQL/PostgreSQL", ["SQL", "PostgreSQL"]),
+        ("Docker/Kubernetes with CI/CD", ["Docker", "Kubernetes", "CI/CD"]),
+        ("Services in C# and .NET.", ["C#", ".NET"]),
+        ("Grew the R&D budget", []),  # not the R language
         ("I go to the office early and grab a java.", []),
         ("Each node in the graph has a parent.", []),
         ("Python, python and PYTHON", ["Python"]),
@@ -388,6 +512,17 @@ def test_extracted_raw_is_the_phrase_as_written(normalizer: SkillNormalizer) -> 
 
 def test_extraction_spans_line_breaks(normalizer: SkillNormalizer) -> None:
     assert names(normalizer.extract_skills("Machine\nlearning")) == ["machine learning"]
+
+
+def test_extraction_finds_the_labels_of_every_loaded_language() -> None:
+    normalizer = SkillNormalizer(load_esco(ESCO_SAMPLE, ESCO_SAMPLE_RO))
+
+    assert names(normalizer.extract_skills("Învățare automată")) == ["machine learning"]
+
+    skills = normalizer.extract_skills("Experiență în învățare automată și lucru în echipă.")
+    assert names(skills) == ["machine learning", "work in teams"]
+    assert [skill.raw for skill in skills] == ["învățare automată", "lucru în echipă"]
+    assert all(skill.method == "exact" for skill in skills)
 
 
 def test_extracted_skills_are_all_accepted(normalizer: SkillNormalizer) -> None:

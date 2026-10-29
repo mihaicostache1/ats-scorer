@@ -50,7 +50,8 @@ def main() -> int:
     )
 
     embedder = SentenceTransformerEmbedder() if args.embeddings else None
-    cache = CACHE / f"esco_labels_{len(esco.concepts)}.npy" if embedder else None
+    # The file records the model and the ESCO concepts; it is rebuilt when either changes.
+    cache = CACHE / "esco_labels.npz" if embedder else None
     if embedder:
         # Embedding the ESCO labels happens once per model; it is not part of the timing.
         started = time.perf_counter()

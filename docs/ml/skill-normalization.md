@@ -36,7 +36,7 @@ pip install -e "ml/[embeddings]"      # step 5 too: sentence-transformers and Py
 
 ## Use (B-13)
 
-Build one normalizer when the worker starts and reuse it. Loading and indexing ESCO is the slow part of setup, and embedding its labels takes minutes the first time (then cached on disk).
+Build one normalizer when the worker starts and reuse it. Loading and indexing ESCO is the slow part of setup, and embedding its labels takes minutes the first time (then cached on disk). A normalizer is **not thread-safe**: its result cache and the indexes it builds on first use have no lock. Use one per process or per thread, or call it under a lock.
 
 ```python
 from ats_scoring.esco import load_esco
@@ -62,11 +62,13 @@ from ats_scoring.skill_normalizer import SentenceTransformerEmbedder, SkillNorma
 normalizer = SkillNormalizer(
     load_esco("/data/esco/skills_en.csv"),
     embedder=SentenceTransformerEmbedder(),               # multilingual-e5-small, as for CVs
-    label_embeddings_cache=Path("/data/esco/labels_e5_small.npy"),
+    label_embeddings_cache=Path("/data/esco/labels_e5_small.npz"),
 )
 ```
 
-There are also module-level `normalize_skills(skills)` and `extract_skills(text)`. They use a shared normalizer built from the files in the `ESCO_SKILLS_CSV` environment variable (several files separated by `;` on Windows and `:` elsewhere). Without the variable they use the alias table only.
+The cache must be an `.npz` file. It stores a key built from the embedder's `name` and `prefix` and the ESCO concepts in order (URI and preferred label). If any of them differ, for example after a model change or an ESCO update, the vectors are computed again and the file is replaced. A matching row count is not enough: with the same concepts in another order, each vector would point to the wrong concept.
+
+There are also module-level `normalize_skills(skills)` and `extract_skills(text)`. They use a shared normalizer built from the files in the `ESCO_SKILLS_CSV` environment variable (several files separated by `;` on Windows and `:` elsewhere). Without the variable they log a warning and use the alias table only. A listed file that does not exist raises `FileNotFoundError`. The shared normalizer is not thread-safe either.
 
 ### What a result contains
 
@@ -85,9 +87,9 @@ There are also module-level `normalize_skills(skills)` and `extract_skills(text)
 
 **Names:** an exact match shows the label that matched, as ESCO spells it, without the bracketed qualifier. An alternative label is kept, because ESCO lists narrower terms there: "Scrum" stays "Scrum", with `esco_label` "ICT project management methodologies". A hidden label (misspellings, old names) and a label from another language show the concept's preferred name instead.
 
-**Rules for `normalize_skills`:** one result per input string, in order. Entries that are not text or are empty after cleaning are dropped. Duplicates are kept, so remove them yourself if the parser finds the same skill twice. Results are cached per cleaned string.
+**Rules for `normalize_skills`:** one result per input string, in order. Entries that are not text or are empty after cleaning are dropped. Duplicates are kept, so remove them yourself if the parser finds the same skill twice. Results are cached per cleaned string. An entry such as `"Python/Java"` is one string and gets one result; pass it to `extract_skills` to split it.
 
-**Rules for `extract_skills`:** it looks for alias-table entries and ESCO preferred labels, longest phrase first (up to 6 words), and returns each skill once in order of first mention. Only accepted matches come back, because guessing at every phrase of a text would mostly produce noise. Single words that are also everyday English (`go`, `node`, `react`, `swift`, two-letter words, and ESCO names that need a qualifier, such as `Java (computer programming)`) count only when capitalized: "Go" and "Java" do, "go to" and "a java" do not.
+**Rules for `extract_skills`:** it looks for alias-table entries and the ESCO preferred labels of every loaded language, longest phrase first (up to 6 words), and returns each skill once in order of first mention. Only accepted matches come back, because guessing at every phrase of a text would mostly produce noise. A `/` separates skills ("Python/Java", "Docker/Kubernetes") unless the whole phrase is a known skill ("CI/CD"). A leading dot is kept (".NET"), and `&` joins a word ("R&D" is not the R language). Single words that are also everyday English (`go`, `node`, `react`, `swift`, two-letter words, and ESCO names that need a qualifier, such as `Java (computer programming)`) count only when capitalized: "Go" and "Java" do, "go to" and "a java" do not.
 
 ## ESCO data
 
@@ -97,7 +99,7 @@ ESCO is not in the repository. Download it once:
 2. Choose version **v1.2.1**, content **classification**, language **en**, file type **CSV**. Enter an email address; the link arrives by email.
 3. Unzip it and keep `skills_en.csv`. For the tests and the benchmark, copy it to `ml/embedding_spike/data/skills_en.csv` (git-ignored), or set `ESCO_SKILLS_CSV` to its path.
 
-For other languages, download the same file in that language and pass it after the English one: `load_esco("skills_en.csv", "skills_ro.csv")`. The extra labels match CVs in that language, and the result still shows the English name. L-6 found that the embedding model alone does not do this reliably.
+For other languages, download the same file in that language and pass it after the English one: `load_esco("skills_en.csv", "skills_ro.csv")`. The extra labels match CVs in that language, in skill lists and in free text, and the result still shows the English name. L-6 found that the embedding model alone does not do this reliably.
 
 ### Licence and attribution
 
@@ -135,4 +137,5 @@ Fuzzy matching compares each string with about 100,000 ESCO labels, in parallel 
 - **Suggestions have no place in the parsed-CV schema 1.0.** `skills[]` holds only `raw` and `normalized`. To show suggestions on the review screen, B-13 can keep them elsewhere, or the schema gets an optional `suggestion` field in a minor version (1.1). The backend and frontend developers decide; see the schema's change rules.
 - **The fuzzy and embedding thresholds are L-6's starting points,** not tuned. L-6 also found that no cosine cut-off separates right from wrong embedding matches. Tune both on recruiter-confirmed matches once F-11 records them.
 - **The scorer does not use this yet.** It keeps its own smaller alias table in `ats_scoring/skills.py`, because changing that table changes scores and needs a new `MODEL_VERSION`. A test checks that the two tables agree where both have an entry.
-- **Extraction is literal.** It misses inflected forms ("Dockerized") and skills written as a sentence ("I lead teams"), and a capitalized ambiguous word at the start of a sentence ("Swift delivery of ...") is a false positive.
+- **Extraction is literal.** It misses inflected forms ("Dockerized") and skills written as a sentence ("I lead teams").
+- **The capital-letter rule only reads the case.** An ambiguous word counts whenever it is capitalized, so a sentence start or a heading in capitals is a false positive: "Go to market" and "GO TO MARKET" both give Go, and "Swift delivery of ..." gives Swift. Skipping sentence starts or words in capitals would lose real skills at the start of a line and in CVs written in capitals, so the rule stays simple. The parser should prefer the skills section and use `extract_skills` on prose as a supplement.

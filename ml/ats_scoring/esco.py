@@ -42,6 +42,7 @@ class EscoLabel:
     concept: EscoConcept
     kind: str  # "preferred", "alternative" or "hidden"
     primary: bool  # from the first file loaded (the main language)
+    qualified: bool = False  # the key is the label without its qualifier: "java"
 
     @property
     def display(self) -> str:
@@ -70,11 +71,13 @@ class EscoIndex:
         return concept
 
     def add_label(self, label: str, concept: EscoConcept, kind: str, primary: bool) -> None:
-        for variant in dict.fromkeys((label.strip(), strip_qualifier(label))):
+        full = label.strip()
+        for variant in dict.fromkeys((full, strip_qualifier(label))):
             key = clean_skill(variant)
             if key:
                 self.labels.setdefault(
-                    key, EscoLabel(strip_qualifier(variant), concept, kind, primary)
+                    key,
+                    EscoLabel(strip_qualifier(variant), concept, kind, primary, variant != full),
                 )
 
     def lookup(self, text: str) -> EscoLabel | None:
@@ -82,10 +85,8 @@ class EscoIndex:
         return self.labels.get(clean_skill(text))
 
     def preferred_keys(self) -> set[str]:
-        """Cleaned preferred labels of the main language, with and without the qualifier."""
-        return {
-            key for key, label in self.labels.items() if label.kind == "preferred" and label.primary
-        }
+        """Cleaned preferred labels of every loaded language, with and without the qualifier."""
+        return {key for key, label in self.labels.items() if label.kind == "preferred"}
 
 
 def strip_qualifier(label: str) -> str:

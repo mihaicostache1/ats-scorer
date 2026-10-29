@@ -13,6 +13,9 @@ the first step that succeeds wins:
 Usage for the CV parser (B-13): docs/ml/skill-normalization.md
 """
 
+import hashlib
+import json
+import logging
 import os
 import re
 from collections.abc import Iterable, Mapping, Sequence
@@ -25,8 +28,10 @@ import numpy as np
 from numpy.typing import NDArray
 from rapidfuzz import fuzz, process
 
-from ats_scoring.esco import EscoIndex, EscoLabel, load_esco
+from ats_scoring.esco import EscoConcept, EscoIndex, EscoLabel, load_esco
 from ats_scoring.skills import clean_skill
+
+logger = logging.getLogger(__name__)
 
 Method = Literal["alias", "exact", "fuzzy", "embedding", "none"]
 
@@ -43,13 +48,17 @@ DEFAULT_EMBEDDING_THRESHOLD = 0.90
 # Paths of ESCO skills files for default_normalizer(), separated by os.pathsep.
 ESCO_SKILLS_ENV = "ESCO_SKILLS_CSV"
 
-# Longest phrase extract_skills() looks for, in words.
+# Longest phrase extract_skills() looks for, in words ("CI/CD" is two).
 MAX_PHRASE_WORDS = 6
 
 # Rows compared at once, to bound memory: 64 strings x ~100,000 ESCO labels.
 _FUZZY_CHUNK = 64
 _EMBEDDING_CHUNK = 256
 _CACHE_LIMIT = 50_000
+
+# Part of the label cache's key. Bump it when the cached vectors change meaning (other
+# texts embedded, for example), so that old cache files are computed again.
+_LABEL_CACHE_FORMAT = 1
 
 # Written forms (cleaned) -> the canonical name. Runs before ESCO, so it fixes ESCO's
 # wrong exact matches ("ML" is also a programming language in ESCO) and names the tech
@@ -72,6 +81,9 @@ ALIASES: dict[str, str] = {
     "golang": "Go",
     "c sharp": "C#",
     "cpp": "C++",
+    ".net": ".NET",
+    "dotnet": ".NET",
+    "asp.net": "ASP.NET",
     "node": "Node.js",
     "nodejs": "Node.js",
     "node.js": "Node.js",
@@ -226,9 +238,11 @@ AMBIGUOUS_WORDS = frozenset(
     }
 )
 
-# A word: starts with a letter or digit and keeps inner ".", "/" and "-" and trailing "+"
-# and "#": "C++", "C#", "Node.js", "CI/CD", "e-learning". A sentence's final dot is left out.
-_TOKEN = re.compile(r"\w[\w+#]*(?:[./-]\w[\w+#]*)*")
+# A word: starts with a letter or digit, or a dot before one (".NET"), and keeps inner ".",
+# "-" and "&" and trailing "+" and "#": "C++", "C#", "Node.js", "e-learning", "R&D". A
+# sentence's final dot is left out. "/" separates words, so "Python/Java" is two skills,
+# and a phrase can span it, so "CI/CD" is still one.
+_TOKEN = re.compile(r"\.?\w[\w+#]*(?:[.&-]\w[\w+#]*)*")
 
 
 @dataclass(frozen=True)
@@ -261,9 +275,14 @@ _UNMATCHED = NormalizedSkill(raw="", normalized=None, method="none", score=None)
 
 
 class Embedder(Protocol):
-    """Turns texts into unit-length vectors, one row per text."""
+    """Turns texts into unit-length vectors, one row per text.
+
+    `name` and `prefix` identify the vectors: cached ESCO label vectors are reused only by
+    an embedder with the same name and prefix.
+    """
 
     name: str
+    prefix: str
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]: ...
 
@@ -278,12 +297,12 @@ class SentenceTransformerEmbedder:
         self.name = model_name
         # E5 models are trained with prefixes. Skill-to-skill is symmetric, so both sides
         # use "query: ". Pass prefix="" for models without prefixes, such as MiniLM.
-        self._prefix = prefix
+        self.prefix = prefix
         self._model = SentenceTransformer(model_name, device="cpu")
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
         vectors = self._model.encode(
-            [self._prefix + text for text in texts],
+            [self.prefix + text for text in texts],
             batch_size=128,
             normalize_embeddings=True,
             convert_to_numpy=True,
@@ -297,6 +316,13 @@ class SkillNormalizer:
 
     Build one per process and reuse it: loading ESCO and embedding its labels is the slow
     part, and results are cached per cleaned string.
+
+    Not thread-safe: the result cache and the indexes built on first use have no lock.
+    Use one normalizer per thread, or call it under a lock.
+
+    `label_embeddings_cache` is an .npz file for the ESCO label vectors. It is used only
+    if it was written for the same embedder name, prefix and ESCO concepts, in the same
+    order; otherwise the vectors are computed again and the file is replaced.
     """
 
     def __init__(
@@ -308,6 +334,9 @@ class SkillNormalizer:
         embedding_threshold: float = DEFAULT_EMBEDDING_THRESHOLD,
         label_embeddings_cache: Path | None = None,
     ) -> None:
+        # np.savez adds ".npz" to any other name, so the file would never be found again.
+        if label_embeddings_cache is not None and label_embeddings_cache.suffix != ".npz":
+            raise ValueError(f"label_embeddings_cache must end in .npz: {label_embeddings_cache}")
         self.esco = esco if esco is not None else EscoIndex()
         self._aliases = {clean_skill(key): name for key, name in aliases.items()}
         # Canonical names are recognized as written too, after ESCO: "natural language
@@ -444,17 +473,14 @@ class SkillNormalizer:
         if self._label_embeddings is None:
             assert self._embedder is not None
             cache = self._label_embeddings_cache
-            count = len(self.esco.concepts)
-            if cache is not None and cache.is_file():
-                stored = np.load(cache)
-                if stored.shape[0] == count:
-                    self._label_embeddings = stored.astype(np.float32)
+            key = _label_cache_key(self._embedder, self.esco.concepts)
+            if cache is not None:
+                self._label_embeddings = _load_label_cache(cache, key, len(self.esco.concepts))
             if self._label_embeddings is None:
                 texts = [concept.preferred_label for concept in self.esco.concepts]
                 self._label_embeddings = self._embedder.encode(texts)
                 if cache is not None:
-                    cache.parent.mkdir(parents=True, exist_ok=True)
-                    np.save(cache, self._label_embeddings)
+                    _save_label_cache(cache, key, self._label_embeddings)
         return self._label_embeddings
 
     def _phrase_index(self) -> tuple[dict[str, bool], int]:
@@ -463,18 +489,56 @@ class SkillNormalizer:
             phrases: dict[str, bool] = {}
             for key in self.esco.preferred_keys():
                 label = self.esco.labels[key]
-                qualified = label.text != label.concept.preferred_label
-                phrases[key] = _ambiguous(key) or (qualified and " " not in key)
+                phrases[key] = _ambiguous(key) or (label.qualified and " " not in key)
             # Aliases override ESCO: "python" needs no capital, although ESCO qualifies it.
             for key in [*self._canonical, *self._aliases]:
                 phrases[key] = _ambiguous(key)
-            longest = max((len(key.split()) for key in phrases), default=1)
+            longest = max((len(_TOKEN.findall(key)) for key in phrases), default=1)
             self._phrases = (phrases, min(longest, MAX_PHRASE_WORDS))
         return self._phrases
 
 
 def _ambiguous(key: str) -> bool:
     return len(key) <= 2 or key in AMBIGUOUS_WORDS
+
+
+def _label_cache_key(embedder: Embedder, concepts: Sequence[EscoConcept]) -> str:
+    """What the label vectors depend on: the model, its prefix and the concepts, in order.
+
+    Row i of the vectors belongs to concept i, so the same number of concepts from another
+    ESCO version, language or order must not reuse them.
+    """
+    identity = [
+        _LABEL_CACHE_FORMAT,
+        embedder.name,
+        embedder.prefix,
+        [[concept.uri, concept.preferred_label] for concept in concepts],
+    ]
+    return hashlib.sha256(json.dumps(identity, ensure_ascii=False).encode()).hexdigest()
+
+
+def _load_label_cache(path: Path, key: str, rows: int) -> NDArray[np.float32] | None:
+    """The cached vectors, or None when the file is missing, unreadable or for other input."""
+    if not path.is_file():
+        return None
+    try:
+        with np.load(path, allow_pickle=False) as stored:
+            if stored["key"].item() != key or stored["vectors"].shape[0] != rows:
+                return None
+            return np.asarray(stored["vectors"], dtype=np.float32)
+    except (OSError, EOFError, ValueError, KeyError, TypeError):
+        # Not written by _save_label_cache, such as an older cache: computed again.
+        return None
+
+
+def _save_label_cache(path: Path, key: str, vectors: NDArray[np.float32]) -> None:
+    # Into a temporary file, renamed when complete, so an interrupted run leaves no half
+    # file. Through an open handle, because np.savez would add ".npz" to the temporary name.
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = path.with_name(path.name + ".partial")
+    with open(partial, "wb") as handle:
+        np.savez(handle, key=np.array(key), vectors=vectors)
+    os.replace(partial, path)
 
 
 def _accepted(name: str, method: Method, label: EscoLabel | None) -> NormalizedSkill:
@@ -504,11 +568,21 @@ def _suggested(name: str, method: Method, score: float, label: EscoLabel) -> Nor
 def default_normalizer() -> SkillNormalizer:
     """A normalizer built once from the ESCO files listed in $ESCO_SKILLS_CSV.
 
-    Without the variable it uses the alias table only: no ESCO concepts, no suggestions.
-    No embedding model is loaded; build a SkillNormalizer yourself for that.
+    Without the variable it logs a warning and uses the alias table only: no ESCO concepts,
+    no suggestions. A listed file that does not exist raises FileNotFoundError. No
+    embedding model is loaded; build a SkillNormalizer yourself for that.
+
+    The normalizer is shared by every caller in the process and is not thread-safe (see
+    SkillNormalizer).
     """
     paths = [path for path in os.environ.get(ESCO_SKILLS_ENV, "").split(os.pathsep) if path]
-    return SkillNormalizer(load_esco(*paths) if paths else None)
+    if not paths:
+        logger.warning(
+            "%s is not set: skills are normalized with the alias table only, without ESCO",
+            ESCO_SKILLS_ENV,
+        )
+        return SkillNormalizer()
+    return SkillNormalizer(load_esco(*paths))
 
 
 def normalize_skills(
