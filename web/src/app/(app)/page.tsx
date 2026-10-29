@@ -225,9 +225,7 @@ export default function HomePage() {
       sortable: true,
       render: (row) =>
         row.avgMatch > 0 ? (
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-            {row.avgMatch}%
-          </span>
+          <span className="text-success font-semibold">{row.avgMatch}%</span>
         ) : (
           <span className="text-muted-foreground text-xs">Pending</span>
         ),
@@ -257,9 +255,7 @@ export default function HomePage() {
         <div className="border-border flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-                Recruitment Dashboard
-              </h1>
+              <h1 className="text-foreground text-large-title">Recruitment Dashboard</h1>
               <Badge variant="secondary" className="hidden sm:inline-flex">
                 Org: Demo Org
               </Badge>
@@ -280,11 +276,9 @@ export default function HomePage() {
             {/* Write action: hidden from viewers */}
             <Can action="job:write">
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger>
-                  <Button className="gap-2">
-                    <Plus className="size-4" />
-                    Post New Requisition
-                  </Button>
+                <DialogTrigger render={<Button className="gap-2" />}>
+                  <Plus className="size-4" />
+                  Post New Requisition
                 </DialogTrigger>
                 <DialogContent className="max-w-xl">
                   <DialogHeader>
@@ -431,10 +425,8 @@ export default function HomePage() {
                       />
 
                       <DialogFooter className="pt-2">
-                        <DialogClose>
-                          <Button type="button" variant="outline">
-                            Cancel
-                          </Button>
+                        <DialogClose render={<Button type="button" variant="outline" />}>
+                          Cancel
                         </DialogClose>
                         <Button type="submit">Create Requisition</Button>
                       </DialogFooter>
@@ -448,51 +440,41 @@ export default function HomePage() {
 
         {/* Metric Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="border-border bg-card rounded-xl border p-5 shadow-xs">
+          <div className="glass rounded-2xl p-5">
             <div className="text-muted-foreground flex items-center justify-between">
-              <span className="text-xs font-medium tracking-wider uppercase">Active Openings</span>
+              <span className="text-footnote font-medium">Active Openings</span>
               <Briefcase className="size-4" />
             </div>
             <div className="text-foreground mt-3 text-2xl font-bold">{jobs.length}</div>
             <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-              <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                +2 this week
-              </span>
+              <span className="text-success font-medium">+2 this week</span>
             </div>
           </div>
 
-          <div className="border-border bg-card rounded-xl border p-5 shadow-xs">
+          <div className="glass rounded-2xl p-5">
             <div className="text-muted-foreground flex items-center justify-between">
-              <span className="text-xs font-medium tracking-wider uppercase">
-                Screened Candidates
-              </span>
+              <span className="text-footnote font-medium">Screened Candidates</span>
               <Users className="size-4" />
             </div>
             <div className="text-foreground mt-3 text-2xl font-bold">132</div>
             <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-              <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                98% consent verified
-              </span>
+              <span className="text-success font-medium">98% consent verified</span>
             </div>
           </div>
 
-          <div className="border-border bg-card rounded-xl border p-5 shadow-xs">
+          <div className="glass rounded-2xl p-5">
             <div className="text-muted-foreground flex items-center justify-between">
-              <span className="text-xs font-medium tracking-wider uppercase">
-                Average ATS Score
-              </span>
+              <span className="text-footnote font-medium">Average ATS Score</span>
               <TrendingUp className="size-4" />
             </div>
-            <div className="mt-3 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-              86.4%
-            </div>
+            <div className="text-success mt-3 text-2xl font-bold">86.4%</div>
             <div className="text-muted-foreground mt-1 text-xs">Across 20 synthetic roles</div>
           </div>
 
-          <div className="border-border bg-card rounded-xl border p-5 shadow-xs">
+          <div className="glass rounded-2xl p-5">
             <div className="text-muted-foreground flex items-center justify-between">
-              <span className="text-xs font-medium tracking-wider uppercase">Backend Services</span>
-              <CheckCircle2 className="size-4 text-emerald-500" />
+              <span className="text-footnote font-medium">Backend Services</span>
+              <CheckCircle2 className="text-success size-4" />
             </div>
             <div className="text-foreground mt-3 text-2xl font-bold">Healthy</div>
             <div className="text-muted-foreground mt-1 text-xs">PostgreSQL, Redis & FastAPI</div>

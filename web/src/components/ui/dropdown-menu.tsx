@@ -26,7 +26,7 @@ function DropdownMenuContent({
       <Menu.Positioner align={align} sideOffset={sideOffset} className="z-50">
         <Menu.Popup
           className={cn(
-            "border-border bg-popover text-popover-foreground min-w-36 rounded-lg border p-1 shadow-md outline-none",
+            "glass-strong text-popover-foreground min-w-40 rounded-xl p-1.5 outline-none",
             className
           )}
           {...props}
@@ -44,8 +44,8 @@ function DropdownMenuRadioItem({ className, children, ...props }: Menu.RadioItem
       // base-ui leaves the menu open after a radio pick; a one-choice menu should close.
       closeOnClick
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-3 pl-8 text-sm outline-none select-none",
-        "data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground",
+        "relative flex cursor-default items-center gap-2 rounded-lg py-2 pr-3 pl-8 text-[15px] transition-colors duration-200 outline-none select-none",
+        "data-[highlighted]:bg-foreground/10 data-[highlighted]:text-foreground",
         className
       )}
       {...props}

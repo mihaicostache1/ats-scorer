@@ -120,18 +120,18 @@ function ToastViewport({
 function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void }) {
   const icons: Record<ToastVariant, React.ReactNode> = {
     default: <Info className="text-foreground size-5" />,
-    info: <Info className="size-5 text-blue-500" />,
-    success: <CheckCircle2 className="size-5 text-emerald-500" />,
+    info: <Info className="text-primary size-5" />,
+    success: <CheckCircle2 className="text-success size-5" />,
     error: <AlertCircle className="text-destructive size-5" />,
-    warning: <TriangleAlert className="size-5 text-amber-500" />,
+    warning: <TriangleAlert className="text-warning size-5" />,
   };
 
   const borderVariants: Record<ToastVariant, string> = {
-    default: "border-border bg-card text-card-foreground",
-    info: "border-blue-500/20 bg-card text-card-foreground",
-    success: "border-emerald-500/20 bg-card text-card-foreground",
-    error: "border-destructive/30 bg-card text-card-foreground",
-    warning: "border-amber-500/30 bg-card text-card-foreground",
+    default: "text-card-foreground",
+    info: "text-card-foreground ring-1 ring-primary/25",
+    success: "text-card-foreground ring-1 ring-success/30",
+    error: "text-card-foreground ring-1 ring-destructive/30",
+    warning: "text-card-foreground ring-1 ring-warning/30",
   };
 
   const variant = item.variant || "default";
@@ -140,20 +140,20 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
     <div
       role="alert"
       className={cn(
-        "animate-in slide-in-from-bottom-5 sm:slide-in-from-right-5 pointer-events-auto relative flex w-full items-start gap-3 rounded-lg border p-4 shadow-lg transition-all",
+        "animate-in slide-in-from-bottom-5 sm:slide-in-from-right-5 glass-strong pointer-events-auto relative flex w-full items-start gap-3 rounded-2xl p-4 transition-all duration-200 ease-out",
         borderVariants[variant]
       )}
     >
       <div className="shrink-0 pt-0.5">{icons[variant]}</div>
       <div className="grid flex-1 gap-1">
-        {item.title && <div className="text-sm font-semibold">{item.title}</div>}
+        {item.title && <div className="text-[15px] font-semibold">{item.title}</div>}
         {item.description && (
-          <div className="text-muted-foreground text-xs">{item.description}</div>
+          <div className="text-muted-foreground text-footnote">{item.description}</div>
         )}
       </div>
       <button
         onClick={onDismiss}
-        className="text-muted-foreground focus:ring-ring rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:outline-none"
+        className="text-muted-foreground focus:ring-primary/25 rounded-full p-1 opacity-70 transition-opacity hover:opacity-100 focus:ring-4 focus:outline-none"
         aria-label="Dismiss notification"
       >
         <X className="size-4" />

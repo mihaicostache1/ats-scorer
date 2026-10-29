@@ -43,14 +43,14 @@ export function CandidatesTable({
         className={cn("w-full text-left text-sm transition-opacity", isRefreshing && "opacity-60")}
       >
         <caption className="sr-only">Candidates</caption>
-        <thead className="border-border bg-muted/40 text-muted-foreground border-b font-medium">
+        <thead className="border-border/60 bg-foreground/[0.03] text-muted-foreground border-b font-medium">
           <tr>
             {COLUMNS.map((col) => (
               <th
                 key={col.key}
                 scope="col"
                 className={cn(
-                  "h-10 px-4 text-xs font-semibold tracking-wider whitespace-nowrap uppercase",
+                  "text-footnote h-10 px-4 font-medium whitespace-nowrap",
                   "className" in col && col.className
                 )}
               >
@@ -74,11 +74,14 @@ export function CandidatesTable({
             candidates.map((candidate) => {
               const skills = readParsedSummary(candidate.parsed_data)?.skills ?? [];
               return (
-                <tr key={candidate.id} className="hover:bg-muted/30 transition-colors">
+                <tr
+                  key={candidate.id}
+                  className="hover:bg-foreground/[0.04] transition-colors duration-200"
+                >
                   <td className="px-4 py-3 align-top">
                     <Link
                       href={`/candidates/${candidate.id}`}
-                      className="text-foreground focus-visible:ring-ring rounded-sm font-semibold hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                      className="text-foreground focus-visible:ring-primary/25 rounded-md font-semibold hover:underline focus-visible:ring-4 focus-visible:outline-none"
                     >
                       {candidate.full_name}
                     </Link>

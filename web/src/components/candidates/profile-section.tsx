@@ -16,15 +16,12 @@ export function ProfileSection({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      aria-labelledby={`${id}-heading`}
-      className="border-border bg-card space-y-4 rounded-xl border p-6 shadow-xs"
-    >
+    <section aria-labelledby={`${id}-heading`} className="glass space-y-4 rounded-2xl p-6">
       <div>
-        <h2 id={`${id}-heading`} className="text-foreground text-base font-semibold">
+        <h2 id={`${id}-heading`} className="text-foreground text-headline">
           {title}
         </h2>
-        {description && <p className="text-muted-foreground mt-0.5 text-xs">{description}</p>}
+        {description && <p className="text-muted-foreground text-footnote mt-0.5">{description}</p>}
       </div>
       {children}
     </section>

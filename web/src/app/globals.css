@@ -6,10 +6,11 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-system);
+  --font-mono: var(--font-system-mono);
+  --font-heading: var(--font-system);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,6 +28,8 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -48,75 +51,315 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Apple HIG tokens. Light values follow the iOS/macOS system colors (systemBlue, systemGray5/6,
+ * systemRed, ...); dark values are their dark-appearance counterparts.
+ */
 :root {
   color-scheme: light;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --font-system:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui,
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-system-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Surfaces: the canvas is the grouped background, cards sit on top of it. */
+  --background: #ffffff;
+  --background-secondary: #f2f2f7;
+  --foreground: #1d1d1f;
+  --card: #ffffff;
+  --card-foreground: #1d1d1f;
+  --popover: #ffffff;
+  --popover-foreground: #1d1d1f;
+
+  /* Tint: systemBlue is the only accent, used for everything interactive. */
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f7;
+  --secondary-foreground: #1d1d1f;
+  --muted: #f2f2f7;
+  --muted-foreground: #6e6e73;
+  --accent: #e5e5ea;
+  --accent-foreground: #1d1d1f;
+
+  /* Semantic colors. */
+  --destructive: #d70015;
+  --success: #248a3d;
+  --warning: #b25000;
+
+  --border: rgb(60 60 67 / 0.18);
+  --input: #f2f2f7;
+  --ring: #007aff;
+  --chart-1: #007aff;
+  --chart-2: #34c759;
+  --chart-3: #ff9500;
+  --chart-4: #af52de;
+  --chart-5: #ff3b30;
+  --radius: 0.75rem;
+
+  /* Translucent material; paired with backdrop-blur on the sidebar. */
+  --sidebar: rgb(246 246 248 / 0.8);
+  --sidebar-foreground: #1d1d1f;
+  --sidebar-primary: #007aff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(0 122 255 / 0.12);
+  --sidebar-accent-foreground: #007aff;
+  --sidebar-border: rgb(60 60 67 / 0.18);
+  --sidebar-ring: #007aff;
+
+  /* Liquid Glass: translucent fill, crisp light edge on top/left, shaded edge on bottom/right. */
+  --glass-bg: rgb(255 255 255 / 0.65);
+  --glass-bg-strong: rgb(255 255 255 / 0.8);
+  --glass-bg-subtle: rgb(255 255 255 / 0.5);
+  --glass-bg-subtle-hover: rgb(255 255 255 / 0.72);
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --glass-edge-shade: rgb(0 0 0 / 0.07);
+  --glass-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(31 38 135 / 0.08),
+    0 24px 48px -12px rgb(31 38 135 / 0.1);
+  --glass-shadow-lg:
+    0 2px 4px rgb(0 0 0 / 0.06), 0 12px 32px rgb(31 38 135 / 0.12),
+    0 32px 64px -16px rgb(31 38 135 / 0.2);
+  --glass-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(31 38 135 / 0.06);
+  --glass-shadow-bar: 0 8px 24px -12px rgb(31 38 135 / 0.14);
+
+  /* Soft colour glows behind the canvas; they are what the glass blurs. */
+  --ambient-base: #f2f2f7;
+  --ambient-a: rgb(0 122 255 / 0.16);
+  --ambient-b: rgb(88 86 214 / 0.14);
+  --ambient-c: rgb(48 176 199 / 0.14);
 }
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #000000;
+  --background-secondary: #1c1c1e;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --popover: #2c2c2e;
+  --popover-foreground: #f5f5f7;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: #2c2c2e;
+  --secondary-foreground: #f5f5f7;
+  --muted: #2c2c2e;
+  --muted-foreground: #98989f;
+  --accent: #3a3a3c;
+  --accent-foreground: #f5f5f7;
+  --destructive: #ff453a;
+  --success: #30d158;
+  --warning: #ff9f0a;
+  --border: rgb(84 84 88 / 0.55);
+  --input: #2c2c2e;
+  --ring: #0a84ff;
+  --chart-1: #0a84ff;
+  --chart-2: #30d158;
+  --chart-3: #ff9f0a;
+  --chart-4: #bf5af2;
+  --chart-5: #ff453a;
+  --sidebar: rgb(28 28 30 / 0.75);
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-primary: #0a84ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(10 132 255 / 0.2);
+  --sidebar-accent-foreground: #64b5ff;
+  --sidebar-border: rgb(84 84 88 / 0.55);
+  --sidebar-ring: #0a84ff;
+
+  --glass-bg: rgb(30 30 30 / 0.65);
+  --glass-bg-strong: rgb(36 36 38 / 0.8);
+  --glass-bg-subtle: rgb(60 60 62 / 0.5);
+  --glass-bg-subtle-hover: rgb(72 72 74 / 0.62);
+  --glass-edge: rgb(255 255 255 / 0.2);
+  --glass-edge-shade: rgb(0 0 0 / 0.35);
+  --glass-shadow:
+    0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35), 0 24px 48px -12px rgb(0 0 0 / 0.45);
+  --glass-shadow-lg:
+    0 2px 4px rgb(0 0 0 / 0.5), 0 12px 32px rgb(0 0 0 / 0.45), 0 32px 64px -16px rgb(0 0 0 / 0.6);
+  --glass-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.3);
+  --glass-shadow-bar: 0 8px 24px -12px rgb(0 0 0 / 0.6);
+
+  --ambient-base: #0a0a0c;
+  --ambient-a: rgb(10 132 255 / 0.26);
+  --ambient-b: rgb(94 92 230 / 0.22);
+  --ambient-c: rgb(50 173 230 / 0.18);
+}
+
+/*
+ * Liquid Glass utilities. Shadows go through Tailwind's --tw-* variables so `ring-*` focus rings
+ * still compose with them instead of being replaced.
+ */
+@utility bg-ambient {
+  background-color: var(--ambient-base);
+  background-image:
+    radial-gradient(60rem 42rem at 0% 0%, var(--ambient-a), transparent 60%),
+    radial-gradient(50rem 40rem at 100% 25%, var(--ambient-b), transparent 60%),
+    radial-gradient(60rem 42rem at 30% 100%, var(--ambient-c), transparent 60%);
+  background-attachment: fixed;
+}
+@utility glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid transparent;
+  border-top-color: var(--glass-edge);
+  border-left-color: var(--glass-edge);
+  border-right-color: var(--glass-edge-shade);
+  border-bottom-color: var(--glass-edge-shade);
+  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
+  --tw-shadow: var(--glass-shadow);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+@utility glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid transparent;
+  border-top-color: var(--glass-edge);
+  border-left-color: var(--glass-edge);
+  border-right-color: var(--glass-edge-shade);
+  border-bottom-color: var(--glass-edge-shade);
+  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
+  --tw-shadow: var(--glass-shadow-lg);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+/* Controls: lighter blur, uniform edge so border/ring utilities can override it cleanly. */
+@utility glass-subtle {
+  background: var(--glass-bg-subtle);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--glass-edge-shade);
+  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
+  --tw-shadow: var(--glass-shadow-sm);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  &:hover:not(:disabled) {
+    background: var(--glass-bg-subtle-hover);
+  }
+}
+/* Full-width bars: only the edge facing the content is drawn. */
+@utility glass-header {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-edge-shade);
+  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
+  --tw-shadow: var(--glass-shadow-bar);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+@utility glass-side {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-right: 1px solid var(--glass-edge-shade);
+  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
+  --tw-shadow: var(--glass-shadow-bar);
+  box-shadow:
+    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+/* No blur support, or the user asked for less transparency: fall back to solid surfaces. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-header,
+  .glass-side {
+    background: var(--card);
+  }
+  .glass-strong {
+    background: var(--popover);
+  }
+  .glass-subtle {
+    background: var(--input);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-header,
+  .glass-side {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-strong {
+    background: var(--popover);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-subtle {
+    background: var(--input);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass-subtle {
+    transition: none;
+  }
+}
+
+/* HIG text styles (web sizes). Use these instead of ad-hoc text-xs / text-[11px]. */
+@utility text-large-title {
+  font-size: 2.125rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+@utility text-title-1 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+@utility text-title-2 {
+  font-size: 1.375rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+}
+@utility text-title-3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+}
+@utility text-headline {
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+@utility text-callout {
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+}
+@utility text-footnote {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  letter-spacing: -0.006em;
+}
+@utility text-caption {
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
 @layer base {
@@ -124,7 +367,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background-secondary text-foreground;
+    font-size: 0.9375rem;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;

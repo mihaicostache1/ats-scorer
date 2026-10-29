@@ -110,9 +110,7 @@ export function CandidatesList() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
-          Candidates
-        </h1>
+        <h1 className="text-foreground text-large-title">Candidates</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Search everyone in your organization and open a profile to see applications and CVs.
         </p>
@@ -128,7 +126,7 @@ export function CandidatesList() {
           onRetry={refetch}
         />
       ) : (
-        <div className="border-border bg-card overflow-hidden rounded-xl border shadow-xs">
+        <div className="glass overflow-hidden rounded-2xl">
           <CandidatesTable
             candidates={candidates}
             isLoading={isLoading}

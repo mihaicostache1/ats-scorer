@@ -37,18 +37,18 @@ export function AuthCard({
   footer: React.ReactNode;
 }) {
   return (
-    <div className="w-full max-w-md space-y-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-xl text-sm font-bold shadow-xs">
+    <div className="w-full max-w-md space-y-8">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="text-primary-foreground flex size-14 items-center justify-center rounded-[22%] bg-gradient-to-b from-[#3395ff] to-[#007aff] text-base font-bold shadow-lg">
           ATS
         </div>
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-          <p className="text-muted-foreground text-sm">{description}</p>
+        <div className="space-y-1.5">
+          <h1 className="text-title-1">{title}</h1>
+          <p className="text-muted-foreground text-callout">{description}</p>
         </div>
       </div>
-      <div className="border-border bg-card rounded-xl border p-6 shadow-xs">{children}</div>
-      <p className="text-muted-foreground text-center text-sm">{footer}</p>
+      <div className="glass rounded-2xl p-8">{children}</div>
+      <p className="text-muted-foreground text-footnote text-center">{footer}</p>
     </div>
   );
 }
@@ -59,7 +59,7 @@ export function FormError({ message }: { message: string | null }) {
   return (
     <div
       role="alert"
-      className="border-destructive/30 bg-destructive/10 text-destructive flex items-start gap-2 rounded-md border px-3 py-2 text-sm"
+      className="border-destructive/30 bg-destructive/10 text-destructive flex items-start gap-2 rounded-[10px] border px-3 py-2.5 text-sm"
     >
       <AlertCircle className="mt-0.5 size-4 shrink-0" />
       <span>{message}</span>

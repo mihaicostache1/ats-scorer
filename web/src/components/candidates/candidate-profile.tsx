@@ -18,7 +18,7 @@ import { unwrap, useResource } from "./use-resource";
 import type { CandidateResponse } from "./use-candidates";
 
 const backLink =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-sm text-sm focus-visible:ring-2 focus-visible:outline-none";
+  "text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none";
 
 export function CandidateProfileSkeleton() {
   return (
@@ -34,9 +34,7 @@ export function CandidateProfileSkeleton() {
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-        {label}
-      </dt>
+      <dt className="text-muted-foreground text-footnote font-medium">{label}</dt>
       <dd className="text-foreground mt-1 text-sm">{children}</dd>
     </div>
   );
@@ -46,7 +44,7 @@ const none = <span className="text-muted-foreground">—</span>;
 
 function ContactCard({ candidate }: { candidate: CandidateResponse }) {
   const link =
-    "focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-sm hover:underline focus-visible:ring-2 focus-visible:outline-none";
+    "focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md hover:underline focus-visible:ring-4 focus-visible:outline-none";
   return (
     <ProfileSection id="contact" title="Contact">
       <dl className="grid gap-5 sm:grid-cols-2">
@@ -135,9 +133,7 @@ export function CandidateProfile({ id }: { id: string }) {
             {getInitials(candidate.full_name)}
           </div>
           <div className="min-w-0">
-            <h1 className="text-foreground text-2xl font-bold tracking-tight break-words sm:text-3xl">
-              {candidate.full_name}
-            </h1>
+            <h1 className="text-foreground text-large-title break-words">{candidate.full_name}</h1>
             <p className="text-muted-foreground mt-0.5 text-sm break-all">{candidate.email}</p>
           </div>
         </div>
