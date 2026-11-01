@@ -35,7 +35,11 @@ The snapshot represents the parser output for the newest uploaded CV and is kept
 separately for B-14 recruiter edits. A delayed older job may finish its document's
 status but cannot replace candidate data. Terminal jobs are skipped on redelivery,
 so they cannot overwrite a recruiter correction. Canonical candidate name/email/
-phone/location columns are left for B-14 to accept.
+phone/location columns are accepted through B-14's
+[`PATCH /candidates/{id}/parsed-profile`](../api_spec.md#patch-apiv1candidatesidparsed-profile).
+That endpoint records the reviewer and timestamp, preserves the parser snapshot,
+and audits the changed field paths in the same transaction. A new parser result
+resets review metadata so an earlier review is not attributed to a newer CV.
 
 The review policy sends a record to `needs_review` if name or email is missing, if
 there are no skills/experiences/education, or if any emitted confidence is below

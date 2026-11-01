@@ -56,6 +56,13 @@ Set `ESCO_SKILLS_CSV` in the worker environment to enable ESCO matching; otherwi
 uses its alias table and preserves other skills as free text. Parser setup, review
 rules and the measured synthetic accuracy are in [CV structured extraction](docs/ml/cv-structured-extraction.md).
 
+Recruiters and admins can correct a parsed CV with
+`PATCH /api/v1/candidates/{id}/parsed-profile`. Corrections validate against L-10,
+preserve the original parser snapshot, and record reviewer, timestamp and an audit
+event. Apply migration `007_parsed_profile_review` before using the endpoint.
+See the [parsed-profile API contract](docs/api_spec.md#patch-apiv1candidatesidparsed-profile)
+for partial-update semantics and field errors.
+
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:
 ```bash

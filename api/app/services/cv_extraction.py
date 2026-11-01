@@ -144,6 +144,8 @@ def _mark_parsed(sessions: sessionmaker[Session], document_id: uuid.UUID, parsed
             candidate.parsed_data = data
             candidate.parsed_data_original = parsed.model_dump(mode="json")
             candidate.raw_text = document.extracted_text
+            candidate.parsed_profile_reviewed_by = None
+            candidate.parsed_profile_reviewed_at = None
         document.status = status
         document.error_code = None
         document.error_message = None

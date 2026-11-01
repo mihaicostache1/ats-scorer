@@ -1,8 +1,9 @@
 """Candidate API endpoints."""
 
 import uuid
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -21,11 +22,13 @@ from app.schemas.candidate import (
     CandidateSortField,
     CreateCandidateRequest,
     PaginatedCandidatesResponse,
+    ParsedProfileResponse,
     UpdateCandidateRequest,
 )
 from app.schemas.job import SortOrder
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.parsed_profile_service import correct_parsed_profile
 from app.services.storage import Storage, get_storage
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
@@ -190,6 +193,36 @@ def update_candidate(
         raise _DUPLICATE_EMAIL from None
     db.refresh(candidate)
     return candidate
+
+
+@router.patch(
+    "/{id}/parsed-profile",
+    response_model=ParsedProfileResponse,
+    summary="Correct a candidate's parsed profile",
+)
+def update_parsed_profile(
+    id: uuid.UUID,
+    request: Request,
+    payload: dict[str, Any] = Body(...),
+    db: Session = Depends(get_tenant_db),
+    current_user: User = Depends(get_current_recruiter_or_admin),
+) -> ParsedProfileResponse:
+    """Merge corrections, validate L-10, and record the authenticated reviewer."""
+    candidate = _get_candidate_or_404(db, id)
+    try:
+        return correct_parsed_profile(db, candidate, payload, current_user, request)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail=[
+                {
+                    "loc": ["body", "contact", "email"],
+                    "msg": "A candidate with this email already exists.",
+                    "type": "value_error",
+                }
+            ],
+        ) from None
 
 
 @router.delete(

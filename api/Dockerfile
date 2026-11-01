@@ -20,6 +20,7 @@ COPY api/app ./app
 COPY api/alembic ./alembic
 COPY api/tests ./tests
 COPY api/scripts ./scripts
+COPY docs/openapi.yaml /app/docs/openapi.yaml
 COPY api/alembic.ini api/pyproject.toml api/start-staging.sh ./
 
 EXPOSE 8000
