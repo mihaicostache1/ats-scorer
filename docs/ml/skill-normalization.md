@@ -1,6 +1,8 @@
 # Skill normalization
 
-**Status:** implemented, not yet used by the parser. Owner: ML/DevOps lead. Used by B-13 (CV parser). The design comes from the L-6 decision in [embedding-model-and-skill-matching.md](embedding-model-and-skill-matching.md).
+**Status:** implemented and integrated with the B-13 parser. Owner: ML/DevOps lead.
+The parser reuses the normalizer under a lock; see [CV extraction](cv-structured-extraction.md).
+The design comes from the L-6 decision in [embedding-model-and-skill-matching.md](embedding-model-and-skill-matching.md).
 
 | What | Where |
 |---|---|

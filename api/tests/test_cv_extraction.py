@@ -7,21 +7,25 @@ import os
 import time
 import uuid
 from collections.abc import Callable
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
 import pymupdf
 import pytest
 from arq import Retry
+from ats_scoring.parsed_cv import Contact, ParsedCV, Skill
 from httpx import AsyncClient
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.audit_event import AuditEvent
+from app.models.candidate import Candidate
 from app.models.cv_document import CvDocument
 from app.models.user import User
 from app.services import cv_extraction
 from app.services.cv_extraction import extract_cv_text
+from app.services.cv_parser import ParserUnavailableError
 from app.services.job_queue import (
     EXTRACT_CV_TEXT_JOB,
     ArqJobQueue,
@@ -117,13 +121,13 @@ async def test_every_l5_layout_is_extracted(
     committed_db: Session,
     cv_storage: LocalDiskStorage,
 ) -> None:
-    """The job takes each L-5 layout from queued to extracted and stores its text."""
+    """The job takes each L-5 layout from queued to needs_review and stores its text."""
     document = await upload((FIXTURES / name).read_bytes())
 
-    assert await _run(cv_storage, document) == "extracted"
+    assert await _run(cv_storage, document) == "needs_review"
 
     status = (await async_client.get(_url(document))).json()
-    assert status["status"] == "extracted"
+    assert status["status"] == "needs_review"
     assert status["page_count"] == 1
     assert status["ocr_used"] is False
     assert status["attempts"] == 1
@@ -161,8 +165,8 @@ async def test_corrupt_pdf_fails_without_crashing_the_worker(
     assert status["processed_at"] is not None
     assert _row(committed_db, corrupt).extracted_text is None
 
-    assert await _run(cv_storage, good) == "extracted"
-    assert (await async_client.get(_url(good))).json()["status"] == "extracted"
+    assert await _run(cv_storage, good) == "needs_review"
+    assert (await async_client.get(_url(good))).json()["status"] == "needs_review"
 
 
 @pytest.mark.asyncio
@@ -192,7 +196,7 @@ async def test_scanned_pdf_is_extracted_with_ocr(
 
     document = await upload(scanned)
     monkeypatch.setattr(cv_extraction, "extract_text", with_ocr)
-    assert await _run(cv_storage, document) == "extracted"
+    assert await _run(cv_storage, document) == "needs_review"
     status = (await async_client.get(_url(document))).json()
     assert status["ocr_used"] is True
     assert status["page_count"] == 1
@@ -269,9 +273,9 @@ async def test_retry_succeeds_after_a_passing_failure(
     # Internal details are logged, not shown to users.
     assert "disk hiccup" not in waiting["error_message"]
 
-    assert await _run(cv_storage, document, job_try=2) == "extracted"
+    assert await _run(cv_storage, document, job_try=2) == "needs_review"
     done = (await async_client.get(_url(document))).json()
-    assert done["status"] == "extracted"
+    assert done["status"] == "needs_review"
     assert done["attempts"] == 2
     assert done["error_code"] is None
     assert done["error_message"] is None
@@ -331,9 +335,9 @@ async def test_job_skips_what_it_should_not_touch(
     """Unknown, finished and deleted documents are skipped; an interrupted one is resumed."""
     assert await extract_cv_text({"storage": cv_storage}, str(uuid.uuid4())) == "skipped"
 
-    # Already extracted: a duplicate job changes nothing.
+    # Already parsed: a duplicate job changes nothing.
     done = await upload()
-    assert await _run(cv_storage, done) == "extracted"
+    assert await _run(cv_storage, done) == "needs_review"
     before = (await async_client.get(_url(done))).json()
     assert await _run(cv_storage, done) == "skipped"
     assert (await async_client.get(_url(done))).json() == before
@@ -343,7 +347,7 @@ async def test_job_skips_what_it_should_not_touch(
     row = _row(committed_db, interrupted)
     row.status, row.attempts = "extracting", 1
     committed_db.commit()
-    assert await _run(cv_storage, interrupted, job_try=2) == "extracted"
+    assert await _run(cv_storage, interrupted, job_try=2) == "needs_review"
     assert (await async_client.get(_url(interrupted))).json()["attempts"] == 2
 
     # The candidate was deleted while the job was waiting in the queue.
@@ -395,7 +399,7 @@ async def test_retry_endpoint(
     cv_storage: LocalDiskStorage,
     job_queue: RecordingJobQueue,
 ) -> None:
-    """A failed document is reset and queued again; an extracted one cannot be retried."""
+    """A failed document is reset and queued again; a processed one cannot be retried."""
     failed = await upload(CORRUPT_PDF)
     assert await _run(cv_storage, failed) == "failed"
     job_queue.cv_extractions.clear()
@@ -427,10 +431,10 @@ async def test_retry_endpoint(
     assert committed_db.query(AuditEvent).filter(AuditEvent.action == "retry_cv").count() == 1
 
     done = await upload()
-    assert await _run(cv_storage, done) == "extracted"
+    assert await _run(cv_storage, done) == "needs_review"
     refused = await async_client.post(f"{_url(done)}/retry")
     assert refused.status_code == 409
-    assert "extracted" in refused.json()["detail"]
+    assert "needs_review" in refused.json()["detail"]
 
     missing = f"{CANDIDATES_URL}/{done['candidate_id']}/cv/{uuid.uuid4()}/retry"
     assert (await async_client.post(missing)).status_code == 404
@@ -464,6 +468,202 @@ async def test_retry_permissions(
 
     assert job_queue.cv_extractions == []
     assert _row(committed_db, document).status == "failed"
+
+
+@pytest.mark.asyncio
+async def test_parsed_output_and_original_are_saved_atomically(
+    upload: Uploader,
+    async_client: AsyncClient,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parsed = ParsedCV(
+        schema_version="1.0",
+        source="parser",
+        contact=Contact(name="Jane", email="a@b.com"),
+        skills=[Skill(raw="Docker", normalized="Docker")],
+        confidence={"/contact/name": 0.9},
+    )
+    monkeypatch.setattr(cv_extraction, "parse_cv_text", lambda text: parsed)
+    document = await upload()
+    assert await _run(cv_storage, document) == "parsed"
+    row = _row(committed_db, document)
+    candidate = committed_db.get(Candidate, row.candidate_id)
+    assert candidate is not None
+    assert candidate.parsed_data == candidate.parsed_data_original == parsed.model_dump(mode="json")
+    assert candidate.raw_text == row.extracted_text
+    # Parsing doesn't accept changes to the candidate's canonical identity (B-14).
+    assert candidate.full_name == "Test Person"
+    assert candidate.email != "a@b.com"
+    assert (
+        "parsed_data_original"
+        not in (await async_client.get(f"{CANDIDATES_URL}/{candidate.id}")).json()
+    )
+
+    original = candidate.parsed_data_original.copy()
+    candidate.parsed_data = {**candidate.parsed_data, "source": "recruiter", "summary": "Corrected"}
+    committed_db.commit()
+    assert await _run(cv_storage, document) == "skipped"
+    committed_db.refresh(candidate)
+    assert candidate.parsed_data_original == original
+    assert candidate.parsed_data["source"] == "recruiter"
+
+
+@pytest.mark.asyncio
+async def test_parsing_retry_resumes_saved_text(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = await upload()
+
+    def broken(text: str) -> ParsedCV:
+        raise RuntimeError("temporary parsing failure")
+
+    with monkeypatch.context() as patched:
+        patched.setattr(cv_extraction, "parse_cv_text", broken)
+        with pytest.raises(Retry):
+            await _run(cv_storage, document)
+    row = _row(committed_db, document)
+    assert row.status == "queued" and row.extracted_text
+    candidate = committed_db.get(Candidate, row.candidate_id)
+    assert candidate is not None
+    assert candidate.parsed_data == candidate.parsed_data_original == {}
+    cv_storage.delete(row.storage_key)  # Resuming parsing must not need the PDF again.
+    assert await _run(cv_storage, document, job_try=2) == "needs_review"
+    assert _row(committed_db, document).error_code is None
+
+
+@pytest.mark.asyncio
+async def test_invalid_output_never_commits_partial_parse(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = await upload()
+    invalid = ParsedCV.model_construct(schema_version="0.1", source="parser", skills=[])
+    monkeypatch.setattr(cv_extraction, "parse_cv_text", lambda text: invalid)
+    assert await _run(cv_storage, document, job_try=3) == "failed"
+    row = _row(committed_db, document)
+    candidate = committed_db.get(Candidate, row.candidate_id)
+    assert candidate is not None
+    assert candidate.parsed_data == candidate.parsed_data_original == {}
+    assert row.extracted_text and row.error_code == "internal_error"
+
+
+@pytest.mark.asyncio
+async def test_previously_extracted_document_resumes_parsing(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+) -> None:
+    document = await upload()
+    row = _row(committed_db, document)
+    row.extracted_text = extract_text(PDF_BYTES).text
+    row.status = "extracted"
+    committed_db.commit()
+    cv_storage.delete(row.storage_key)
+    assert await _run(cv_storage, document) == "needs_review"
+
+
+@pytest.mark.asyncio
+async def test_older_job_cannot_overwrite_newer_candidate_data(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = await upload()
+    older = _row(committed_db, original)
+    older.extracted_text = "older result"
+    older.status = "extracted"
+    newer = CvDocument(
+        id=uuid.uuid4(),
+        org_id=older.org_id,
+        candidate_id=older.candidate_id,
+        storage_key=f"{uuid.uuid4()}.pdf",
+        original_filename="new.pdf",
+        content_type=older.content_type,
+        size_bytes=older.size_bytes,
+        sha256=older.sha256,
+        status="extracted",
+        extracted_text="newer result",
+        created_at=older.created_at + timedelta(seconds=1),
+    )
+    committed_db.add(newer)
+    committed_db.commit()
+    monkeypatch.setattr(
+        cv_extraction,
+        "parse_cv_text",
+        lambda text: ParsedCV(
+            schema_version="1.0",
+            source="parser",
+            summary=text,
+            skills=[],
+        ),
+    )
+    assert await extract_cv_text({"storage": cv_storage}, str(newer.id)) == "needs_review"
+    assert await _run(cv_storage, original) == "needs_review"
+    committed_db.expire_all()
+    candidate = committed_db.get(Candidate, older.candidate_id)
+    assert candidate is not None
+    assert candidate.parsed_data["summary"] == "newer result"
+    assert candidate.parsed_data_original["summary"] == "newer result"
+    assert candidate.raw_text == "newer result"
+
+
+@pytest.mark.asyncio
+async def test_deletion_during_parse_does_not_store_output(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = await upload()
+
+    def delete_during_parse(text: str) -> ParsedCV:
+        with cv_extraction.SessionLocal() as db:
+            db.query(CvDocument).filter(CvDocument.id == uuid.UUID(document["id"])).delete()
+            db.commit()
+        return ParsedCV(schema_version="1.0", source="parser", skills=[])
+
+    monkeypatch.setattr(cv_extraction, "parse_cv_text", delete_during_parse)
+    assert await _run(cv_storage, document) == "skipped"
+    committed_db.expire_all()
+    candidate = committed_db.get(Candidate, uuid.UUID(document["candidate_id"]))
+    assert candidate is not None
+    assert candidate.parsed_data == candidate.parsed_data_original == {}
+
+
+@pytest.mark.asyncio
+async def test_parser_missing_and_timeout_have_stable_errors(
+    upload: Uploader,
+    committed_db: Session,
+    cv_storage: LocalDiskStorage,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document = await upload()
+
+    def missing(text: str) -> ParsedCV:
+        raise ParserUnavailableError("missing model")
+
+    monkeypatch.setattr(cv_extraction, "parse_cv_text", missing)
+    assert await _run(cv_storage, document) == "failed"
+    assert _row(committed_db, document).error_code == "parser_unavailable"
+
+    def slow(text: str) -> ParsedCV:
+        time.sleep(0.1)
+        return ParsedCV(schema_version="1.0", source="parser", skills=[])
+
+    document = await upload()
+    monkeypatch.setattr(cv_extraction, "parse_cv_text", slow)
+    monkeypatch.setattr(settings, "CV_PARSING_TIMEOUT_SECONDS", 0.01)
+    with pytest.raises(Retry):
+        await _run(cv_storage, document)
+    assert _row(committed_db, document).error_code == "parsing_timeout"
 
 
 def test_worker_settings() -> None:

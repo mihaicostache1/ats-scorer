@@ -31,7 +31,10 @@ class WorkerSettings:
             max_tries=settings.CV_EXTRACTION_MAX_TRIES,
             # The job enforces its own limit and records the outcome; Arq's limit is
             # only a backstop, so it is set a little later.
-            timeout=int(settings.CV_EXTRACTION_TIMEOUT_SECONDS) + 30,
+            timeout=int(
+                settings.CV_EXTRACTION_TIMEOUT_SECONDS + settings.CV_PARSING_TIMEOUT_SECONDS
+            )
+            + 30,
             # Results live in cv_documents. Keeping none also frees the job ID, so a
             # failed document can be queued again.
             keep_result=0,

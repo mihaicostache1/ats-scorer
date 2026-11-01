@@ -39,6 +39,10 @@ class Candidate(Base):
     cv_file_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     raw_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     parsed_data: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default="{}", nullable=False)
+    # Parser snapshot for review; recruiter edits only parsed_data (B-14).
+    parsed_data_original: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, server_default="{}", nullable=False
+    )
     embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
     protected_attributes: Mapped[dict[str, Any]] = mapped_column(
         JSONB, server_default="{}", nullable=False

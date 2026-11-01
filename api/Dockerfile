@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /app/api
 
 # curl for Docker health checks, Tesseract for OCR of scanned CVs (used by the worker)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -9,16 +9,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency specifications
-COPY requirements.txt requirements-dev.txt ./
+COPY api/requirements.txt api/requirements-dev.txt ./
+COPY ml /app/ml
 
 # Install Python dependencies including dev requirements for CI/testing
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
 # Copy application source code and migrations
-COPY app ./app
-COPY alembic ./alembic
-COPY tests ./tests
-COPY alembic.ini pyproject.toml start-staging.sh ./
+COPY api/app ./app
+COPY api/alembic ./alembic
+COPY api/tests ./tests
+COPY api/scripts ./scripts
+COPY api/alembic.ini api/pyproject.toml api/start-staging.sh ./
 
 EXPOSE 8000
 

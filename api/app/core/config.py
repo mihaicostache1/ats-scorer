@@ -59,6 +59,8 @@ class Settings(BaseSettings):
     CV_EXTRACTION_MAX_TRIES: int = 3
     CV_EXTRACTION_TIMEOUT_SECONDS: float = 120
     CV_EXTRACTION_RETRY_DELAY_SECONDS: int = 10
+    CV_PARSING_TIMEOUT_SECONDS: float = 60
+    CV_REVIEW_CONFIDENCE_THRESHOLD: float = Field(default=0.75, ge=0, le=1)
     # Full path to the tesseract binary; empty = find it on PATH.
     TESSERACT_CMD: str = Field(default="", alias="TESSERACT_CMD")
     OCR_LANGUAGE: str = "eng"

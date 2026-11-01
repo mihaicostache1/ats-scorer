@@ -300,7 +300,19 @@ The file is checked by its content, not its extension or declared type, and may 
 
 `status` is one of `queued`, `extracting`, `extracted`, `parsed`, `needs_review`, `failed`. Where the file is stored is never returned, and neither is the extracted text.
 
-**Processing.** A background worker extracts the text: `queued` → `extracting` → `extracted`, or `failed`. Scanned pages go through OCR (`ocr_used` is then `true`). A failure that may pass (a timeout, an unexpected error) is retried up to 3 times; between attempts the document is `queued` again, with `attempts` counting up and `error_code` showing why the last attempt failed. `parsed` and `needs_review` are set by the later parsing step.
+**Processing.** A background worker extracts the text: `queued` → `extracting` →
+`extracted`, then validates structured data against the L-10 schema and finishes as
+`parsed` or `needs_review`. Scanned pages go through OCR (`ocr_used` is then `true`).
+A timeout or unexpected error is retried up to 3 times; between attempts the document
+is `queued` again, with `attempts` counting up and `error_code` showing the reason.
+Parsing retries reuse saved text. Missing `en_core_web_sm` ends as `failed` with
+`parser_unavailable`; a parsing timeout uses `parsing_timeout`.
+
+Both `candidates.parsed_data` and the internal `parsed_data_original` snapshot receive
+the validated parser output in the same transaction as the final status. The newest
+uploaded document supplies candidate data; delayed older jobs cannot overwrite it.
+Canonical candidate contact columns are accepted separately by the review step (B-14).
+See [extraction and review rules](ml/cv-structured-extraction.md).
 
 When `status` is `failed`, `error_code` and `error_message` say why:
 
