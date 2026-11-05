@@ -1,0 +1,26 @@
+{
+  "job_id": "J08",
+  "synthetic": true,
+  "title": "Senior Product Manager",
+  "department": "Product",
+  "location": "Remote (EU)",
+  "employment_type": "full_time",
+  "description": "Senior Product Manager - Remote (EU)\nMust have: Agile, A/B Testing, User Stories, Roadmapping, User Research, KPI Definition\nExperience: At least 5 years of relevant experience\nGood to have: Scrum, Product Analytics, Product Strategy, Market Research\nTasks: Work daily with engineering, design and stakeholders; Define success metrics and track outcomes; Own the roadmap and backlog for a product area",
+  "required_skills": [
+    "Agile",
+    "A/B Testing",
+    "User Stories",
+    "Roadmapping",
+    "User Research",
+    "KPI Definition"
+  ],
+  "preferred_skills": [
+    "Scrum",
+    "Product Analytics",
+    "Product Strategy",
+    "Market Research"
+  ],
+  "min_experience_years": 5,
+  "role_family": "product",
+  "seniority": "senior"
+}

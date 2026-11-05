@@ -1,0 +1,23 @@
+{
+  "job_id": "J17",
+  "synthetic": true,
+  "title": "Junior Data Analyst",
+  "department": "Data",
+  "location": "Madrid, Spain (hybrid)",
+  "employment_type": "full_time",
+  "description": "Junior Data Analyst - Madrid, Spain (hybrid)\nMust have: Reporting, Dashboards, Data Cleaning, Power BI\nExperience: No professional experience needed; internships and personal projects count\nGood to have: Excel, Snowflake, Statistics\nTasks: Automate recurring reporting; Build dashboards and reports for business teams; Clean, combine and validate data from several sources; Answer business questions with clear analysis",
+  "required_skills": [
+    "Reporting",
+    "Dashboards",
+    "Data Cleaning",
+    "Power BI"
+  ],
+  "preferred_skills": [
+    "Excel",
+    "Snowflake",
+    "Statistics"
+  ],
+  "min_experience_years": 0,
+  "role_family": "data_analyst",
+  "seniority": "junior"
+}

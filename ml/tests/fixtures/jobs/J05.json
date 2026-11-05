@@ -1,0 +1,24 @@
+{
+  "job_id": "J05",
+  "synthetic": true,
+  "title": "Junior QA Tester",
+  "department": "Quality Assurance",
+  "location": "Remote (EU)",
+  "employment_type": "full_time",
+  "description": "About the role\nWe are hiring a Junior QA Tester for our Quality Assurance team (Remote (EU)).\n\nWhat you will do\n- Plan and run tests for new features\n- Report and track defects with developers\n- Build and maintain automated test suites\n\nWhat you bring\n- No professional experience needed; internships and personal projects count\n- Solid working knowledge of Regression Testing, API Testing, Selenium, Java, Playwright and Test Planning\n\nNice to have\n- Performance Testing and SQL",
+  "required_skills": [
+    "Regression Testing",
+    "API Testing",
+    "Selenium",
+    "Java",
+    "Playwright",
+    "Test Planning"
+  ],
+  "preferred_skills": [
+    "Performance Testing",
+    "SQL"
+  ],
+  "min_experience_years": 0,
+  "role_family": "qa",
+  "seniority": "junior"
+}

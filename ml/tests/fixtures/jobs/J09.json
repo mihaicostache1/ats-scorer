@@ -1,0 +1,22 @@
+{
+  "job_id": "J09",
+  "synthetic": true,
+  "title": "UX Designer",
+  "department": "Design",
+  "location": "Berlin, Germany (hybrid)",
+  "employment_type": "full_time",
+  "description": "UX Designer - Berlin, Germany (hybrid)\nMust have: Interaction Design, Prototyping, User Flows, Accessibility\nExperience: At least 3 years of relevant experience\nGood to have: Motion Design, Illustration\nTasks: Work with developers to ship accessible interfaces; Design user flows, wireframes and prototypes; Plan and run user research and usability tests; Maintain and extend the design system",
+  "required_skills": [
+    "Interaction Design",
+    "Prototyping",
+    "User Flows",
+    "Accessibility"
+  ],
+  "preferred_skills": [
+    "Motion Design",
+    "Illustration"
+  ],
+  "min_experience_years": 3,
+  "role_family": "ux_design",
+  "seniority": "mid"
+}
