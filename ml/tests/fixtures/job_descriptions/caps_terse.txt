@@ -1,0 +1,16 @@
+Sr. Data Engineer
+Remote (EU timezones) | Full-time
+
+WHO WE ARE LOOKING FOR
+- min. 4 years building data pipelines
+- Spark, Airflow, dbt
+- SQL & Python
+- Snowflake or BigQuery
+
+NICE TO HAVE
+- kafka / streaming experience
+- dbt certification
+- Experience with Terraform is an advantage
+
+WHAT WE OFFER
+Competitive salary, stock options, learning budget.
