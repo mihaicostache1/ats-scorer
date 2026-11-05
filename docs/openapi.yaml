@@ -533,6 +533,60 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
 
+  /candidates/{id}/parsed-profile:
+    patch:
+      summary: Correct Parsed Candidate Profile
+      description: |
+        Apply partial corrections to an existing L-10 profile. Nested contact fields
+        merge; arrays replace their lists. The complete result must validate against
+        schema 1.0. Requires the admin or recruiter role.
+        The server sets source to recruiter, records reviewer and timestamp, and sets
+        corrected fields' confidence to 1. Client source/confidence values are validated
+        but cannot override server provenance. Preserves parsed_data_original.
+        Explicit contact corrections also update canonical candidate fields.
+      operationId: updateCandidateParsedProfile
+      security:
+        - CookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UUIDPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParsedProfilePatch'
+            example:
+              contact:
+                name: Jane Smith
+              skills:
+                - raw: Docker
+                  normalized: Docker
+      responses:
+        '200':
+          description: Validated recruiter version and server review metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParsedProfileResponse'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          description: Profile not ready for correction, or duplicate canonical email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '422':
+          description: Field errors with nested paths in detail[].loc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+
   /candidates/{id}/cv:
     get:
       summary: List Candidate CV Documents
@@ -1336,6 +1390,315 @@ components:
           format: date-time
           example: '2026-10-01T09:15:00Z'
 
+    ParsedCvYearMonth:
+      type: string
+      pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+    ParsedCvContact:
+      description: Who the CV belongs to, as read from the CV. Never read by the scorer.
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+        email:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+        location:
+          type:
+          - string
+          - 'null'
+        links:
+          description: Profile and portfolio URLs.
+          type: array
+          items:
+            type: string
+            minLength: 1
+    ParsedCvSkill:
+      type: object
+      required:
+      - raw
+      - normalized
+      additionalProperties: false
+      properties:
+        raw:
+          description: The skill as written in the CV.
+          type: string
+          minLength: 1
+        normalized:
+          description: Canonical name of the skill, or null when it is not recognized.
+          type:
+          - string
+          - 'null'
+          minLength: 1
+    ParsedCvExperience:
+      type: object
+      required:
+      - title
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          minLength: 1
+        company:
+          type:
+          - string
+          - 'null'
+        start:
+          description: 'First month in the position, as YYYY-MM. null: unknown.'
+          anyOf:
+          - $ref: '#/components/schemas/ParsedCvYearMonth'
+          - type: 'null'
+        end:
+          description: 'Last month in the position, as YYYY-MM. null: unknown, or the
+            position is current (see is_current).'
+          anyOf:
+          - $ref: '#/components/schemas/ParsedCvYearMonth'
+          - type: 'null'
+        is_current:
+          description: True if the candidate still holds the position. Defaults to false.
+          type: boolean
+        summary:
+          description: One-sentence description of the work.
+          type:
+          - string
+          - 'null'
+        bullets:
+          description: Achievements or responsibilities, one per entry.
+          type: array
+          items:
+            type: string
+    ParsedCvEducation:
+      type: object
+      required:
+      - degree
+      additionalProperties: false
+      properties:
+        degree:
+          type: string
+          minLength: 1
+        institution:
+          type:
+          - string
+          - 'null'
+        grad_year:
+          type:
+          - integer
+          - 'null'
+          minimum: 1950
+          maximum: 2100
+    ParsedCvLanguage:
+      type: object
+      required:
+      - language
+      additionalProperties: false
+      properties:
+        language:
+          type: string
+          minLength: 1
+        level:
+          description: Level as written in the CV, e.g. B2, native, fluent.
+          type:
+          - string
+          - 'null'
+    ParsedCV:
+      title: Parsed CV
+      description: 'Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data.
+        Every object is closed: a new field needs a new schema version. Rules for changing
+        it: docs/ml/parsed-cv-schema.md.'
+      type: object
+      required:
+      - schema_version
+      - source
+      - skills
+      additionalProperties: false
+      properties:
+        schema_version:
+          description: Version of this schema the record was written with. A change that
+            keeps older records valid adds its version to this list; a breaking change
+            gets a new schema file.
+          enum:
+          - '1.0'
+        source:
+          description: 'Who wrote this version of the record: the CV parser, or a recruiter
+            who corrected it.'
+          enum:
+          - parser
+          - recruiter
+        contact:
+          $ref: '#/components/schemas/ParsedCvContact'
+        headline:
+          description: Current or most recent job title.
+          type:
+          - string
+          - 'null'
+        summary:
+          description: The candidate's own profile or summary paragraph.
+          type:
+          - string
+          - 'null'
+        skills:
+          description: Skills found in the CV. May be empty.
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvSkill'
+        experience_years:
+          description: Total years of work experience.
+          type:
+          - number
+          - 'null'
+          minimum: 0
+        experiences:
+          description: Positions held, most recent first.
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvExperience'
+        education:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvEducation'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvLanguage'
+        certifications:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        confidence:
+          description: Confidence from 0 to 1 per field, keyed by JSON Pointer into this
+            record, e.g. /contact/email or /experiences/0/title. A field with no entry
+            has no confidence value; that is not the same as low confidence.
+          type: object
+          propertyNames:
+            pattern: ^(/[A-Za-z0-9_-]+)+$
+          additionalProperties:
+            type: number
+            minimum: 0
+            maximum: 1
+    ParsedProfileContactPatch:
+      type: object
+      additionalProperties: false
+      description: Explicit contact corrections also update canonical candidate columns.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: [string, 'null']
+          maxLength: 50
+        location:
+          type: [string, 'null']
+          maxLength: 255
+        links:
+          type: array
+          items:
+            type: string
+            minLength: 1
+    ParsedProfilePatch:
+      title: Parsed profile corrections
+      description: Partial L-10 corrections. Nested objects merge; arrays replace. Source
+        and confidence are assigned by the server after schema validation. Explicit contact
+        name and email corrections must meet canonical candidate validation.
+      type: object
+      additionalProperties: false
+      properties:
+        schema_version:
+          description: Version of this schema the record was written with. A change that
+            keeps older records valid adds its version to this list; a breaking change
+            gets a new schema file.
+          enum:
+          - '1.0'
+        source:
+          description: 'Who wrote this version of the record: the CV parser, or a recruiter
+            who corrected it.'
+          enum:
+          - parser
+          - recruiter
+        contact:
+          $ref: '#/components/schemas/ParsedProfileContactPatch'
+        headline:
+          description: Current or most recent job title.
+          type:
+          - string
+          - 'null'
+        summary:
+          description: The candidate's own profile or summary paragraph.
+          type:
+          - string
+          - 'null'
+        skills:
+          description: Skills found in the CV. May be empty.
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvSkill'
+        experience_years:
+          description: Total years of work experience.
+          type:
+          - number
+          - 'null'
+          minimum: 0
+        experiences:
+          description: Positions held, most recent first.
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvExperience'
+        education:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvEducation'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedCvLanguage'
+        certifications:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        confidence:
+          description: Confidence from 0 to 1 per field, keyed by JSON Pointer into this
+            record, e.g. /contact/email or /experiences/0/title. A field with no entry
+            has no confidence value; that is not the same as low confidence.
+          type: object
+          propertyNames:
+            pattern: ^(/[A-Za-z0-9_-]+)+$
+          additionalProperties:
+            type: number
+            minimum: 0
+            maximum: 1
+    ParsedProfileResponse:
+      type: object
+      required:
+      - candidate_id
+      - parsed_data
+      - reviewed_by
+      - reviewed_at
+      properties:
+        candidate_id:
+          type: string
+          format: uuid
+        parsed_data:
+          $ref: '#/components/schemas/ParsedCV'
+        reviewed_by:
+          type: string
+          format: uuid
+        reviewed_at:
+          type: string
+          format: date-time
+
     CandidateResponse:
       type: object
       required:
@@ -1377,6 +1740,14 @@ components:
         parsed_data:
           type: object
           additionalProperties: true
+        parsed_profile_reviewed_by:
+          type: [string, 'null']
+          format: uuid
+          description: User who last saved the current recruiter version.
+        parsed_profile_reviewed_at:
+          type: [string, 'null']
+          format: date-time
+          description: When the current parsed profile was last reviewed.
         consent_given_at:
           type: [string, 'null']
           format: date-time

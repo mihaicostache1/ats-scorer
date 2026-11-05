@@ -1,0 +1,117 @@
+{
+  "parser_version": "cv-parser-0.1.0",
+  "packages": {
+    "spacy": "3.8.18",
+    "en-core-web-sm": "3.8.0",
+    "pymupdf": "1.28.2",
+    "ats-scoring": "0.1.0",
+    "Faker": "40.41.0",
+    "reportlab": "5.0.1"
+  },
+  "dataset_sha256": "25789656d83abe48cdfc48b8cd240aebae76d6dc72bc2039ed0702ecb9e3ffc3",
+  "generator": {
+    "generator_version": "1.0.0",
+    "seed": 42,
+    "reference_year": 2026,
+    "packages": {
+      "Faker": "40.41.0",
+      "reportlab": "5.0.1"
+    },
+    "counts": {
+      "cvs": 100,
+      "jobs": 20,
+      "rating_pairs": 300
+    }
+  },
+  "normalizer": "L-11 aliases only",
+  "target_status": "proposed; pending lead agreement",
+  "proposed_targets": {
+    "email_accuracy": 0.98,
+    "phone_accuracy": 0.98,
+    "skills_micro_f1": 0.9
+  },
+  "meets_proposed_targets": true,
+  "metrics": {
+    "overall": {
+      "documents": 100,
+      "email_correct": 100,
+      "email_accuracy": 1.0,
+      "phone_correct": 100,
+      "phone_accuracy": 1.0,
+      "skills": {
+        "true_positives": 1044,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "micro_f1": 1.0
+      },
+      "needs_review": 100
+    },
+    "classic": {
+      "documents": 43,
+      "email_correct": 43,
+      "email_accuracy": 1.0,
+      "phone_correct": 43,
+      "phone_accuracy": 1.0,
+      "skills": {
+        "true_positives": 458,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "micro_f1": 1.0
+      },
+      "needs_review": 43
+    },
+    "two_column": {
+      "documents": 29,
+      "email_correct": 29,
+      "email_accuracy": 1.0,
+      "phone_correct": 29,
+      "phone_accuracy": 1.0,
+      "skills": {
+        "true_positives": 298,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "micro_f1": 1.0
+      },
+      "needs_review": 29
+    },
+    "table": {
+      "documents": 14,
+      "email_correct": 14,
+      "email_accuracy": 1.0,
+      "phone_correct": 14,
+      "phone_accuracy": 1.0,
+      "skills": {
+        "true_positives": 143,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "micro_f1": 1.0
+      },
+      "needs_review": 14
+    },
+    "plain": {
+      "documents": 14,
+      "email_correct": 14,
+      "email_accuracy": 1.0,
+      "phone_correct": 14,
+      "phone_accuracy": 1.0,
+      "skills": {
+        "true_positives": 145,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "micro_f1": 1.0
+      },
+      "needs_review": 14
+    }
+  },
+  "failures": []
+}

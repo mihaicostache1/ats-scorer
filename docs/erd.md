@@ -151,6 +151,9 @@ Candidate records storing parsed CV text, structured extraction, vector embeddin
 | `cv_file_path` | TEXT | NULLABLE | Path to original PDF file on storage |
 | `raw_text` | TEXT | NULLABLE | Parsed resume text (via PyMuPDF / Tesseract) |
 | `parsed_data` | JSONB | NOT NULL, DEFAULT `'{}'` | Extracted skills, work history, education, OCR flags |
+| `parsed_data_original` | JSONB | NOT NULL, DEFAULT `'{}'` | Original parser output, kept separately from recruiter corrections |
+| `parsed_profile_reviewed_by` | UUID | FK → users.id, NULLABLE, ON DELETE SET NULL | User who last saved the recruiter version |
+| `parsed_profile_reviewed_at` | TIMESTAMPTZ | NULLABLE | Timestamp of the latest saved review; reset when a newer CV is parsed |
 | `embedding` | `vector(384)` | NULLABLE | Resume semantic embedding vector |
 | `protected_attributes` | JSONB | NOT NULL, DEFAULT `'{}'` | Redacted demographic attributes for fairness audit |
 | `is_anonymized` | BOOLEAN | NOT NULL, DEFAULT `FALSE` | Flag indicating if PII has been redacted |

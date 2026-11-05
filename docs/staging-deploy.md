@@ -4,7 +4,7 @@ Staging runs the API on Render and the database on Supabase. Every push to `main
 
 | Part | Where | Notes |
 |---|---|---|
-| API | Render web service `ats-api` (Docker, free plan) | Built from `api/Dockerfile`. Runs `alembic upgrade head`, then uvicorn |
+| API | Render web service `ats-api` (Docker, free plan) | Built from `api/Dockerfile` with the repository root as context, including `ml/`. Runs `alembic upgrade head`, then uvicorn |
 | Redis | Render Key Value `ats-redis` (free plan) | Internal connections only |
 | Postgres + pgvector | Supabase (free plan) | Migration 001 runs `CREATE EXTENSION IF NOT EXISTS vector` |
 
@@ -26,7 +26,7 @@ Taken from third-party summaries, not the vendors' pricing pages. Check the curr
 - **Supabase** pauses a free project after about a week without activity. A paused database makes the API fail at start-up (the migration cannot connect) until someone restores it in the dashboard. Free storage is about 500 MB.
 - **Render** free web services sleep after a period without traffic, so the first request after a pause is slow.
 - **Uploaded CVs are lost on every deploy.** The API stores files on the instance's local disk (`STORAGE_LOCAL_DIR`), and a free Render instance has no persistent disk. Fine for a smoke test, not for real data.
-- The CV extraction worker (Arq) is not deployed, and the image has no Tesseract, so uploads are not processed on staging yet.
+- The CV extraction worker (Arq) is not deployed, so uploads are not processed on staging yet. The image includes Tesseract and the spaCy model for a future worker deployment.
 
 ## Checking that no secrets are committed
 

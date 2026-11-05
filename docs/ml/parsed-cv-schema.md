@@ -136,5 +136,7 @@ Details of the scoring are in [ml/README.md](../../ml/README.md).
 
 - **Review by the backend and frontend developers** is required before this is final. Record the approvals on the PR.
 - **Where the "needs manual review" state for scoring lives.** `cv_documents.status = needs_review` is about parsing (backend).
-- **The API image builds from `./api` and cannot see `ml/` yet** (backend, separate PR). Until then the backend can validate with the JSON Schema file, or copy `parsed_cv.py`.
+- **B-13 integration:** the API image now builds from the repository root and installs
+  `ml/` directly. The parser validates with `ParsedCV`; tests also validate its output
+  against the JSON Schema. See [CV extraction](cv-structured-extraction.md).
 - **TypeScript types for F-11.** The web app generates its types from `docs/openapi.yaml`, where `parsed_data` is still an open object. Either describe the schema there, or generate types from the JSON Schema. The frontend developer decides.

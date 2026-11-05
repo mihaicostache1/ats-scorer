@@ -300,7 +300,19 @@ The file is checked by its content, not its extension or declared type, and may 
 
 `status` is one of `queued`, `extracting`, `extracted`, `parsed`, `needs_review`, `failed`. Where the file is stored is never returned, and neither is the extracted text.
 
-**Processing.** A background worker extracts the text: `queued` → `extracting` → `extracted`, or `failed`. Scanned pages go through OCR (`ocr_used` is then `true`). A failure that may pass (a timeout, an unexpected error) is retried up to 3 times; between attempts the document is `queued` again, with `attempts` counting up and `error_code` showing why the last attempt failed. `parsed` and `needs_review` are set by the later parsing step.
+**Processing.** A background worker extracts the text: `queued` → `extracting` →
+`extracted`, then validates structured data against the L-10 schema and finishes as
+`parsed` or `needs_review`. Scanned pages go through OCR (`ocr_used` is then `true`).
+A timeout or unexpected error is retried up to 3 times; between attempts the document
+is `queued` again, with `attempts` counting up and `error_code` showing the reason.
+Parsing retries reuse saved text. Missing `en_core_web_sm` ends as `failed` with
+`parser_unavailable`; a parsing timeout uses `parsing_timeout`.
+
+Both `candidates.parsed_data` and the internal `parsed_data_original` snapshot receive
+the validated parser output in the same transaction as the final status. The newest
+uploaded document supplies candidate data; delayed older jobs cannot overwrite it.
+Canonical candidate contact columns are accepted separately by the review step (B-14).
+See [extraction and review rules](ml/cv-structured-extraction.md).
 
 When `status` is `failed`, `error_code` and `error_message` say why:
 
@@ -338,6 +350,70 @@ Partially updates a candidate's `full_name`, `email`, `phone`, `location` or `co
   "consent_given_at": "2026-10-02T10:00:00Z"
 }
 ```
+
+#### `PATCH /api/v1/candidates/{id}/parsed-profile`
+
+Requires an authenticated **admin or recruiter** from the candidate's organization.
+Viewers receive 403; other organizations and unknown candidate IDs receive 404.
+
+The body contains partial L-10 fields directly, rather than a `parsed_data` wrapper:
+
+```json
+{
+  "contact": { "name": "Jane Smith", "email": "jane@example.org" },
+  "skills": [{ "raw": "Docker", "normalized": "Docker" }]
+}
+```
+
+Nested objects merge with the saved profile; arrays replace the entire list. Omitted
+fields remain unchanged. Explicit nulls are allowed only where the schema permits
+them. The merged profile is validated against L-10 schema 1.0. A missing or invalid
+saved profile, or a latest CV that has not completed parsing successfully, returns
+409. A valid saved profile without a document can also be corrected.
+
+The server sets `source` to `recruiter`, records the authenticated user's ID and a
+timezone-aware timestamp, and sets changed fields' confidence to 1. Replaced lists
+have confidence rebuilt for their new indexes; cleared lists have no old index
+pointers. Other confidence values remain unchanged. Supplied `source`/`confidence`
+fields are schema-validated but cannot override server provenance or confidence.
+An empty object records a review without claiming that low-confidence fields were
+corrected. Every successful save writes a `correct_parsed_profile` audit event with
+changed JSON pointers and the schema version; profile values stay out of the audit log.
+
+Explicitly supplied contact name/email/phone/location fields also update canonical
+candidate columns using their existing validation and limits. Name and email cannot
+be cleared; phone and location can be null. Duplicate email returns 409 with a field
+error for `contact.email`. The original parser snapshot and extracted text remain intact.
+The latest document is `parsed` only when the B-13 review policy passes; otherwise
+it stays `needs_review`.
+
+The profile, metadata, contact columns, document status and audit event commit in
+one transaction. New parser output resets review metadata. The metadata is also
+available on candidate GET responses as `parsed_profile_reviewed_by` and
+`parsed_profile_reviewed_at`.
+
+Success returns 200:
+
+```json
+{
+  "candidate_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "parsed_data": { "schema_version": "1.0", "source": "recruiter", "skills": [] },
+  "reviewed_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+  "reviewed_at": "2026-11-01T18:00:00Z"
+}
+```
+
+Invalid fields return 422 in FastAPI's field-error shape, for example:
+
+```json
+{
+  "detail": [
+    { "loc": ["body", "skills", 0, "normalized"], "msg": "Field required", "type": "missing" }
+  ]
+}
+```
+
+Run migration `007_parsed_profile_review` before using this endpoint.
 
 #### `DELETE /api/v1/candidates/{id}`
 Permanently deletes the candidate together with their applications, stage history, scores and stored CV files. Requires the `admin` role.

@@ -16,6 +16,10 @@ python-jose[cryptography]>=3.3.0
 slowapi>=0.1.9
 email-validator>=2.1.0
 arq>=0.26.0
-pymupdf>=1.24.0
+pymupdf>=1.24.0,<2
 pytesseract>=0.3.10
 pillow>=10.0.0
+# Shared L-10 schema and L-11 normalizer (run pip from api/).
+-e ../ml
+spacy>=3.8,<3.9
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85

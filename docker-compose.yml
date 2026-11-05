@@ -33,8 +33,8 @@ services:
 
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api/Dockerfile
     container_name: ats-api
     restart: unless-stopped
     ports:
@@ -58,11 +58,11 @@ services:
       timeout: 5s
       retries: 10
 
-  # Background jobs (CV text extraction). Same image as the api, different command.
+  # Background jobs (CV text and structured extraction). Same image as the api.
   worker:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api/Dockerfile
     container_name: ats-worker
     restart: unless-stopped
     command: ["arq", "app.worker.WorkerSettings"]
