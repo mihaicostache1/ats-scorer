@@ -11,15 +11,16 @@
 
 ## ats_scoring
 
-Scores how well a parsed CV fits a job. The first version is a baseline: skill-keyword overlap plus TF-IDF text similarity.
+Scores how well a parsed CV fits a job. Version 1 (`hybrid-1.0.0`, L-13) mixes skill overlap, embedding similarity, experience fit, title similarity and TF-IDF text similarity. Design, evaluation and timing: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md).
 
 ### Install
 
 From the repository root:
 
 ```bash
-pip install -e ml/            # the package
-pip install -e "ml/[dev]"     # plus pytest, ruff and jsonschema
+pip install -e ml/                  # the package (scoring needs nothing more)
+pip install -e "ml/[dev]"           # plus pytest, ruff and jsonschema
+pip install -e "ml/[embeddings]"    # to compute embeddings: sentence-transformers and PyTorch, about 2 GB
 ```
 
 ### Use
@@ -31,54 +32,79 @@ candidate = {
     "headline": "Backend Developer",
     "summary": "Builds REST services in Python.",
     "skills": ["python", "Postgres", "Git"],
+    "experience_years": 1.5,
 }
 job = {
-    "title": "Backend Developer",
+    "title": "Senior Backend Engineer",
     "description": "Build and maintain REST services in Python with PostgreSQL.",
     "required_skills": ["Python", "PostgreSQL", "Docker", "REST APIs"],
     "preferred_skills": ["Redis", "Kafka"],
+    "min_experience_years": 3,
 }
 
-score(candidate, job)
+score(candidate, job, candidate_embedding=cv_vector, job_embedding=job_vector)
 # {
-#     "total": ...,                      # 0-100
-#     "components": {"skill_overlap": 40.0, "text_similarity": ...},
-#     "weights": {"skill_overlap": 0.6, "text_similarity": 0.4},
+#     "total": ...,                                   # 0-100
+#     "components": {
+#         "skill_overlap": 40.0,
+#         "embedding_similarity": ...,                # None without both embeddings
+#         "experience_fit": 50.0,                     # 1.5 of 3 years
+#         "title_similarity": 100.0,                  # seniority words are ignored
+#         "text_similarity": ...,
+#     },
+#     "weights": {"skill_overlap": 0.3, "embedding_similarity": 0.35, ...},
 #     "matched_skills": ["Python", "PostgreSQL"],
 #     "missing_skills": ["Docker", "REST APIs"],
-#     "score_explanations": [
-#         "Has 2 of 4 required skills.",
-#         "Has 0 of 2 preferred skills.",
-#         "Text similarity with the job: .../100. It counts shared words, not meaning.",
-#     ],
-#     "model_version": "tfidf-skills-0.1.0",
+#     "score_explanations": ["Has 2 of 4 required skills.", ...],
+#     "model_version": "hybrid-1.0.0",
 # }
 ```
 
 `candidate` follows the parsed-CV schema (version 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
 
+The embeddings come from `ats_scoring.embeddings.Embedder`, computed once per CV and per job and stored. `score()` never loads a model and makes no network call. Without embeddings it still works, and the embedding weight is shared among the other components.
+
+```bash
+python -m ats_scoring.embeddings download --to models/multilingual-e5-small   # once; the only network step
+export ATS_EMBEDDING_MODEL_DIR=$PWD/models/multilingual-e5-small
+```
+
+```python
+from ats_scoring.embeddings import Embedder
+
+embedder = Embedder()  # loads from ATS_EMBEDDING_MODEL_DIR, offline
+cv_vector = embedder.embed_candidate(candidate)
+job_vector = embedder.embed_job(job)
+```
+
 ### How the score is built
+
+The weights, the model version and the embedding model live in [`ats_scoring/weights.yaml`](ats_scoring/weights.yaml).
 
 | Component | Weight | How it is computed |
 |---|---|---|
-| `skill_overlap` | 0.6 | Share of the job's skills found in the candidate's skill list. A preferred skill counts half as much as a required one |
-| `text_similarity` | 0.4 | TF-IDF cosine similarity between the CV text and the job text, on single words and word pairs |
+| `skill_overlap` | 0.30 | Share of the job's skills found in the CV's skill list. A required skill weighs 1.0, a nice-to-have one 0.5 |
+| `embedding_similarity` | 0.35 | Cosine of the e5-small embeddings of the CV and the job, mapped from [0.80, 0.95] to 0-100 |
+| `experience_fit` | 0.10 | 100 when `experience_years` meets `min_experience_years`, falling linearly to 0. More years are not penalized |
+| `title_similarity` | 0.15 | Word overlap of the job title with the CV's headline and position titles, without seniority words |
+| `text_similarity` | 0.10 | TF-IDF cosine similarity between the CV text and the job text, on single words and word pairs |
 
+- **A component that cannot be computed is `None`,** and its weight is shared among the others. `weights` in the result shows the weights actually used. Examples: no embeddings, no skills on the job, no minimum experience (or a minimum of 0), no years on the CV.
 - **Skills are compared after normalization:** case, spacing and list bullets are ignored, and a small alias table resolves abbreviations such as `JS`, `Postgres` and `k8s`.
 - **`matched_skills`** lists the job's skills the candidate has, required ones first, in the job's spelling. **`missing_skills`** lists the required skills the candidate lacks.
-- **Only qualifications are read:** headline, summary, skills, job titles and descriptions, degrees and certifications. Names, contact details, employers, schools and dates never reach the score.
-- **`weights`** are the weights actually applied, and **`score_explanations`** are short sentences for the recruiter-facing breakdown.
-- **A job with no skills** is scored on text alone: `skill_overlap` is `None` and the weights become 0 and 1.
+- **Only qualifications are read:** headline, summary, skills, job titles and descriptions, total years of experience, degrees and certifications. Names, contact details, employers, schools and dates never reach the score or the embedding.
+- **`score_explanations`** are short sentences for the recruiter-facing breakdown, one per component.
 - **Nothing to score is an error:** `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has no skills and no text. A CV that failed to parse must not look like a poor candidate.
+- **Deterministic:** the same inputs give the same result. The embedding model is pinned to one revision.
 
-### Limits of the baseline
+Change `model_version` in `weights.yaml` whenever the same input could get a different score, for example when the weights, the embedding model or the alias table change.
 
-- A skill counts only if it is in the candidate's skill list. A skill mentioned only in the CV's free text is not matched.
-- Skills are compared as text, so synonyms outside the alias table do not match ("Kubernetes" and "container orchestration").
-- The TF-IDF weights come from the two texts being compared, not from a larger collection, and the stop-word list is English.
-- Experience and job-title fit are not scored yet.
+### Limits
 
-Change `MODEL_VERSION` in `ats_scoring/scoring.py` whenever the same input could get a different score, for example when the weights or the alias table change.
+- Skills count only from the CV's skill list, matched as text after the alias table. Synonyms outside it do not match ("Tableau" and "Power BI").
+- The cosine range was measured on synthetic CVs. Check it on real CVs before reading the embedding score as an absolute number.
+- The title synonym table is small and English only, and the TF-IDF stop-word list is English.
+- More in [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#limits).
 
 ### Skill normalization
 
@@ -94,16 +120,19 @@ normalizer.normalize_skills(["JS", "k8s"])  # JavaScript (ESCO), Kubernetes (not
 
 ### Evaluate
 
-`python -m ats_scoring.evaluate` compares a scorer's results with human ratings of 30 candidate/job pairs, and reports Spearman correlation and NDCG@10. See [docs/ml/evaluation.md](../docs/ml/evaluation.md).
+`python -m ats_scoring.evaluate` compares a scorer's results with human ratings of 30 candidate/job pairs, and reports Spearman correlation and NDCG@10. It reads precomputed embeddings from `evaluation/data/embeddings.json`, so it needs no PyTorch. `python evaluation/ablation.py` scores each component alone and the scorer without each one. See [docs/ml/evaluation.md](../docs/ml/evaluation.md).
 
 ### Speed
 
-`benchmarks/time_scoring.py` scores synthetic CVs against one job, as the backend worker will. It needs the synthetic dataset (see [synthetic/README.md](synthetic/README.md)):
+`benchmarks/time_scoring.py` ranks synthetic CVs against one job, as the backend worker will, with network access blocked. It needs the synthetic dataset (see [synthetic/README.md](synthetic/README.md)):
 
 ```bash
 cd ml
-python benchmarks/time_scoring.py --candidates 1000
+python synthetic/generate.py --cvs 1000 --out /tmp/synth1000
+python benchmarks/time_scoring.py --data /tmp/synth1000 --model-dir models/multilingual-e5-small
 ```
+
+On an Apple M5: ranking 1,000 candidates takes about 0.5 s, and embedding 1,000 CVs takes about 16 s (once per CV). Full results: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#speed).
 
 ### Test
 
@@ -112,4 +141,7 @@ cd ml
 ruff check .
 ruff format --check .
 pytest
+ATS_EMBEDDING_MODEL_DIR=$PWD/models/multilingual-e5-small pytest tests/test_embeddings.py   # also the real-model tests
 ```
+
+CI runs without PyTorch: the embedder tests use a stand-in for the model, and the real-model tests are skipped.

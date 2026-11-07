@@ -61,14 +61,26 @@ Rules:
 From `ml/`, with the package installed:
 
 ```bash
-python -m ats_scoring.evaluate                                    # the L-7 baseline
+python -m ats_scoring.evaluate                                    # the current scorer (hybrid, L-13)
+python -m ats_scoring.evaluate --no-embeddings                    # the same without embeddings
 python -m ats_scoring.evaluate --scorer my_package.my_module:my_score
 python -m ats_scoring.evaluate --no-save                          # print only
 ```
 
 Any function that takes `(candidate, job)` can be evaluated. It must return either the result dict of `ats_scoring.score` or a plain number, and raise `NothingToScoreError` for a pair it cannot score.
 
-Each run prints the metrics and saves them to `results/<date>_<model version>.json`, together with every pair's rating and score. A second run on the same day with the same model version replaces the file.
+**Embeddings.** The embeddings of the 22 CVs and 3 jobs are precomputed in `data/embeddings.json`, so evaluating needs neither the model nor PyTorch. When that file exists, the scorer also gets the keyword arguments `candidate_embedding` and `job_embedding`. A scorer that does not take them must be run with `--no-embeddings`. Rebuild the file with `python evaluation/embed_eval_set.py --model-dir <model folder>` whenever `data/` or the embedding model in `weights.yaml` changes. The harness refuses a file made with another model or revision.
+
+Each run prints the metrics and saves them to `results/<date>_<model version>.json` (`..._no-embeddings.json` with `--no-embeddings`), together with every pair's rating and score. A second run on the same day with the same model version replaces the file.
+
+## Results so far
+
+| Model | Spearman, all pairs | Spearman, mean per job | NDCG@10 | Write-up |
+|---|---|---|---|---|
+| `tfidf-skills-0.1.0` (L-7 baseline) | 0.701 | 0.740 | 0.982 | [ml/README.md](../../ml/README.md) |
+| `hybrid-1.0.0` (L-13) | 0.739 | 0.809 | 0.985 | [hybrid-scorer.md](hybrid-scorer.md) |
+
+A random order gets an NDCG@10 of 0.784.
 
 ## Reading the numbers
 

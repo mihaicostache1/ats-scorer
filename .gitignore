@@ -5,3 +5,5 @@ __pycache__/
 node_modules/
 # Uploaded CV files (local-disk storage in development)
 api/storage/
+# Downloaded embedding model (python -m ats_scoring.embeddings download)
+ml/models/
