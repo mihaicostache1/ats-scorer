@@ -56,6 +56,18 @@ Rules:
 - **Judge qualifications only.** Ignore the name, location, date of birth, nationality and how nice the layout looks.
 - **A second rater helps.** The person who built the scorer may lean, without meaning to, towards what the scorer rewards. A colleague rating the same file independently reduces that, and the evaluation then reports how much the two of you agree.
 
+### Rating with the labeling tool (optional)
+
+Instead of editing the CSV by hand you can use the web app's labeling tool (F-13). Start the web app in
+development mode (`npm run dev` in `web/`) and open <http://localhost:3000/dev/labeling>. It exists only in the
+dev server: a production build does not contain it.
+
+It follows the rules above. The CV is the PDF, next to the job description, and no score is ever shown. Type your
+name (it becomes the file name), rate each pair with the keys `0` to `3`, skip with `S`, undo with `U`. Progress is
+kept in the browser, so you can close the tab and carry on. **Export CSV** downloads `<your-name>.csv`: a filled-in
+copy of `pairs.csv` with the same 30 rows in the same order and empty ratings where you skipped. Save it as
+`ratings/<your-name>.csv`, unedited, and run the evaluation. Key list and details: [web/README.md](../../web/README.md#dev-only-routes-and-the-labeling-tool).
+
 ## How to run it
 
 From `ml/`, with the package installed:

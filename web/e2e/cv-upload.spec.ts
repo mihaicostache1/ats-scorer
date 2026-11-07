@@ -42,7 +42,7 @@ test("an uploaded CV goes from queued to parsed, with a link to review it", asyn
 
   await row.getByRole("link", { name: "Review priya-new.pdf" }).click();
   await expect(page).toHaveURL(/\/candidates\/[0-9a-f-]+\/cvs\/[0-9a-f-]+\/review$/);
-  await expect(page.getByText("CV review is coming soon")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Review parsed CV", level: 1 })).toBeVisible();
 });
 
 test("a CV that needs a human check says so", async ({ page }) => {

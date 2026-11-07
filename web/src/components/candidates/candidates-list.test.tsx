@@ -102,6 +102,39 @@ describe("CandidatesList", () => {
     expect(screen.queryByRole("button", { name: "Clear search" })).not.toBeInTheDocument();
   });
 
+  describe("when the real API reports zero pages for an empty list", () => {
+    // The real API answers `total_pages: 0` when nothing matches; the mock always says 1. Zero pages
+    // used to read as "past the last page", so the page redirected forever and sat on skeleton rows.
+    const empty = (over: Record<string, unknown> = {}) =>
+      page([], { total_items: 0, total_pages: 0, has_next: false, ...over });
+
+    it("shows the empty state instead of loading forever", async () => {
+      listCandidates.mockResolvedValue(empty());
+      const { container } = render(<CandidatesList />);
+
+      expect(await screen.findByText("No candidates yet")).toBeInTheDocument();
+      expect(container.querySelector('[aria-busy="true"]')).not.toBeInTheDocument();
+      expect(replace).not.toHaveBeenCalled();
+    });
+
+    it("shows 'no matches' for a search", async () => {
+      url.search = "?q=zzz";
+      listCandidates.mockResolvedValue(empty());
+      render(<CandidatesList />);
+      expect(await screen.findByText("No candidates match your search")).toBeInTheDocument();
+      expect(replace).not.toHaveBeenCalled();
+    });
+
+    it("still moves a stale page back to page 1, never to page 0", async () => {
+      url.search = "?page=5";
+      listCandidates.mockResolvedValue(empty({ page: 5 }));
+      render(<CandidatesList />);
+
+      await waitFor(() => expect(replace).toHaveBeenCalled());
+      for (const [target] of replace.mock.calls) expect(target).not.toContain("page=0");
+    });
+  });
+
   it("shows a different empty state for a search with no matches, and can clear it", async () => {
     url.search = "?q=zzz";
     listCandidates.mockResolvedValue(page([], { total_items: 0, total_pages: 1, has_next: false }));
