@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Self
 
+from ats_scoring.parsed_cv import ParsedCV
 from pydantic import (
     AwareDatetime,
     BaseModel,
@@ -78,11 +79,22 @@ class CandidateResponse(BaseModel):
     location: str | None
     cv_file_path: str | None
     parsed_data: dict[str, Any]
+    parsed_profile_reviewed_by: uuid.UUID | None = None
+    parsed_profile_reviewed_at: datetime | None = None
     consent_given_at: datetime | None
     created_at: datetime
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ParsedProfileResponse(BaseModel):
+    """The validated recruiter version and server-assigned review metadata."""
+
+    candidate_id: uuid.UUID
+    parsed_data: ParsedCV
+    reviewed_by: uuid.UUID
+    reviewed_at: datetime
 
 
 class PaginatedCandidatesResponse(BaseModel):

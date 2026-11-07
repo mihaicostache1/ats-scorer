@@ -56,6 +56,8 @@ Extracted skills are mapped to ESCO in this order. The first step that succeeds 
 
 Each skill keeps its original string, the ESCO URI if there is one, the method and the score. Version 1 can ship with steps 1-3 and 6. Steps 4 and 5 need confirmed matches to tune on first.
 
+**Implemented** in `ats_scoring.skill_normalizer`: [skill-normalization.md](skill-normalization.md).
+
 **ESCO covers our skills poorly.** Of the 174 skills in the synthetic dataset, 55 (32%) match an ESCO label exactly, and about 45% have no acceptable match by any method. Docker, Kubernetes, Django, Redis, pandas and FastAPI are not in ESCO (13,960 skills, 101,782 labels).
 
 **Failures seen in the prototype:**

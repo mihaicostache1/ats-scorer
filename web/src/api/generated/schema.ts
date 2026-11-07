@@ -297,6 +297,32 @@ export interface paths {
     patch: operations["updateCandidate"];
     trace?: never;
   };
+  "/candidates/{id}/parsed-profile": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Correct Parsed Candidate Profile
+     * @description Apply partial corrections to an existing L-10 profile. Nested contact fields
+     *     merge; arrays replace their lists. The complete result must validate against
+     *     schema 1.0. Requires the admin or recruiter role.
+     *     The server sets source to recruiter, records reviewer and timestamp, and sets
+     *     corrected fields' confidence to 1. Client source/confidence values are validated
+     *     but cannot override server provenance. Preserves parsed_data_original.
+     *     Explicit contact corrections also update canonical candidate fields.
+     */
+    patch: operations["updateCandidateParsedProfile"];
+    trace?: never;
+  };
   "/candidates/{id}/cv": {
     parameters: {
       query?: never;
@@ -798,6 +824,132 @@ export interface components {
        */
       updated_at: string;
     };
+    ParsedCvYearMonth: string;
+    /** @description Who the CV belongs to, as read from the CV. Never read by the scorer. */
+    ParsedCvContact: {
+      name?: string | null;
+      email?: string | null;
+      phone?: string | null;
+      location?: string | null;
+      /** @description Profile and portfolio URLs. */
+      links?: string[];
+    };
+    ParsedCvSkill: {
+      /** @description The skill as written in the CV. */
+      raw: string;
+      /** @description Canonical name of the skill, or null when it is not recognized. */
+      normalized: string | null;
+    };
+    ParsedCvExperience: {
+      title: string;
+      company?: string | null;
+      /** @description First month in the position, as YYYY-MM. null: unknown. */
+      start?: components["schemas"]["ParsedCvYearMonth"] | null;
+      /** @description Last month in the position, as YYYY-MM. null: unknown, or the position is current (see is_current). */
+      end?: components["schemas"]["ParsedCvYearMonth"] | null;
+      /** @description True if the candidate still holds the position. Defaults to false. */
+      is_current?: boolean;
+      /** @description One-sentence description of the work. */
+      summary?: string | null;
+      /** @description Achievements or responsibilities, one per entry. */
+      bullets?: string[];
+    };
+    ParsedCvEducation: {
+      degree: string;
+      institution?: string | null;
+      grad_year?: number | null;
+    };
+    ParsedCvLanguage: {
+      language: string;
+      /** @description Level as written in the CV, e.g. B2, native, fluent. */
+      level?: string | null;
+    };
+    /**
+     * Parsed CV
+     * @description Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.
+     */
+    ParsedCV: {
+      /**
+       * @description Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.
+       * @enum {unknown}
+       */
+      schema_version: "1.0";
+      /**
+       * @description Who wrote this version of the record: the CV parser, or a recruiter who corrected it.
+       * @enum {unknown}
+       */
+      source: "parser" | "recruiter";
+      contact?: components["schemas"]["ParsedCvContact"];
+      /** @description Current or most recent job title. */
+      headline?: string | null;
+      /** @description The candidate's own profile or summary paragraph. */
+      summary?: string | null;
+      /** @description Skills found in the CV. May be empty. */
+      skills: components["schemas"]["ParsedCvSkill"][];
+      /** @description Total years of work experience. */
+      experience_years?: number | null;
+      /** @description Positions held, most recent first. */
+      experiences?: components["schemas"]["ParsedCvExperience"][];
+      education?: components["schemas"]["ParsedCvEducation"][];
+      languages?: components["schemas"]["ParsedCvLanguage"][];
+      certifications?: string[];
+      /** @description Confidence from 0 to 1 per field, keyed by JSON Pointer into this record, e.g. /contact/email or /experiences/0/title. A field with no entry has no confidence value; that is not the same as low confidence. */
+      confidence?: {
+        [key: string]: number;
+      };
+    };
+    /** @description Explicit contact corrections also update canonical candidate columns. */
+    ParsedProfileContactPatch: {
+      name?: string;
+      /** Format: email */
+      email?: string;
+      phone?: string | null;
+      location?: string | null;
+      links?: string[];
+    };
+    /**
+     * Parsed profile corrections
+     * @description Partial L-10 corrections. Nested objects merge; arrays replace. Source and confidence are assigned by the server after schema validation. Explicit contact name and email corrections must meet canonical candidate validation.
+     */
+    ParsedProfilePatch: {
+      /**
+       * @description Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.
+       * @enum {unknown}
+       */
+      schema_version?: "1.0";
+      /**
+       * @description Who wrote this version of the record: the CV parser, or a recruiter who corrected it.
+       * @enum {unknown}
+       */
+      source?: "parser" | "recruiter";
+      contact?: components["schemas"]["ParsedProfileContactPatch"];
+      /** @description Current or most recent job title. */
+      headline?: string | null;
+      /** @description The candidate's own profile or summary paragraph. */
+      summary?: string | null;
+      /** @description Skills found in the CV. May be empty. */
+      skills?: components["schemas"]["ParsedCvSkill"][];
+      /** @description Total years of work experience. */
+      experience_years?: number | null;
+      /** @description Positions held, most recent first. */
+      experiences?: components["schemas"]["ParsedCvExperience"][];
+      education?: components["schemas"]["ParsedCvEducation"][];
+      languages?: components["schemas"]["ParsedCvLanguage"][];
+      certifications?: string[];
+      /** @description Confidence from 0 to 1 per field, keyed by JSON Pointer into this record, e.g. /contact/email or /experiences/0/title. A field with no entry has no confidence value; that is not the same as low confidence. */
+      confidence?: {
+        [key: string]: number;
+      };
+    };
+    ParsedProfileResponse: {
+      /** Format: uuid */
+      candidate_id: string;
+      parsed_data: components["schemas"]["ParsedCV"];
+      /** Format: uuid */
+      reviewed_by: string;
+      /** Format: date-time */
+      reviewed_at: string;
+    };
     CandidateResponse: {
       /**
        * Format: uuid
@@ -822,6 +974,16 @@ export interface components {
       parsed_data: {
         [key: string]: unknown;
       };
+      /**
+       * Format: uuid
+       * @description User who last saved the current recruiter version.
+       */
+      parsed_profile_reviewed_by?: string | null;
+      /**
+       * Format: date-time
+       * @description When the current parsed profile was last reviewed.
+       */
+      parsed_profile_reviewed_at?: string | null;
       /**
        * Format: date-time
        * @description When the candidate consented to data processing; null if not recorded.
@@ -1660,6 +1822,66 @@ export interface operations {
       403: components["responses"]["403Forbidden"];
       404: components["responses"]["404NotFound"];
       409: components["responses"]["409Conflict"];
+    };
+  };
+  updateCandidateParsedProfile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "contact": {
+         *         "name": "Jane Smith"
+         *       },
+         *       "skills": [
+         *         {
+         *           "raw": "Docker",
+         *           "normalized": "Docker"
+         *         }
+         *       ]
+         *     }
+         */
+        "application/json": components["schemas"]["ParsedProfilePatch"];
+      };
+    };
+    responses: {
+      /** @description Validated recruiter version and server review metadata */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ParsedProfileResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      /** @description Profile not ready for correction, or duplicate canonical email */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Field errors with nested paths in detail[].loc */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
     };
   };
   listCandidateCvDocuments: {

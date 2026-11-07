@@ -10,8 +10,8 @@ services:
     region: frankfurt
     branch: main
     autoDeployTrigger: commit
-    rootDir: api
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     # Free instances have no pre-deploy step, so migrate on start. Alembic is idempotent.
     dockerCommand: sh start-staging.sh

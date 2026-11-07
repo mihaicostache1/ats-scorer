@@ -32,6 +32,10 @@ docker compose down -v        # stop AND delete all data
 ```
 
 ### Run the apps
+Install backend dependencies from `api/` with `pip install -r requirements-dev.txt`, then
+run `alembic upgrade head`. This installs the shared `ml/` package and the pinned
+spaCy `en_core_web_sm` model as well.
+
 - API: `uvicorn app.main:app --reload` (from the backend folder)
 - Worker: `arq app.worker.WorkerSettings` (from the backend folder, in a second terminal)
 - Web: `npm run dev` (from the web folder)
@@ -40,7 +44,24 @@ docker compose down -v        # stop AND delete all data
 ### Background worker
 Uploaded CVs are processed by an [Arq](https://arq-docs.helpmanual.io/) worker that reads jobs from Redis. The API only queues the work, so without a running worker an uploaded CV stays `queued`.
 
-The worker extracts the text with PyMuPDF and uses Tesseract for scanned pages. It needs the same `.env` as the API (`DATABASE_URL`, `REDIS_URL`, `STORAGE_LOCAL_DIR`) and must see the same storage folder. A CV goes `queued` → `extracting` → `extracted`, or `failed` with an `error_code` and a message. `docker compose up` starts a worker container too.
+The worker extracts the text with PyMuPDF and uses Tesseract for scanned pages, then
+parses it into the shared L-10 schema using spaCy and the L-11 skill normalizer. It
+needs the same `.env` as the API (`DATABASE_URL`, `REDIS_URL`, `STORAGE_LOCAL_DIR`)
+and must see the same storage folder. A CV goes `queued` → `extracting` → `extracted`
+→ `parsed` or `needs_review`, or ends as `failed` with an error code. `docker compose up`
+starts a worker container too. Docker builds use the repository root as their context:
+`docker build -f api/Dockerfile .`.
+
+Set `ESCO_SKILLS_CSV` in the worker environment to enable ESCO matching; otherwise L-11
+uses its alias table and preserves other skills as free text. Parser setup, review
+rules and the measured synthetic accuracy are in [CV structured extraction](docs/ml/cv-structured-extraction.md).
+
+Recruiters and admins can correct a parsed CV with
+`PATCH /api/v1/candidates/{id}/parsed-profile`. Corrections validate against L-10,
+preserve the original parser snapshot, and record reviewer, timestamp and an audit
+event. Apply migration `007_parsed_profile_review` before using the endpoint.
+See the [parsed-profile API contract](docs/api_spec.md#patch-apiv1candidatesidparsed-profile)
+for partial-update semantics and field errors.
 
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:

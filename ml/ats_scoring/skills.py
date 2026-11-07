@@ -49,16 +49,19 @@ class SkillMatch:
         return self.missing_required
 
 
-def normalize_skill(skill: str) -> str:
-    """Return the form used to compare two skills.
-
-    Unicode-normalized, lower case, single spaces, without list bullets or trailing
-    punctuation, and with known abbreviations expanded. Keeps `#`, `+`, `.` and `/`,
-    so `C#`, `C++`, `Node.js` and `CI/CD` stay distinct.
-    """
+def clean_skill(skill: str) -> str:
+    """Unicode-normalized, lower case, single spaces, without list bullets or trailing
+    punctuation. Keeps `#`, `+`, `.` and `/`, so `C#`, `C++`, `Node.js` and `CI/CD` stay
+    distinct."""
     text = unicodedata.normalize("NFKC", skill).casefold()
     text = re.sub(r"\s+", " ", text).strip()
-    text = text.lstrip("-*• ").rstrip(".,;: ")
+    return text.lstrip("-*• ").rstrip(".,;: ")
+
+
+def normalize_skill(skill: str) -> str:
+    """Return the form the scorer uses to compare two skills: cleaned, with known
+    abbreviations expanded."""
+    text = clean_skill(skill)
     return SKILL_ALIASES.get(text, text)
 
 

@@ -4,7 +4,7 @@
 |---|---|
 | `ats_scoring/` | The scoring package the backend imports. Installed with `pip install -e ml/` |
 | `tests/` | Unit tests for `ats_scoring` |
-| `benchmarks/` | Speed measurement for the scorer |
+| `benchmarks/` | Speed measurement for the scorer and the skill normalizer |
 | `evaluation/` | Hand-rated candidate/job pairs and evaluation results ([how it works](../docs/ml/evaluation.md)) |
 | `synthetic/` | Script that generates the synthetic CV and job dataset ([README](synthetic/README.md)) |
 | `embedding_spike/` | Experiments behind the embedding-model decision ([README](embedding_spike/README.md)) |
@@ -79,6 +79,18 @@ score(candidate, job)
 - Experience and job-title fit are not scored yet.
 
 Change `MODEL_VERSION` in `ats_scoring/scoring.py` whenever the same input could get a different score, for example when the weights or the alias table change.
+
+### Skill normalization
+
+`ats_scoring.skill_normalizer` maps CV skills to canonical names and ESCO concepts (`normalize_skills`) and finds skills in free text (`extract_skills`), for the CV parser. It needs ESCO's skills file, downloaded separately. Usage, ESCO licence and limits: [docs/ml/skill-normalization.md](../docs/ml/skill-normalization.md).
+
+```python
+from ats_scoring.esco import load_esco
+from ats_scoring.skill_normalizer import SkillNormalizer
+
+normalizer = SkillNormalizer(load_esco("skills_en.csv"))
+normalizer.normalize_skills(["JS", "k8s"])  # JavaScript (ESCO), Kubernetes (not in ESCO)
+```
 
 ### Evaluate
 

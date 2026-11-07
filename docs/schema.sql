@@ -87,6 +87,9 @@ CREATE TABLE IF NOT EXISTS candidates (
     cv_file_path TEXT,
     raw_text TEXT,
     parsed_data JSONB NOT NULL DEFAULT '{}'::jsonb, -- Extracted skills, work history, education, OCR status
+    parsed_data_original JSONB NOT NULL DEFAULT '{}'::jsonb, -- Parser snapshot before recruiter edits
+    parsed_profile_reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    parsed_profile_reviewed_at TIMESTAMPTZ,
     embedding vector(384), -- Candidate resume text embedding (384 dims for vector similarity search)
     protected_attributes JSONB NOT NULL DEFAULT '{}'::jsonb, -- Redacted/encrypted demographic proxies for fairness audit
     is_anonymized BOOLEAN NOT NULL DEFAULT FALSE,

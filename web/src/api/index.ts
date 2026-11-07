@@ -100,6 +100,16 @@ export function updateCandidate(id: string, body: components["schemas"]["UpdateC
   return apiClient.PATCH("/candidates/{id}", { params: { path: { id } }, body });
 }
 
+export function updateCandidateParsedProfile(
+  id: string,
+  body: components["schemas"]["ParsedProfilePatch"]
+) {
+  return apiClient.PATCH("/candidates/{id}/parsed-profile", {
+    params: { path: { id } },
+    body,
+  });
+}
+
 export function hardDeleteCandidate(id: string) {
   return apiClient.DELETE("/candidates/{id}", { params: { path: { id } } });
 }
