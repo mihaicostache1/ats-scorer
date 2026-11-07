@@ -15,7 +15,9 @@ const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogPrimitive.Backdrop
     <DialogPrimitive.Backdrop
       ref={ref}
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/25 backdrop-blur-md",
+        // Base UI marks the first frame `data-starting-style` and the last `data-ending-style`, and waits
+        // for the transition between them before it unmounts; Radix-style `data-[state=…]` never matches.
+        "ease-fluid fixed inset-0 z-50 bg-black/25 backdrop-blur-md transition-opacity duration-(--motion-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
         className
       )}
       {...props}
@@ -33,7 +35,9 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Popup
       ref={ref}
       className={cn(
-        "glass-strong data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-5 rounded-3xl p-6 duration-200 outline-none sm:p-7",
+        "glass-strong fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-5 rounded-3xl p-6 outline-none sm:p-7",
+        // Scales in from slightly smaller and fades; the same in reverse on the way out.
+        "ease-fluid transition-[opacity,scale] duration-(--motion-base) data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
         className
       )}
       {...props}

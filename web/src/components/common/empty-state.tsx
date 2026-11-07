@@ -20,7 +20,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "border-border animate-in fade-in-50 flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed p-8 text-center",
+        "border-border animate-pop-in flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed p-8 text-center",
         className
       )}
       role="status"

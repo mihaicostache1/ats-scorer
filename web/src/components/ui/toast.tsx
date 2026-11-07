@@ -12,7 +12,12 @@ export interface ToastItem {
   description?: string;
   variant?: ToastVariant;
   duration?: number;
+  /** Set while the exit animation plays, just before the toast is removed. */
+  leaving?: boolean;
 }
+
+/** How long a toast takes to leave. Matches `--motion-base` (220ms), a little under it. */
+const TOAST_EXIT_MS = 200;
 
 type ToastContextType = {
   toasts: ToastItem[];
@@ -42,8 +47,13 @@ toast.warning = (description: string, title = "Warning") =>
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastItem[]>([]);
 
+  // Two steps, so a toast slides away instead of vanishing: mark it as leaving, then drop it once the
+  // exit animation has played. Auto-dismiss and the close button both come through here.
   const removeToast = React.useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, leaving: true } : t)));
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, TOAST_EXIT_MS);
   }, []);
 
   const addToast = React.useCallback(
@@ -139,8 +149,12 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
   return (
     <div
       role="alert"
+      data-leaving={item.leaving ? "" : undefined}
       className={cn(
-        "animate-in slide-in-from-bottom-5 sm:slide-in-from-right-5 glass-strong pointer-events-auto relative flex w-full items-start gap-3 rounded-2xl p-4 transition-all duration-200 ease-out",
+        "glass-strong relative flex w-full items-start gap-3 rounded-2xl p-4",
+        item.leaving
+          ? "animate-toast-out pointer-events-none"
+          : "animate-in slide-in-from-bottom-5 sm:slide-in-from-right-5 ease-fluid pointer-events-auto duration-(--motion-base)",
         borderVariants[variant]
       )}
     >

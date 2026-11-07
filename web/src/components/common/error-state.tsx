@@ -30,7 +30,7 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "border-destructive/20 bg-destructive/5 animate-in fade-in-50 flex min-h-[280px] flex-col items-center justify-center rounded-2xl border p-8 text-center",
+        "border-destructive/20 bg-destructive/5 animate-pop-in flex min-h-[280px] flex-col items-center justify-center rounded-2xl border p-8 text-center",
         className
       )}
       {...props}

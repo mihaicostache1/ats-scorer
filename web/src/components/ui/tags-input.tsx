@@ -120,7 +120,7 @@ export const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
         {value.map((tag, index) => (
           <span
             key={tag}
-            className="bg-secondary text-secondary-foreground inline-flex max-w-full items-center gap-1 rounded-md py-0.5 pr-0.5 pl-2 text-xs font-medium"
+            className="animate-pop-in bg-secondary text-secondary-foreground inline-flex max-w-full items-center gap-1 rounded-md py-0.5 pr-0.5 pl-2 text-xs font-medium"
           >
             <span className="truncate">{tag}</span>
             <button

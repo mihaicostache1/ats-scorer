@@ -49,6 +49,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Motion curves: `ease-fluid` is a long ease-out for almost everything; `ease-pop` overshoots
+     slightly and is only for small things that pop in. */
+  --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 /*
@@ -127,6 +132,13 @@
   --ambient-a: rgb(0 122 255 / 0.16);
   --ambient-b: rgb(88 86 214 / 0.14);
   --ambient-c: rgb(48 176 199 / 0.14);
+
+  /* Motion durations: hover/press, overlays, page and list entrances. */
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 320ms;
+  /* The highlight that sweeps across a loading skeleton. */
+  --shimmer: rgb(255 255 255 / 0.6);
 }
 
 .dark {
@@ -183,6 +195,8 @@
   --ambient-a: rgb(10 132 255 / 0.26);
   --ambient-b: rgb(94 92 230 / 0.22);
   --ambient-c: rgb(50 173 230 / 0.18);
+
+  --shimmer: rgb(255 255 255 / 0.08);
 }
 
 /*
@@ -212,10 +226,12 @@
     var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
     var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    background-color var(--motion-base) var(--ease-fluid),
+    border-color var(--motion-base) var(--ease-fluid),
+    box-shadow var(--motion-base) var(--ease-fluid),
+    transform var(--motion-base) var(--ease-fluid),
+    scale var(--motion-base) var(--ease-fluid),
+    translate var(--motion-base) var(--ease-fluid);
 }
 @utility glass-strong {
   background: var(--glass-bg-strong);
@@ -244,10 +260,12 @@
     var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
     var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    background-color var(--motion-base) var(--ease-fluid),
+    border-color var(--motion-base) var(--ease-fluid),
+    box-shadow var(--motion-base) var(--ease-fluid),
+    transform var(--motion-base) var(--ease-fluid),
+    scale var(--motion-base) var(--ease-fluid),
+    translate var(--motion-base) var(--ease-fluid);
   &:hover:not(:disabled) {
     background: var(--glass-bg-subtle-hover);
   }
@@ -309,10 +327,106 @@
     backdrop-filter: none;
   }
 }
+/*
+ * Motion. Short, ease-out and compositor-only (opacity and transform). Entrances use
+ * `animation-fill-mode: backwards`, so nothing is left behind when they finish: no lingering
+ * transform and no stacking context. The reduced-motion rule below switches all of it off.
+ */
+@keyframes fluid-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes fluid-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes fluid-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes fluid-toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(12px) scale(0.98);
+  }
+}
+@keyframes fluid-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* A whole page, when you navigate to it (see the `template.tsx` files). */
+@utility animate-page-in {
+  animation: fluid-page-in var(--motion-slow) var(--ease-fluid) backwards;
+}
+/* A row or list item. Set `--i` (its index) to stagger them, up to ten steps. */
+@utility animate-row-in {
+  animation: fluid-row-in var(--motion-slow) var(--ease-fluid) backwards;
+  animation-delay: calc(min(var(--i, 0), 10) * 28ms);
+}
+/* Small things that appear: empty states, tag chips. */
+@utility animate-pop-in {
+  animation: fluid-pop-in var(--motion-base) var(--ease-pop) backwards;
+}
+@utility animate-toast-out {
+  animation: fluid-toast-out var(--motion-base) var(--ease-fluid) forwards;
+}
+/* Loading placeholders: a soft highlight sweeps across (still, when motion is reduced). */
+@utility skeleton-shimmer {
+  background-image: linear-gradient(90deg, transparent 35%, var(--shimmer) 50%, transparent 65%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  background-position: 150% 0;
+  animation: fluid-shimmer 1.6s var(--ease-fluid) infinite;
+}
+/* A surface you can click: lifts on hover, presses on click. Pair it with `glass`. */
+@utility interactive {
+  transition:
+    transform var(--motion-base) var(--ease-fluid),
+    box-shadow var(--motion-base) var(--ease-fluid),
+    background-color var(--motion-base) var(--ease-fluid),
+    border-color var(--motion-base) var(--ease-fluid);
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover:not(:disabled, [aria-disabled="true"]) {
+      transform: translateY(-2px);
+      --tw-shadow: var(--glass-shadow-lg);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:active:not(:disabled, [aria-disabled="true"]) {
+      transform: scale(0.99);
+    }
+  }
+}
+
+/*
+ * Reduced motion: entrances and transitions finish at once, in their final state, and nothing loops.
+ * A loading spinner is feedback rather than decoration, so it keeps turning.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .glass,
-  .glass-subtle {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-spin {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
   }
 }
 

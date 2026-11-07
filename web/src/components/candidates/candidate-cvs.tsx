@@ -73,17 +73,24 @@ export function CandidateCvs({ candidateId }: { candidateId: string }) {
           }
           return (
             <ul className="divide-border divide-y">
-              {uploads.pending.map((upload) => (
+              {uploads.pending.map((upload, index) => (
                 <CvUploadItem
                   key={upload.key}
+                  index={index}
                   upload={upload}
                   onCancel={() => uploads.cancel(upload.key)}
                   onRetry={() => uploads.retry(upload.key)}
                   onDismiss={() => uploads.dismiss(upload.key)}
                 />
               ))}
-              {cvs.map((cv) => (
-                <CvRow key={cv.id} candidateId={candidateId} cv={cv} onUpdate={handleUpdate} />
+              {cvs.map((cv, index) => (
+                <CvRow
+                  key={cv.id}
+                  index={uploads.pending.length + index}
+                  candidateId={candidateId}
+                  cv={cv}
+                  onUpdate={handleUpdate}
+                />
               ))}
             </ul>
           );

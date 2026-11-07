@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SkeletonTableRow } from "@/components/ui/skeleton";
+import { staggerStyle } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { formatDate, formatEmploymentType, STATUS_BADGE } from "./job-meta";
 import { JOB_PAGE_SIZE, type JobResponse } from "./use-jobs";
@@ -68,12 +69,13 @@ export function JobsTable({
               </td>
             </tr>
           ) : (
-            jobs.map((job) => {
+            jobs.map((job, index) => {
               const status = STATUS_BADGE[job.status];
               return (
                 <tr
                   key={job.id}
-                  className="hover:bg-foreground/[0.04] transition-colors duration-200"
+                  style={staggerStyle(index)}
+                  className="animate-row-in hover:bg-foreground/[0.04] transition-colors duration-(--motion-base)"
                 >
                   <td className="px-4 py-3 align-top">
                     <Link
