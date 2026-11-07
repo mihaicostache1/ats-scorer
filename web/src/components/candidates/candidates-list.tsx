@@ -70,8 +70,11 @@ export function CandidatesList() {
     return () => clearTimeout(timer);
   }, [searchText, q, go]);
 
-  // A stale `?page=99` snaps to the last page once the API says how many there are.
-  const totalPages = state.phase === "success" ? state.data.pagination.total_pages : undefined;
+  // A stale `?page=99` snaps to the last page once the API says how many there are. An empty list
+  // has one (empty) page: the real API reports `total_pages: 0` for it, which must not read as
+  // "past the end", or the page redirects forever and never shows its empty state.
+  const totalPages =
+    state.phase === "success" ? Math.max(1, state.data.pagination.total_pages) : undefined;
   React.useEffect(() => {
     if (totalPages !== undefined && page > totalPages) go({ page: totalPages }, "replace");
   }, [totalPages, page, go]);

@@ -14,6 +14,15 @@ describe("can", () => {
 
   it("denies everything when there is no role", () => {
     expect(can(undefined, "candidate:read")).toBe(false);
+    expect(can(undefined, "cv-review:read")).toBe(false);
+  });
+
+  it("lets every role open the CV review screen, but only admins and recruiters edit", () => {
+    for (const role of ["admin", "recruiter", "viewer"] as const) {
+      expect(can(role, "cv-review:read")).toBe(true);
+    }
+    expect(can("viewer", "candidate:write")).toBe(false);
+    expect(can("recruiter", "candidate:write")).toBe(true);
   });
 
   it("keeps admin-only actions admin-only", () => {
