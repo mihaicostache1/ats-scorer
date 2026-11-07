@@ -7,7 +7,13 @@ import { parsePairsCsv } from "./data";
 import { pairKey, type Rating } from "./types";
 
 const EVAL_DIR = path.resolve(process.cwd(), "..", "ml", "evaluation");
-const read = (...parts: string[]) => readFileSync(path.join(EVAL_DIR, ...parts), "utf8");
+/**
+ * The file as git stores it. Git keeps these CSVs with LF, but a Windows checkout with
+ * `core.autocrlf=true` turns them into CRLF on disk, so the line endings are normalised here: the
+ * tests are about the content, and must give the same answer on a developer's PC and on CI.
+ */
+const read = (...parts: string[]) =>
+  readFileSync(path.join(EVAL_DIR, ...parts), "utf8").replace(/\r\n/g, "\n");
 const names = (dir: string, ext: string) =>
   readdirSync(path.join(EVAL_DIR, dir))
     .filter((file) => file.endsWith(ext))
@@ -52,7 +58,7 @@ describe("exportRatingsCsv", () => {
       [pairKey(pairs[1])]: 0,
       [pairKey(pairs[29])]: 2,
     };
-    const lines = exportRatingsCsv(pairs, ratings).split("\r\n");
+    const lines = exportRatingsCsv(pairs, ratings).split("\n");
 
     expect(lines[0]).toBe(CSV_HEADER);
     expect(lines[1]).toBe(`${pairs[0].candidateId},${pairs[0].jobId},3`);
@@ -61,20 +67,22 @@ describe("exportRatingsCsv", () => {
     expect(lines[30]).toBe(`${pairs[29].candidateId},${pairs[29].jobId},2`);
   });
 
-  it("keeps all 30 pairs in file order, with CRLF endings, no BOM and no blank lines", () => {
+  it("keeps all 30 pairs in file order, with LF endings, no BOM and no blank lines", () => {
     const text = exportRatingsCsv(pairs, { [pairKey(pairs[4])]: 1 });
     expect(text.startsWith(CSV_HEADER)).toBe(true);
     expect(text.charCodeAt(0)).not.toBe(0xfeff);
-    expect(text.endsWith("\r\n")).toBe(true);
-    expect(text.replace(/\r\n/g, "")).not.toMatch(/[\r\n]/);
-    const rows = text.split("\r\n").slice(1, -1);
+    // LF, like the CSVs as git stores them in ml/evaluation/.
+    expect(text).not.toContain("\r");
+    expect(text.endsWith("\n")).toBe(true);
+    expect(text).not.toContain("\n\n");
+    const rows = text.split("\n").slice(1, -1);
     expect(rows).toHaveLength(30);
     expect(rows.map((row) => row.split(",").slice(0, 2).join("|"))).toEqual(pairs.map(pairKey));
   });
 
   it("writes a skipped or unrated pair as an empty cell, never as a placeholder", () => {
     const text = exportRatingsCsv(pairs, { [pairKey(pairs[0])]: 1 });
-    const empty = text.split("\r\n").slice(2, -1);
+    const empty = text.split("\n").slice(2, -1);
     expect(empty).toHaveLength(29);
     for (const row of empty) expect(row).toMatch(/^C\d+,J\d+,$/);
   });
@@ -104,6 +112,12 @@ describe("what L-9 does with the export", () => {
       expect(evaluationCandidates.has(candidateId)).toBe(true);
       expect(evaluationJobs.has(jobId)).toBe(true);
     }
+  });
+
+  it("reads the same ratings when a Windows editor has turned the endings into CRLF", () => {
+    const lf = exportRatingsCsv(pairs, { [pairKey(pairs[0])]: 3, [pairKey(pairs[7])]: 1 });
+    expect(loadRatingsLikeL9(lf.replace(/\n/g, "\r\n"))).toEqual(loadRatingsLikeL9(lf));
+    expect(loadRatingsLikeL9(`﻿${lf}`)).toEqual(loadRatingsLikeL9(lf));
   });
 
   it("loads an unrated export too: it has no ratings and L-9 skips every row", () => {
@@ -167,10 +181,10 @@ describe("exportLooseRatingsCsv", () => {
       "not a key": 1,
       "C005|J01|extra": 1,
     });
-    expect(text).toBe(`${CSV_HEADER}\r\nC001,J01,3\r\nC009,J01,2\r\n`);
+    expect(text).toBe(`${CSV_HEADER}\nC001,J01,3\nC009,J01,2\n`);
   });
 
   it("is just the header when there is nothing to rescue", () => {
-    expect(exportLooseRatingsCsv({})).toBe(`${CSV_HEADER}\r\n`);
+    expect(exportLooseRatingsCsv({})).toBe(`${CSV_HEADER}\n`);
   });
 });

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { flushSync } from "react-dom";
 import { useForm, type FieldPath, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -305,6 +306,9 @@ function ReviewEditor({
     reValidateMode: "onChange",
   });
   const { isDirty, isSubmitting, submitCount, errors } = form.formState;
+  // True only while a valid save is in flight (see `save`), unlike `isSubmitting`, which also covers
+  // the moment the form is being validated.
+  const [saving, setSaving] = React.useState(false);
 
   const guard = useUnsavedChangesGuard(canEdit && isDirty);
   const flagged = React.useMemo(() => lowConfidenceFields(saved), [saved]);
@@ -324,6 +328,10 @@ function ReviewEditor({
       return;
     }
 
+    // Lock the fields only now that a request is really going out, not while the form is still being
+    // validated: a disabled input ignores `.focus()`, so locking earlier would stop the form library
+    // from moving focus to the first invalid field.
+    setSaving(true);
     try {
       const { data, error, response } = await updateCandidateParsedProfile(
         candidate.id,
@@ -331,6 +339,8 @@ function ReviewEditor({
       );
       if (!data) {
         const failure = parseApiFailure(error, response.status);
+        // Unlock first, in this same tick, so the field the server complains about can take focus.
+        flushSync(() => setSaving(false));
         showServerErrors(form, failure);
         toast.error(failure.message, "Couldn't save corrections");
         return;
@@ -346,6 +356,8 @@ function ReviewEditor({
       );
     } catch {
       toast.error(NETWORK_ERROR_MESSAGE, "Couldn't save corrections");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -440,7 +452,7 @@ function ReviewEditor({
                 noValidate
                 onSubmit={(event) => {
                   event.preventDefault();
-                  if (canEdit) void submit();
+                  if (canEdit && !isSubmitting) void submit();
                 }}
                 onKeyDown={(event) => {
                   if (
@@ -449,7 +461,7 @@ function ReviewEditor({
                     event.key.toLowerCase() === "s"
                   ) {
                     event.preventDefault();
-                    void submit();
+                    if (!isSubmitting) void submit();
                   }
                 }}
                 className="space-y-4"
@@ -481,7 +493,7 @@ function ReviewEditor({
                 )}
 
                 {/* A disabled fieldset disables every control inside it, so viewers can read but not edit. */}
-                <fieldset disabled={!canEdit || isSubmitting} className="min-w-0 border-0 p-0">
+                <fieldset disabled={!canEdit || saving} className="min-w-0 border-0 p-0">
                   <legend className="sr-only">Parsed CV fields</legend>
                   <ReviewForm />
                 </fieldset>

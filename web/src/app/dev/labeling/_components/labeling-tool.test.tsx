@@ -325,7 +325,7 @@ describe("progress survives a reload", () => {
     await user.click(screen.getByRole("button", { name: "Download the old ratings" }));
     expect(downloadTextFile).toHaveBeenCalledWith(
       "ana-previous-version.csv",
-      "candidate_id,job_id,rating\r\nC001,J01,3\r\nC002,J01,1\r\n"
+      "candidate_id,job_id,rating\nC001,J01,3\nC002,J01,1\n"
     );
     // Nothing was thrown away by downloading.
     expect(localStorage.getItem(PROGRESS_KEY)).not.toBeNull();
@@ -346,9 +346,7 @@ describe("export", () => {
     const [fileName, text] = downloadTextFile.mock.calls[0];
     expect(fileName).toBe("ana.csv");
     expect(text).toBe(exportRatingsCsv(data.pairs, { "C001|J01": 3, "C003|J07": 1 }));
-    expect(text).toBe(
-      "candidate_id,job_id,rating\r\nC001,J01,3\r\nC002,J01,\r\nC003,J07,1\r\nC001,J07,\r\n"
-    );
+    expect(text).toBe("candidate_id,job_id,rating\nC001,J01,3\nC002,J01,\nC003,J07,1\nC001,J07,\n");
     expect(toast.warning).toHaveBeenCalledWith(
       expect.stringContaining("2 of 4 pairs are rated"),
       "Exported"

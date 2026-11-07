@@ -301,7 +301,8 @@ describe("only schema-valid data can be submitted", () => {
     await user.click(screen.getByRole("button", { name: "Save corrections" }));
 
     expect(await screen.findByText("Fix 2 problems to save")).toBeInTheDocument();
-    expect(screen.getByLabelText("Skill 1 as written")).toHaveFocus();
+    // The form library moves focus a moment after the errors render, so wait for it.
+    await waitFor(() => expect(screen.getByLabelText("Skill 1 as written")).toHaveFocus());
 
     await user.click(screen.getByRole("button", { name: /Education 1 · graduation year/ }));
     expect(screen.getByLabelText("Graduation year")).toHaveFocus();
@@ -322,6 +323,93 @@ describe("only schema-valid data can be submitted", () => {
     );
     await user.click(screen.getByRole("button", { name: "Save corrections" }));
     await waitFor(() => expect(updateCandidateParsedProfile).toHaveBeenCalledTimes(1));
+  });
+});
+
+describe("focus after a failed save", () => {
+  // The form library moves focus to the problem field while the form still counts as "submitting",
+  // and a disabled input ignores `.focus()`. So the fields must not be locked while the form is only
+  // being validated. These run with zero-delay timeouts firing ahead of React, which is what a slow CI
+  // runner does and a fast PC usually doesn't: without the fix the button kept the focus.
+  const timeoutsAheadOfReact = () => {
+    const real = globalThis.setTimeout;
+    const spy = vi.spyOn(globalThis, "setTimeout").mockImplementation(((
+      fn: () => void,
+      ms?: number,
+      ...rest: unknown[]
+    ) => {
+      if (!ms) {
+        queueMicrotask(() => fn());
+        return 0;
+      }
+      return real(fn as never, ms, ...(rest as []));
+    }) as unknown as typeof setTimeout);
+    return { spy, real };
+  };
+
+  it("puts focus on the first invalid field, even when React is slow to re-render", async () => {
+    const { spy, real } = timeoutsAheadOfReact();
+    try {
+      await renderReview();
+      await user.clear(screen.getByLabelText("Skill 1 as written"));
+      await user.click(screen.getByRole("button", { name: "Save corrections" }));
+      await screen.findByText("Fix 1 problem to save");
+      await new Promise((resolve) => real(resolve, 300));
+
+      expect(screen.getByLabelText("Skill 1 as written")).toHaveFocus();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("puts focus on the field a server error is about (a taken email)", async () => {
+    updateCandidateParsedProfile.mockResolvedValue(
+      fail(409, {
+        detail: [
+          {
+            loc: ["body", "contact", "email"],
+            msg: "A candidate with this email already exists.",
+            type: "value_error",
+          },
+        ],
+      })
+    );
+    await renderReview();
+    await user.clear(screen.getByLabelText("Email"));
+    await user.type(screen.getByLabelText("Email"), "taken@example.com");
+    await user.click(screen.getByRole("button", { name: "Save corrections" }));
+    await screen.findByText("A candidate with this email already exists.");
+
+    await waitFor(() => expect(screen.getByLabelText("Email")).toHaveFocus());
+  });
+
+  it("still locks the fields while a valid save is in flight, and unlocks them after", async () => {
+    let finish!: (value: unknown) => void;
+    updateCandidateParsedProfile.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      })
+    );
+    await renderReview();
+    await user.type(screen.getByLabelText("Headline"), "!");
+    await user.click(screen.getByRole("button", { name: "Save corrections" }));
+
+    await waitFor(() => expect(screen.getByLabelText("Headline")).toBeDisabled());
+    expect(screen.getByRole("button", { name: "Saving…" })).toBeDisabled();
+
+    finish(saved());
+    await waitFor(() => expect(screen.getByLabelText("Headline")).toBeEnabled());
+  });
+
+  it("unlocks the fields again after a network failure, with the edits kept", async () => {
+    updateCandidateParsedProfile.mockRejectedValue(new TypeError("Failed to fetch"));
+    await renderReview();
+    await user.type(screen.getByLabelText("Headline"), "!");
+    await user.click(screen.getByRole("button", { name: "Save corrections" }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByLabelText("Headline")).toBeEnabled());
+    expect(screen.getByLabelText("Headline")).toHaveValue("Backend Software Engineer!");
   });
 });
 
@@ -381,8 +469,10 @@ describe("unsaved changes", () => {
 
     const dialog = await screen.findByRole("dialog", { name: "Discard unsaved changes?" });
     expect(router.push).not.toHaveBeenCalled();
-    // The safe choice has the focus.
-    expect(within(dialog).getByRole("button", { name: "Keep editing" })).toHaveFocus();
+    // The safe choice has the focus (the dialog moves it there just after it opens).
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Keep editing" })).toHaveFocus()
+    );
 
     await user.click(within(dialog).getByRole("button", { name: "Keep editing" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());

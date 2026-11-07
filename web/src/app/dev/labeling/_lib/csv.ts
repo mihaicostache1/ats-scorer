@@ -4,11 +4,14 @@ import { isRating, pairKey, type Pair, type Rating } from "./types";
  * The export, in the format L-9 reads (`load_ratings` in `ml/ats_scoring/evaluate.py`): a copy of
  * `ml/evaluation/pairs.csv` with the `rating` column filled in. That means the same header, every
  * pair in the same order and no extra rows, so the file can be dropped into `ml/evaluation/ratings/`
- * as it is. A pair without a rating keeps an empty cell, which L-9 ignores. Lines end in CRLF like
- * `pairs.csv` (Python's `csv` module does the same), and the file has no byte order mark.
+ * as it is. A pair without a rating keeps an empty cell, which L-9 ignores. The file has no byte
+ * order mark, and lines end in LF because that is how git stores the CSVs in `ml/evaluation/`: a
+ * rater who saves the file there and commits it adds no line-ending noise on any platform. (A Windows
+ * checkout with `core.autocrlf` shows those files with CRLF; L-9's `csv.DictReader` reads both.)
  */
 
 export const CSV_HEADER = "candidate_id,job_id,rating";
+const EOL = "\n";
 
 export function exportRatingsCsv(
   pairs: readonly Pair[],
@@ -18,7 +21,7 @@ export function exportRatingsCsv(
     const rating = ratings[pairKey(pair)];
     return `${pair.candidateId},${pair.jobId},${rating === undefined ? "" : rating}`;
   });
-  return [CSV_HEADER, ...rows].map((line) => `${line}\r\n`).join("");
+  return [CSV_HEADER, ...rows].map((line) => `${line}${EOL}`).join("");
 }
 
 /**
@@ -31,7 +34,7 @@ export function exportLooseRatingsCsv(ratings: Readonly<Record<string, unknown>>
     .filter(([key, value]) => /^[^,|\r\n]+\|[^,|\r\n]+$/.test(key) && isRating(value))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => `${key.replace("|", ",")},${value}`);
-  return [CSV_HEADER, ...rows].map((line) => `${line}\r\n`).join("");
+  return [CSV_HEADER, ...rows].map((line) => `${line}${EOL}`).join("");
 }
 
 /**
