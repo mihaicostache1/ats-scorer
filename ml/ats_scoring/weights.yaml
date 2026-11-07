@@ -1,0 +1,34 @@
+# Settings of the hybrid scorer (L-13), read by ats_scoring.config when the package is imported.
+# Change model_version whenever you change anything in this file: every stored score carries
+# the version, and the same input must always get the same score under the same version.
+model_version: hybrid-1.0.0
+
+# Share of the total carried by each component. Must add up to 1. When a component cannot be
+# computed (no embedding, no minimum experience on the job, no skills on the job, ...) it is
+# None and its share is spread over the other components in proportion to their weights.
+# Why these values: docs/ml/hybrid-scorer.md#weights
+weights:
+  skill_overlap: 0.30
+  embedding_similarity: 0.35
+  experience_fit: 0.10
+  title_similarity: 0.15
+  text_similarity: 0.10
+
+skills:
+  # How much one matching skill earns. A required skill must count more than a nice-to-have one.
+  required_weight: 1.0
+  preferred_weight: 0.5
+
+embedding:
+  # Embeddings must come from exactly this model and revision (see ats_scoring.embeddings).
+  model: intfloat/multilingual-e5-small
+  revision: 614241f622f53c4eeff9890bdc4f31cfecc418b3
+  dimensions: 384
+  # e5 gives even unrelated texts a cosine well above 0 (L-6). The cosine is mapped linearly
+  # from [cosine_floor, cosine_ceiling] to 0-100, so the component uses its whole range.
+  cosine_floor: 0.80
+  cosine_ceiling: 0.95
+
+title:
+  # The headline and the most recent position count in full. Older positions count this much.
+  older_title_factor: 0.8
