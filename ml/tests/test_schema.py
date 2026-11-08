@@ -1,4 +1,4 @@
-"""Tests for the parsed-CV schema (version 1.0) shared with the backend and the frontend.
+"""Tests for the parsed-CV schema (versions 1.0 and 1.1) shared across the app.
 
 The JSON Schema and the Pydantic models are two descriptions of one shape. The fixtures in
 ats_scoring/schemas/fixtures/ are checked against both, so a change to one that is not made
@@ -57,6 +57,8 @@ WHY_INVALID = {
     "skill_as_plain_string": "skills/0",
     "skill_empty_raw": "skills/0/raw",
     "skill_missing_normalized": "'normalized' is a required property",
+    "skill_suggestion_as_object": "skills/0/suggestion",
+    "skill_suggestion_empty": "skills/0/suggestion",
     "unknown_schema_version": "schema_version",
     "unknown_source": "source",
 }
@@ -124,12 +126,13 @@ def test_the_set_of_fixtures_covers_the_main_cases() -> None:
 def test_the_version_is_the_same_everywhere() -> None:
     schema = load_parsed_cv_schema()
 
-    assert schema["properties"]["schema_version"]["enum"] == [SCHEMA_VERSION]
-    assert get_args(ParsedCV.model_fields["schema_version"].annotation) == (SCHEMA_VERSION,)
+    versions = get_args(ParsedCV.model_fields["schema_version"].annotation)
+    assert versions == ("1.0", SCHEMA_VERSION)
+    assert schema["properties"]["schema_version"]["enum"] == list(versions)
     assert PARSED_CV_SCHEMA_VERSION == SCHEMA_VERSION
-    assert {load_parsed_cv_fixture("valid", name)["schema_version"] for name in VALID} == {
-        SCHEMA_VERSION
-    }
+    assert {load_parsed_cv_fixture("valid", name)["schema_version"] for name in VALID} == set(
+        versions
+    )
 
 
 def test_the_example_is_the_full_fixture() -> None:
@@ -187,6 +190,33 @@ def test_a_skill_that_is_not_recognized_keeps_its_raw_text() -> None:
     assert [skill.raw for skill in unrecognized] == ["Team player"]
 
 
+@pytest.mark.parametrize("version", ["1.0", "1.1"])
+def test_suggestions_are_optional_in_both_supported_versions(version: str) -> None:
+    parsed = ParsedCV.model_validate(
+        {
+            "schema_version": version,
+            "source": "parser",
+            "skills": [{"raw": "Docker", "normalized": "Docker"}],
+        }
+    )
+    assert parsed.schema_version == version
+    assert parsed.skills[0].suggestion is None
+
+
+def test_suggestions_survive_round_trip_without_becoming_normalized() -> None:
+    parsed = ParsedCV.model_validate(load_parsed_cv_fixture("valid", "skill_suggestions"))
+    restored = ParsedCV.model_validate_json(parsed.model_dump_json())
+
+    assert restored == parsed
+    assert [s.suggestion for s in restored.skills] == [
+        "project management",
+        "perform software unit testing",
+        None,
+        None,
+    ]
+    assert [s.normalized for s in restored.skills] == [None, None, "Docker", None]
+
+
 # ------------------------------------------------------------------ the scorer
 
 
@@ -224,5 +254,15 @@ def test_contact_and_confidence_do_not_change_the_score() -> None:
     changed["contact"] = {"name": "Maria Ionescu", "location": "Bucharest"}
     changed["confidence"] = {"/skills/0/raw": 0.1}
     changed["languages"] = [{"language": "Romanian", "level": "native"}]
+
+    assert score(changed, JOB) == score(record, JOB)
+
+
+def test_suggestions_do_not_change_the_score() -> None:
+    record = load_parsed_cv_example()
+    changed = copy.deepcopy(record)
+    changed["schema_version"] = SCHEMA_VERSION
+    changed["skills"][-1]["suggestion"] = "Kafka"
+    ParsedCV.model_validate(changed)
 
     assert score(changed, JOB) == score(record, JOB)

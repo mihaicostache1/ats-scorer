@@ -105,6 +105,52 @@ Authenticates recruiter or admin credentials.
 
 ---
 
+#### User administration (B-15)
+
+All `/users` endpoints require an active **admin** and operate only within that admin's
+organization. A user in another organization returns `404`. Roles are `admin`, `recruiter`
+and `viewer`; unsupported roles and extra request fields return `422`.
+
+| Endpoint | Request | Successful response |
+| --- | --- | --- |
+| `GET /api/v1/users` | Optional `role`, `is_active`, `search`, `page` (default 1), `per_page` (default 20, max 100) | `200`: `items` of public user profiles plus the standard `pagination` envelope |
+| `POST /api/v1/users/invitations` | `{"email":"colleague@example.com","role":"recruiter"}`; role defaults to recruiter | `201`: `id`, `email`, `role`, `expires_at`, `invite_url` |
+| `PATCH /api/v1/users/{id}/role` | `{"role":"viewer"}` | `200`: updated public user profile |
+| `POST /api/v1/users/{id}/deactivate` | No body | `200`: public user profile with `is_active: false` |
+| `POST /api/v1/auth/accept-invite` | `{"token":"<token>","full_name":"New Colleague","password":"SecretPass123!"}` | `201`: new public user profile; no existing session required |
+
+The list includes inactive accounts unless filtered and never returns password hashes or
+invitation secrets. Email comparisons for invitations are case-insensitive, and invited
+emails are stored lowercase. Inviting an existing member, including an inactive one, returns
+`409`. The account is created only after the invitation is accepted.
+
+The response to invitation creation contains a shareable link such as
+`http://localhost:3000/accept-invite#token=<secret>`. Set `INVITE_ACCEPT_URL` to the frontend
+invitation form. The form must read the fragment and send the token in the acceptance **body**;
+the secret is not part of a server query string or referrer. Both invitation creation and
+acceptance return `Cache-Control: no-store`. No email is sent and the API does not render the
+frontend form. After acceptance, use the existing login endpoint to sign in.
+
+Tokens contain 256 random bits; only their SHA-256 digests are stored. They expire after
+`USER_INVITE_EXPIRE_HOURS` (default **48**, allowed 1–720). Expired, unknown, superseded and
+already-used tokens all return the same `400` error. Reissuing an invitation for the same
+workspace/email invalidates every older unused link. Name/password validation failures do not
+consume the token. The invited email, organization and role cannot be supplied or changed
+during acceptance.
+
+The last **active** admin cannot be demoted or deactivated (`409`); inactive admins and admins
+in another organization do not count. Self-deactivation always returns `409`. An admin may
+demote themself only when another active admin remains. Membership writes are serialized per
+organization and permissions are rechecked after obtaining the lock. Existing access and
+refresh tokens stop working after deactivation, and existing sessions use the new role
+immediately after a role change.
+
+Successful operations record `list_users`, `invite_user`, `accept_invitation`,
+`change_user_role` or `deactivate_user` audit events with actor, target, timestamp and request
+metadata. Mutations and their audit events commit together; tokens and passwords are never
+included in audit details. Repeating an unchanged role or an already-applied deactivation is
+harmless and adds no duplicate mutation event. Apply migration `008_user_invitations` first.
+
 ### 2.2 Jobs & Pipeline Stages
 
 #### `POST /api/v1/jobs`
@@ -367,7 +413,9 @@ The body contains partial L-10 fields directly, rather than a `parsed_data` wrap
 
 Nested objects merge with the saved profile; arrays replace the entire list. Omitted
 fields remain unchanged. Explicit nulls are allowed only where the schema permits
-them. The merged profile is validated against L-10 schema 1.0. A missing or invalid
+them. The merged profile is validated against L-10 schema 1.1, which also accepts
+existing 1.0 records. Optional `skills[].suggestion` preserves unconfirmed fuzzy or
+embedding labels; it never automatically fills `normalized`. A missing or invalid
 saved profile, or a latest CV that has not completed parsing successfully, returns
 409. A valid saved profile without a document can also be corrected.
 
