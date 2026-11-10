@@ -3,19 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border bg-clip-padding text-[15px] font-medium whitespace-nowrap transition-all duration-200 ease-out outline-none select-none focus-visible:ring-4 focus-visible:ring-primary/25 active:not-aria-[haspopup]:scale-[0.98] active:not-aria-[haspopup]:opacity-80 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border bg-clip-padding text-[15px] font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,opacity,scale,translate] duration-(--motion-fast) ease-fluid outline-none select-none focus-visible:ring-4 focus-visible:ring-primary/25 motion-safe:active:not-aria-[haspopup]:scale-[0.98] active:not-aria-[haspopup]:opacity-80 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-gradient-to-b from-white/20 to-transparent bg-primary text-primary-foreground inset-shadow-[0_1px_0] inset-shadow-white/40 shadow-[0_4px_14px_-4px] shadow-primary/50 hover:bg-primary/90 hover:shadow-[0_6px_18px_-4px] hover:shadow-primary/60",
+          "border-transparent bg-gradient-to-b from-white/20 to-transparent bg-primary text-primary-foreground inset-shadow-[0_1px_0] inset-shadow-white/40 shadow-[0_4px_14px_-4px] shadow-primary/50 hover:bg-primary/90 hover:shadow-[0_6px_18px_-4px] hover:shadow-primary/60 motion-safe:hover:scale-[1.02]",
         outline: "glass-subtle hover:text-foreground aria-expanded:text-foreground",
         secondary:
-          "border-transparent bg-primary/10 text-primary inset-shadow-[0_1px_0] inset-shadow-white/40 hover:bg-primary/15 aria-expanded:bg-primary/15 aria-expanded:text-primary",
+          "border-transparent bg-primary/10 text-primary inset-shadow-[0_1px_0] inset-shadow-white/40 hover:bg-primary/15 motion-safe:hover:scale-[1.02] aria-expanded:bg-primary/15 aria-expanded:text-primary",
         ghost:
           "border-transparent hover:bg-foreground/5 hover:text-foreground aria-expanded:bg-foreground/5 aria-expanded:text-foreground",
         destructive:
-          "border-transparent bg-destructive/10 text-destructive inset-shadow-[0_1px_0] inset-shadow-white/30 hover:bg-destructive/15 focus-visible:ring-destructive/20",
+          "border-transparent bg-destructive/10 text-destructive inset-shadow-[0_1px_0] inset-shadow-white/30 hover:bg-destructive/15 motion-safe:hover:scale-[1.02] focus-visible:ring-destructive/20",
         link: "border-transparent text-primary underline-offset-4 hover:underline",
       },
       size: {

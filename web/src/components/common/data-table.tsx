@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SkeletonTableRow } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/empty-state";
+import { staggerStyle } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export interface Column<T> {
@@ -200,8 +201,9 @@ export function DataTable<T>({
                     <tr
                       key={String(record.id ?? idx)}
                       onClick={() => onRowClick?.(row)}
+                      style={staggerStyle(idx)}
                       className={cn(
-                        "hover:bg-foreground/[0.04] focus-within:bg-foreground/[0.04] transition-colors duration-200",
+                        "animate-row-in hover:bg-foreground/[0.04] focus-within:bg-foreground/[0.04] transition-colors duration-(--motion-base)",
                         onRowClick && "cursor-pointer"
                       )}
                     >

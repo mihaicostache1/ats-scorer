@@ -27,6 +27,8 @@ function DropdownMenuContent({
         <Menu.Popup
           className={cn(
             "glass-strong text-popover-foreground min-w-40 rounded-xl p-1.5 outline-none",
+            // Expands from the button that opened it (`--transform-origin` comes from the positioner).
+            "ease-fluid origin-(--transform-origin) transition-[opacity,scale] duration-(--motion-fast) data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             className
           )}
           {...props}
