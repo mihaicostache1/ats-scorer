@@ -2,9 +2,13 @@
 
     python -m ats_scoring.evaluate
     python -m ats_scoring.evaluate --scorer my_package.my_module:my_score
+    python -m ats_scoring.evaluate --no-embeddings
 
 Reads the evaluation set in ml/evaluation (see docs/ml/evaluation.md), prints the metrics
 and saves them to ml/evaluation/results/<date>_<model version>.json.
+
+The embeddings of the evaluation set are precomputed in ml/evaluation/data/embeddings.json
+(see ml/evaluation/embed_eval_set.py), so evaluating needs neither the model nor PyTorch.
 """
 
 import argparse
@@ -25,6 +29,7 @@ from typing import Any
 from scipy.stats import spearmanr
 from sklearn.metrics import cohen_kappa_score, ndcg_score
 
+from ats_scoring.config import DEFAULT_CONFIG
 from ats_scoring.scoring import NothingToScoreError
 
 Scorer = Callable[[Mapping[str, Any], Mapping[str, Any]], Any]
@@ -32,6 +37,7 @@ Pair = tuple[str, str]  # (candidate_id, job_id)
 
 DEFAULT_SCORER = "ats_scoring:score"
 DEFAULT_EVAL_DIR = Path(__file__).resolve().parents[1] / "evaluation"
+EMBEDDINGS_FILE = Path("data") / "embeddings.json"
 K = 10
 RATINGS = {"0", "1", "2", "3"}
 
@@ -135,6 +141,23 @@ def load_ratings(directory: Path) -> dict[str, dict[Pair, int]]:
     return raters
 
 
+def load_embeddings(path: Path) -> dict[str, Any]:
+    """Read precomputed embeddings: {"model", "revision", "candidates": {id: [...]},
+    "jobs": {id: [...]}}. They must come from the model weights.yaml names."""
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    settings = DEFAULT_CONFIG.embedding
+    found = (data.get("model"), data.get("revision"))
+    if found != (settings.model, settings.revision):
+        raise SystemExit(
+            f"{path} was made with {found[0]} at {found[1]}, but weights.yaml asks for "
+            f"{settings.model} at {settings.revision}. Rebuild it with embed_eval_set.py."
+        )
+    for key in ("candidates", "jobs"):
+        if not isinstance(data.get(key), Mapping):
+            raise SystemExit(f"{path} has no '{key}' mapping")
+    return data
+
+
 # --------------------------------------------------------------------------- evaluation
 
 
@@ -149,9 +172,16 @@ def _mean(values: list[float | None]) -> float | None:
 
 
 def evaluate(
-    scorer: Scorer, eval_dir: Path = DEFAULT_EVAL_DIR, scorer_spec: str = DEFAULT_SCORER
+    scorer: Scorer,
+    eval_dir: Path = DEFAULT_EVAL_DIR,
+    scorer_spec: str = DEFAULT_SCORER,
+    embeddings: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Score every rated pair and compare the scores with the mean human rating."""
+    """Score every rated pair and compare the scores with the mean human rating.
+
+    With `embeddings` (see load_embeddings), the scorer is called with the keyword
+    arguments `candidate_embedding` and `job_embedding`, as `ats_scoring.score` takes them.
+    """
     jobs = load_records(eval_dir / "data" / "jobs")
     candidates = load_records(eval_dir / "data" / "candidates")
     raters = load_ratings(eval_dir / "ratings")
@@ -174,8 +204,14 @@ def evaluate(
     skipped: list[str] = []
     model_version = scorer_spec
     for (candidate_id, job_id), values in sorted(collected.items()):
+        extra: dict[str, Any] = {}
+        if embeddings is not None:
+            extra = {
+                "candidate_embedding": embeddings["candidates"].get(candidate_id),
+                "job_embedding": embeddings["jobs"].get(job_id),
+            }
         try:
-            result = scorer(candidates[candidate_id], jobs[job_id])
+            result = scorer(candidates[candidate_id], jobs[job_id], **extra)
         except NothingToScoreError:
             skipped.append(f"{candidate_id}/{job_id}")
             continue
@@ -205,6 +241,9 @@ def evaluate(
         "date": date.today().isoformat(),
         "model_version": model_version,
         "scorer": scorer_spec,
+        "embeddings": None
+        if embeddings is None
+        else {"model": embeddings["model"], "revision": embeddings["revision"]},
         "raters": sorted(raters),
         "pairs_rated": len(collected),
         "pairs_scored": len(rows),
@@ -234,9 +273,11 @@ def _fmt(value: float | None) -> str:
 
 def format_report(report: Mapping[str, Any]) -> str:
     metrics = report["metrics"]
+    embeddings = report.get("embeddings")
     lines = [
         f"Model {report['model_version']}, {report['date']}: {report['pairs_scored']} pairs, "
-        f"{len(report['raters'])} rater(s)",
+        f"{len(report['raters'])} rater(s), "
+        + (f"embeddings from {embeddings['model']}" if embeddings else "no embeddings"),
         "",
         f"  Spearman, all pairs          {_fmt(metrics['spearman_all_pairs'])}",
         f"  Spearman, mean per job       {_fmt(metrics['spearman_mean_per_job'])}",
@@ -255,11 +296,12 @@ def format_report(report: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def save(report: Mapping[str, Any], results_dir: Path) -> Path:
-    """Write the report to <results_dir>/<date>_<model version>.json."""
+def save(report: Mapping[str, Any], results_dir: Path, label: str | None = None) -> Path:
+    """Write the report to <results_dir>/<date>_<model version>[_<label>].json."""
     results_dir.mkdir(parents=True, exist_ok=True)
-    version = re.sub(r"[^A-Za-z0-9._-]+", "-", report["model_version"]).strip("-")
-    path = results_dir / f"{report['date']}_{version}.json"
+    name = report["model_version"] + (f"_{label}" if label else "")
+    name = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
+    path = results_dir / f"{report['date']}_{name}.json"
     path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path
 
@@ -279,13 +321,25 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_EVAL_DIR,
         help="folder with data/, ratings/ and results/ (default: ml/evaluation)",
     )
+    parser.add_argument(
+        "--embeddings",
+        type=Path,
+        help=f"precomputed embeddings (default: <eval-dir>/{EMBEDDINGS_FILE.as_posix()}, if any)",
+    )
+    parser.add_argument("--no-embeddings", action="store_true", help="score without embeddings")
     parser.add_argument("--no-save", action="store_true", help="print the metrics only")
     args = parser.parse_args(argv)
 
-    report = evaluate(load_scorer(args.scorer), args.eval_dir, args.scorer)
+    embeddings = None
+    if not args.no_embeddings:
+        path = args.embeddings or args.eval_dir / EMBEDDINGS_FILE
+        if args.embeddings or path.is_file():
+            embeddings = load_embeddings(path)
+    report = evaluate(load_scorer(args.scorer), args.eval_dir, args.scorer, embeddings)
     print(format_report(report))
     if not args.no_save:
-        print(f"\nSaved to {save(report, args.eval_dir / 'results')}")
+        label = "no-embeddings" if args.no_embeddings else None
+        print(f"\nSaved to {save(report, args.eval_dir / 'results', label)}")
     return 0
 
 

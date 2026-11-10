@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.24.0",
     "pydantic>=2.6.0",
+    "pyyaml>=6.0",
     "rapidfuzz>=3.0.0",
     "scikit-learn>=1.4.0",
     "scipy>=1.10.0",
@@ -34,6 +35,7 @@ packages = ["ats_scoring"]
 [tool.setuptools.package-data]
 ats_scoring = [
     "py.typed",
+    "weights.yaml",
     "schemas/*.json",
     "schemas/fixtures/valid/*.json",
     "schemas/fixtures/invalid/*.json",
