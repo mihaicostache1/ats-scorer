@@ -1,7 +1,7 @@
 # Settings of the hybrid scorer (L-13), read by ats_scoring.config when the package is imported.
 # Change model_version whenever you change anything in this file: every stored score carries
 # the version, and the same input must always get the same score under the same version.
-model_version: hybrid-1.0.0
+model_version: hybrid-1.1.0
 
 # Share of the total carried by each component. Must add up to 1. When a component cannot be
 # computed (no embedding, no minimum experience on the job, no skills on the job, ...) it is

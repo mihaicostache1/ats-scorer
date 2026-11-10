@@ -12,6 +12,7 @@ from typing import Any
 import numpy as np
 
 from ats_scoring.config import COMPONENTS, DEFAULT_CONFIG, ScorerConfig
+from ats_scoring.redaction import redact
 from ats_scoring.schema import ScoreComponents, ScoreResult
 from ats_scoring.skills import SkillMatch, match_skills
 from ats_scoring.text import candidate_text, job_text, skill_texts, tfidf_similarity
@@ -194,8 +195,9 @@ def score(
 
     `candidate` follows the parsed-CV schema (see `ats_scoring.schema`). `job` uses the job
     fields of the API: `title`, `description`, `required_skills`, `preferred_skills`,
-    `min_experience_years`. Fields the scorer does not know are ignored, so a name or a birth
-    date in the input cannot change the result.
+    `min_experience_years`. The candidate is passed through `redact()` first, so a name,
+    contact details, dates, a birth date or gendered words cannot change the result, even
+    inside the summary or a bullet (US-06).
 
     `candidate_embedding` and `job_embedding` come from `ats_scoring.embeddings.Embedder`
     with the model named in weights.yaml. Without both, the embedding component is None.
@@ -206,6 +208,7 @@ def score(
     Raises NothingToScoreError (a ValueError) if the candidate or the job has nothing to
     compare, and ValueError if an embedding has the wrong length.
     """
+    candidate = redact(candidate)
     cv_text = candidate_text(candidate)
     posting_text = job_text(job)
     if not cv_text:

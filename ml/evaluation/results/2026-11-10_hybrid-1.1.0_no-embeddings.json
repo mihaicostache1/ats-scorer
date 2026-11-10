@@ -1,0 +1,221 @@
+{
+  "date": "2026-11-10",
+  "model_version": "hybrid-1.1.0",
+  "scorer": "ats_scoring:score",
+  "embeddings": null,
+  "raters": [
+    "mihai"
+  ],
+  "pairs_rated": 30,
+  "pairs_scored": 30,
+  "pairs_skipped": [],
+  "metrics": {
+    "spearman_all_pairs": 0.723099714758421,
+    "spearman_mean_per_job": 0.7381400415449924,
+    "ndcg_at_10_mean_per_job": 0.9706741378355335,
+    "ndcg_at_10_random_order": 0.78369757417744,
+    "rater_agreement_kappa": null
+  },
+  "per_job": {
+    "J01": {
+      "pairs": 10,
+      "spearman": 0.743700819611562,
+      "ndcg_at_10": 0.9815583242848673,
+      "ndcg_at_10_random": 0.7449450921128411
+    },
+    "J07": {
+      "pairs": 10,
+      "spearman": 0.6119527105427882,
+      "ndcg_at_10": 0.9804836406945264,
+      "ndcg_at_10_random": 0.8819077862070398
+    },
+    "J10": {
+      "pairs": 10,
+      "spearman": 0.8587665944806268,
+      "ndcg_at_10": 0.9499804485272066,
+      "ndcg_at_10_random": 0.7242398442124393
+    }
+  },
+  "pairs": [
+    {
+      "candidate_id": "C001",
+      "job_id": "J01",
+      "rating": 1.0,
+      "score": 65.2
+    },
+    {
+      "candidate_id": "C001",
+      "job_id": "J07",
+      "rating": 1.0,
+      "score": 22.37
+    },
+    {
+      "candidate_id": "C003",
+      "job_id": "J07",
+      "rating": 0.0,
+      "score": 41.21
+    },
+    {
+      "candidate_id": "C004",
+      "job_id": "J01",
+      "rating": 0.0,
+      "score": 27.66
+    },
+    {
+      "candidate_id": "C004",
+      "job_id": "J10",
+      "rating": 0.0,
+      "score": 0.04
+    },
+    {
+      "candidate_id": "C006",
+      "job_id": "J07",
+      "rating": 1.0,
+      "score": 5.48
+    },
+    {
+      "candidate_id": "C008",
+      "job_id": "J07",
+      "rating": 3.0,
+      "score": 16.0
+    },
+    {
+      "candidate_id": "C008",
+      "job_id": "J10",
+      "rating": 1.0,
+      "score": 0.5
+    },
+    {
+      "candidate_id": "C009",
+      "job_id": "J01",
+      "rating": 0.0,
+      "score": 15.7
+    },
+    {
+      "candidate_id": "C009",
+      "job_id": "J07",
+      "rating": 2.0,
+      "score": 15.64
+    },
+    {
+      "candidate_id": "C009",
+      "job_id": "J10",
+      "rating": 0.0,
+      "score": 0.13
+    },
+    {
+      "candidate_id": "C010",
+      "job_id": "J10",
+      "rating": 3.0,
+      "score": 72.05
+    },
+    {
+      "candidate_id": "C011",
+      "job_id": "J01",
+      "rating": 1.0,
+      "score": 42.05
+    },
+    {
+      "candidate_id": "C013",
+      "job_id": "J01",
+      "rating": 0.0,
+      "score": 19.81
+    },
+    {
+      "candidate_id": "C017",
+      "job_id": "J07",
+      "rating": 3.0,
+      "score": 60.18
+    },
+    {
+      "candidate_id": "C020",
+      "job_id": "J10",
+      "rating": 2.0,
+      "score": 42.69
+    },
+    {
+      "candidate_id": "C021",
+      "job_id": "J01",
+      "rating": 3.0,
+      "score": 80.3
+    },
+    {
+      "candidate_id": "C021",
+      "job_id": "J10",
+      "rating": 0.0,
+      "score": 0.12
+    },
+    {
+      "candidate_id": "C027",
+      "job_id": "J07",
+      "rating": 3.0,
+      "score": 67.35
+    },
+    {
+      "candidate_id": "C031",
+      "job_id": "J01",
+      "rating": 2.0,
+      "score": 51.56
+    },
+    {
+      "candidate_id": "C040",
+      "job_id": "J10",
+      "rating": 3.0,
+      "score": 63.52
+    },
+    {
+      "candidate_id": "C041",
+      "job_id": "J01",
+      "rating": 3.0,
+      "score": 73.49
+    },
+    {
+      "candidate_id": "C047",
+      "job_id": "J07",
+      "rating": 2.0,
+      "score": 51.83
+    },
+    {
+      "candidate_id": "C047",
+      "job_id": "J10",
+      "rating": 0.0,
+      "score": 0.46
+    },
+    {
+      "candidate_id": "C050",
+      "job_id": "J01",
+      "rating": 1.0,
+      "score": 15.62
+    },
+    {
+      "candidate_id": "C050",
+      "job_id": "J10",
+      "rating": 1.0,
+      "score": 67.87
+    },
+    {
+      "candidate_id": "C052",
+      "job_id": "J01",
+      "rating": 1.0,
+      "score": 23.63
+    },
+    {
+      "candidate_id": "C060",
+      "job_id": "J10",
+      "rating": 2.0,
+      "score": 51.07
+    },
+    {
+      "candidate_id": "C067",
+      "job_id": "J07",
+      "rating": 3.0,
+      "score": 57.41
+    },
+    {
+      "candidate_id": "C077",
+      "job_id": "J07",
+      "rating": 3.0,
+      "score": 72.91
+    }
+  ]
+}
