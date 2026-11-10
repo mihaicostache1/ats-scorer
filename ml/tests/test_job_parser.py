@@ -211,6 +211,36 @@ def test_job_title_and_team_names_are_not_skills() -> None:
     assert parsed.seniority == "senior"
 
 
+def test_a_bullet_is_never_taken_as_the_title() -> None:
+    # Without a title, a short first line is the title, but not a bullet.
+    text = "- 5+ years of experience with Python\n- Docker"
+    parsed = parse_job_description(text, normalizer=SkillNormalizer())
+    assert parsed.required_skills == ["Python", "Docker"]
+    assert parsed.min_experience_years == 5
+
+
+def test_a_short_first_line_without_a_bullet_is_still_the_title() -> None:
+    text = "Senior Backend Engineer\nRequirements\n- Python"
+    parsed = parse_job_description(text, normalizer=SkillNormalizer())
+    assert parsed.required_skills == ["Python"]
+    assert (parsed.seniority, parsed.seniority_source) == ("senior", "title")
+
+
+@pytest.mark.parametrize(
+    ("requirement", "skills"),
+    [
+        ("Python with Django", ["Python", "Django"]),
+        ("Python with Django and Flask", ["Python", "Django", "Flask"]),
+        ("Docker, Python in production", ["Docker", "Python"]),
+    ],
+)
+def test_skills_after_a_preposition_are_kept(
+    requirement: str, skills: list[str], normalizer: SkillNormalizer
+) -> None:
+    text = f"Requirements\n- {requirement}"
+    assert parse_job_description(text, normalizer=normalizer).required_skills == skills
+
+
 def test_empty_text() -> None:
     parsed = parse_job_description("", title="Senior Data Engineer", normalizer=SkillNormalizer())
     assert parsed.required_skills == parsed.preferred_skills == parsed.skills == []
@@ -229,6 +259,9 @@ def test_empty_text() -> None:
         ("5+ yrs Python", 5),
         ("3-5 years of experience", 3),
         ("3 to 5 years in backend development", 3),
+        ("Between 3 and 5 years of experience", 3),
+        ("between three (3) and five (5) years of experience", 3),
+        ("Python 3 and 2 years of Go", 2),
         ("Minimum of three years' experience", 3),
         ("At least one year of experience", 1),
         ("18 months of experience", 1),
@@ -241,6 +274,14 @@ def test_empty_text() -> None:
 def test_min_experience_years(requirement: str, years: int | None) -> None:
     text = f"Requirements\n- {requirement}"
     assert parse_job_description(text, normalizer=SkillNormalizer()).min_experience_years == years
+
+
+def test_a_between_range_gives_its_lower_end_and_no_skill() -> None:
+    text = "Requirements\n- Between 3 and 5 years of experience"
+    parsed = parse_job_description(text, normalizer=SkillNormalizer())
+    assert parsed.min_experience_years == 3
+    assert (parsed.seniority, parsed.seniority_source) == ("mid", "experience")
+    assert parsed.required_skills == []
 
 
 def test_the_highest_required_minimum_wins() -> None:

@@ -23,7 +23,7 @@ from ats_scoring.skill_normalizer import SkillNormalizer, default_normalizer
 from ats_scoring.skills import clean_skill
 
 # Stored with a parsed job. Change it whenever the same text could give a different result.
-PARSER_VERSION = "jd-parser-0.1.0"
+PARSER_VERSION = "jd-parser-0.1.1"
 
 Requirement = Literal["required", "preferred"]
 Seniority = Literal["junior", "mid", "senior", "lead"]
@@ -253,10 +253,13 @@ _NUMBER_WORDS = {
     "twenty": 20,
 }
 _NUMBER = r"(?:\d{1,2}(?:[.,]\d)?|" + "|".join(sorted(_NUMBER_WORDS, key=len, reverse=True)) + ")"
-# "5+ years", "3-5 years", "three (3) years", "18 months". A range keeps its lower end.
+# "5+ years", "3-5 years", "between 3 and 5 years", "three (3) years", "18 months". A range
+# keeps its lower end. "and" joins a range only after "between", so "Python 3 and 2 years"
+# gives 2.
 _YEARS = re.compile(
-    rf"\b(?P<low>{_NUMBER})(?:\s*\(\d{{1,2}}\))?\s*\+?\s*"
-    rf"(?:(?:-|–|—|to|or)\s*{_NUMBER}\s*\+?\s*)?(?P<unit>years?|yrs?|months?)\b",
+    rf"\b(?:(?P<between>between)\s+)?(?P<low>{_NUMBER})(?:\s*\(\d{{1,2}}\))?\s*\+?\s*"
+    rf"(?:(?:-|–|—|to|or|(?(between)and|(?!)))\s*{_NUMBER}(?:\s*\(\d{{1,2}}\))?\s*\+?\s*)?"
+    r"(?P<unit>years?|yrs?|months?)\b",
     re.I,
 )
 _EXPERIENCE_WORD = re.compile(r"\b(?:experience|experienced|track record|background)\b", re.I)
@@ -411,7 +414,8 @@ def _clauses(text: str, title: str | None) -> tuple[list[_Clause], str | None]:
                 section = kind
         else:
             kind = section
-            if first and _is_title_line(line, title):
+            # A bullet is never the title: "- 5+ years of experience with Python".
+            if first and not bullet and _is_title_line(line, title):
                 title_line, line = line, ""
         first = False
         for sentence in _SENTENCE_END.split(line):
@@ -537,9 +541,15 @@ def _list_skills(text: str, normalizer: SkillNormalizer) -> list[_Found]:
     for chunk in _CHUNK.split(text):
         items, complete = _chunk_items(chunk, normalizer)
         found += items
-        if not complete:
-            found += _known_skills(chunk, normalizer)
+        # An incomplete part is searched whole. Otherwise only the text _clean_item() cut
+        # after a preposition is, for the skills it names: "Python with Django".
+        found += _known_skills(_after_preposition(chunk) if complete else chunk, normalizer)
     return found
+
+
+def _after_preposition(text: str) -> str:
+    parts = _PREPOSITION.split(text.strip(), maxsplit=1)
+    return parts[1] if len(parts) > 1 else ""
 
 
 def _chunk_items(chunk: str, normalizer: SkillNormalizer) -> tuple[list[_Found], bool]:
@@ -550,6 +560,8 @@ def _chunk_items(chunk: str, normalizer: SkillNormalizer) -> tuple[list[_Found],
     normalized = _normalize(item, normalizer)
     if normalized is not None:  # also keeps a known name that contains "and"
         return [(item, normalized)], True
+    if _YEARS.search(chunk):  # "Between 3 and 5 years": "Between 3" is not a name
+        return [], False
 
     found: list[_Found] = []
     complete = True

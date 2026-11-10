@@ -28,7 +28,7 @@ parsed = parse_job_description(job.description, title=job.title)
 parsed.to_dict()   # JSON, see below
 ```
 
-- Pass `title` when the job has one. Without it, a short first line of the text is taken as the title.
+- Pass `title` when the job has one. Without it, a short first line of the text is taken as the title, unless it is a bullet.
 - By default the shared normalizer is used (`default_normalizer()`, built from `$ESCO_SKILLS_CSV`, alias table only without it). Pass `normalizer=` to reuse the parser worker's own. Like the normalizer, a call is **not thread-safe**: call it under the same lock as the CV parser.
 - The result is a **suggestion**. Show it in the job form for the recruiter to confirm or edit (US-01). Do not overwrite skills a recruiter has entered.
 
@@ -58,7 +58,7 @@ parsed.to_dict()   # JSON, see below
     {"raw": "Lambda", "normalized": null, "requirement": "required"},
     {"raw": "Kubernetes", "normalized": "Kubernetes", "requirement": "preferred"}
   ],
-  "parser_version": "jd-parser-0.1.0"
+  "parser_version": "jd-parser-0.1.1"
 }
 ```
 
@@ -108,12 +108,12 @@ When sections are detected but the required and nice-to-have parts name no skill
 ### 3. Skills
 
 - **Lists** after a lead-in ("experience with", "knowledge of", "confident with", "familiar with") and whole bullets under a required or nice-to-have heading are split at commas, `and`, `or`, `&` and parentheses. `Python/Go` is split when both halves are known skills, `CI/CD` and `A/B Testing` are not.
-- An item counts when the normalizer recognizes it, or when it looks like a name: at most 4 words, each capitalized (`Mobile UI Design`, `KPI Definition`). Words like "strong", "solid", "fluent" and endings like "experience" or "certification" are removed first.
+- An item counts when the normalizer recognizes it, or when it looks like a name: at most 4 words, each capitalized (`Mobile UI Design`, `KPI Definition`). Words like "strong", "solid", "fluent" and endings like "experience" or "certification" are removed first. An item ends at a preposition ("Python in production" gives `Python`); the text after it is searched for known skills, so "Python with Django" gives both. A part that states years ("Between 3 and 5 years") is never taken as a name.
 - **Other text** is searched for skills the normalizer knows (alias table and ESCO preferred labels, see `extract_skills`).
 
 ### 4. Minimum experience
 
-Patterns: `5+ years`, `3-5 years` (gives 3), `at least two years'`, `minimum of three years`, `18 months` (gives 1), and `no (prior) experience required` (gives 0). Under a requirements heading any number of years counts ("5+ yrs Python"). Elsewhere the sentence must be about experience. Sentences with `ago`, `founded`, `contract` or `within` are skipped, as are nice-to-have sentences ("5+ years preferred") and company text. With several values, the highest is kept: "5+ years, 2+ with Kubernetes" gives 5.
+Patterns: `5+ years`, `3-5 years` and `between 3 and 5 years` (give 3), `at least two years'`, `minimum of three years`, `18 months` (gives 1), and `no (prior) experience required` (gives 0). Under a requirements heading any number of years counts ("5+ yrs Python"). Elsewhere the sentence must be about experience. Sentences with `ago`, `founded`, `contract` or `within` are skipped, as are nice-to-have sentences ("5+ years preferred") and company text. With several values, the highest is kept: "5+ years, 2+ with Kubernetes" gives 5.
 
 ### 5. Seniority
 
