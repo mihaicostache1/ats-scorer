@@ -6,6 +6,7 @@ import { FileText, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatBytes } from "@/lib/format";
+import { staggerStyle } from "@/lib/motion";
 import type { PendingUpload } from "./use-cv-uploads";
 
 /** A file on its way to the server: a progress bar with Cancel, or why it failed with Try again. */
@@ -14,16 +15,19 @@ export function CvUploadItem({
   onCancel,
   onRetry,
   onDismiss,
+  index = 0,
 }: {
   upload: PendingUpload;
   onCancel: () => void;
   onRetry: () => void;
   onDismiss: () => void;
+  /** Position in the list, for the entrance animation. */
+  index?: number;
 }) {
   const { file, phase, progress, message } = upload;
 
   return (
-    <li className="py-3 first:pt-0 last:pb-0">
+    <li style={staggerStyle(index)} className="animate-row-in py-3 first:pt-0 last:pb-0">
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <div className="flex min-w-0 items-start gap-3">
           <FileText className="text-muted-foreground mt-0.5 size-5 shrink-0" aria-hidden="true" />

@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SkeletonTableRow } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/format";
+import { staggerStyle } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { readParsedSummary } from "./parsed-cv";
 import { CANDIDATE_PAGE_SIZE, type CandidateResponse } from "./use-candidates";
@@ -71,12 +72,13 @@ export function CandidatesTable({
               </td>
             </tr>
           ) : (
-            candidates.map((candidate) => {
+            candidates.map((candidate, index) => {
               const skills = readParsedSummary(candidate.parsed_data)?.skills ?? [];
               return (
                 <tr
                   key={candidate.id}
-                  className="hover:bg-foreground/[0.04] transition-colors duration-200"
+                  style={staggerStyle(index)}
+                  className="animate-row-in hover:bg-foreground/[0.04] transition-colors duration-(--motion-base)"
                 >
                   <td className="px-4 py-3 align-top">
                     <Link

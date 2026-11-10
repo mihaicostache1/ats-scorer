@@ -60,7 +60,7 @@ export function SectionBody<T>({
       />
     );
   }
-  return <>{children(state.data)}</>;
+  return <div className="animate-row-in">{children(state.data)}</div>;
 }
 
 /** Shown inside a section when there is nothing to list. */

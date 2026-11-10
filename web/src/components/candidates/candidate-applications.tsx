@@ -7,6 +7,7 @@ import { getJob, getJobStages, listApplications } from "@/api";
 import type { components } from "@/api/generated/schema";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
+import { staggerStyle } from "@/lib/motion";
 import { ProfileSection, SectionBody, SectionEmpty } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
 
@@ -92,12 +93,13 @@ export function CandidateApplications({ candidateId }: { candidateId: string }) 
             <SectionEmpty>Not applied to any job yet.</SectionEmpty>
           ) : (
             <ul className="divide-border divide-y">
-              {rows.map((row) => {
+              {rows.map((row, index) => {
                 const status = STATUS_BADGE[row.status];
                 return (
                   <li
                     key={row.id}
-                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
+                    style={staggerStyle(index)}
+                    className="animate-row-in flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
                   >
                     <div className="min-w-0">
                       {row.jobTitle ? (
