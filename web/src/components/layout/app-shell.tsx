@@ -11,32 +11,56 @@ interface AppShellProps {
   className?: string;
 }
 
+/** How long the mobile sidebar takes to slide away; about `--motion-base` (220ms). */
+const NAV_EXIT_MS = 200;
+
 export function AppShell({ children, className }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  // "closing" keeps the slide-over mounted while it plays its exit, then it is removed.
+  const [nav, setNav] = React.useState<"closed" | "open" | "closing">("closed");
+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const openNav = () => {
+    clearTimeout(closeTimer.current);
+    setNav("open");
+  };
+  const closeNav = () => {
+    setNav("closing");
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setNav("closed"), NAV_EXIT_MS);
+  };
+  React.useEffect(() => () => clearTimeout(closeTimer.current), []);
+  const leaving = nav === "closing";
 
   return (
     <ToastProvider>
       <div className="bg-ambient text-foreground flex min-h-screen flex-col">
-        <AppHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <AppHeader onToggleSidebar={() => (nav === "open" ? closeNav() : openNav())} />
 
         <div className="relative flex flex-1 overflow-hidden">
           {/* Desktop persistent sidebar */}
           <AppSidebar className="hidden lg:flex" />
 
           {/* Mobile slide-over sidebar */}
-          {sidebarOpen && (
+          {nav !== "closed" && (
             <div className="fixed inset-0 z-50 flex lg:hidden">
               <div
-                className="animate-in fade-in fixed inset-0 bg-black/25 backdrop-blur-md transition-opacity"
-                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "ease-fluid fixed inset-0 bg-black/25 backdrop-blur-md duration-(--motion-base)",
+                  leaving ? "animate-out fade-out fill-mode-forwards" : "animate-in fade-in"
+                )}
+                onClick={closeNav}
                 aria-hidden="true"
               />
               {/* No fill of its own: the sidebar inside supplies the glass, so the blur isn't nested. */}
-              <div className="animate-in slide-in-from-left relative z-10 flex h-full w-72 max-w-full flex-col overflow-hidden rounded-r-2xl shadow-2xl duration-200">
-                <AppSidebar
-                  className="w-full flex-1 border-r-0"
-                  onItemClick={() => setSidebarOpen(false)}
-                />
+              <div
+                className={cn(
+                  "ease-fluid relative z-10 flex h-full w-72 max-w-full flex-col overflow-hidden rounded-r-2xl shadow-2xl duration-(--motion-base)",
+                  leaving
+                    ? "animate-out slide-out-to-left fill-mode-forwards"
+                    : "animate-in slide-in-from-left"
+                )}
+              >
+                <AppSidebar className="w-full flex-1 border-r-0" onItemClick={closeNav} />
               </div>
             </div>
           )}

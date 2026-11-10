@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("bg-muted/70 dark:bg-muted/40 animate-pulse rounded-md", className)}
+      className={cn("bg-muted/70 dark:bg-muted/40 skeleton-shimmer rounded-md", className)}
       role="status"
       aria-label="Loading..."
       {...props}

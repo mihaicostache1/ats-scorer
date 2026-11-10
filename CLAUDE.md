@@ -65,6 +65,7 @@ Both test layers run in CI (`web` and `web e2e` jobs, no API/DB needed). First t
 - **List pages keep their state in the URL** (`?q=&status=&page=`): parse with `lib/url-state.ts` (invalid values fall back to defaults), write with `router.push` (filters/pages) or `replace` (debounced typing), and wrap the component in `<Suspense>` because it calls `useSearchParams`. `components/jobs/*` (`/jobs`) is the reference implementation; `components/common/pagination.tsx` is reusable. The older `DataTable` is client-side only (no URL state, no server paging).
 - Env vars are validated in `src/env.ts` (`@t3-oss/env-nextjs` + zod); add new ones there, including `experimental__runtimeEnv`.
 - UI: shared primitives in `src/components/ui` (shadcn), app chrome in `components/layout`, reusable states/tables in `components/common`; `/dev/components` is a component playground.
+- **Dev-only routes** are files named `page.dev.tsx` / `route.dev.ts`. `next.config.ts` adds `dev.tsx`/`dev.ts` to `pageExtensions` only for `next dev` (`src/lib/dev-routes.ts`), so in `next build` / `next start` they are not routes, not compiled and not shipped. `/dev/labeling` (the F-13 labeling tool for the L-9 evaluation, under `src/app/dev/labeling/`) is the first. Keep such a route's code inside its folder, never import it from elsewhere and never link to it (`isolation.test.ts` and `e2e/dev-routes.spec.ts` enforce this), and don't use `PageProps<…>`/`RouteContext<…>` in them. `/dev/components` is not one of these and ships.
 
 ## Known mismatches to be aware of
 

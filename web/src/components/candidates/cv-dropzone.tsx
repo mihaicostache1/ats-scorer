@@ -53,15 +53,22 @@ export function CvDropzone({
           if (!disabled) void accept(Array.from(event.dataTransfer.files));
         }}
         className={cn(
-          "border-border flex flex-col items-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors",
-          dragging && "border-primary bg-primary/5",
+          "border-border ease-fluid flex flex-col items-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-[border-color,background-color,scale] duration-(--motion-base)",
+          // Dragging a file over: the zone eases up a touch and the icon lifts.
+          dragging && "border-primary bg-primary/5 motion-safe:scale-[1.01]",
           disabled && "opacity-60"
         )}
       >
-        <FileUp className="text-muted-foreground size-6" aria-hidden="true" />
+        <FileUp
+          className={cn(
+            "text-muted-foreground ease-fluid size-6 transition-[color,translate] duration-(--motion-base)",
+            dragging && "text-primary motion-safe:-translate-y-1"
+          )}
+          aria-hidden="true"
+        />
         <p className="text-sm">
           Drag and drop a PDF here, or
-          <label className="focus-within:ring-primary/25 bg-primary/10 text-primary hover:bg-primary/15 ml-2 inline-flex h-9 cursor-pointer items-center rounded-[10px] px-3.5 text-sm font-medium focus-within:ring-4">
+          <label className="focus-within:ring-primary/25 bg-primary/10 text-primary hover:bg-primary/15 ease-fluid ml-2 inline-flex h-9 cursor-pointer items-center rounded-[10px] px-3.5 text-sm font-medium transition-[background-color,scale] duration-(--motion-fast) focus-within:ring-4 motion-safe:active:scale-[0.97]">
             Choose PDF
             <input
               type="file"
