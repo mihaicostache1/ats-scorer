@@ -45,18 +45,27 @@ GENERIC_WORDS = frozenset(
 )
 GENERIC_WEIGHT = 0.5
 
-_WORD = re.compile(r"[^\W_]+(?:[-/][^\W_]+)*")
+# A word with a trailing + or # kept (c++, c#, f#), optionally joined to more by - or /.
+_WORD = re.compile(r"[^\W_]+[+#]*(?:[-/][^\W_]+[+#]*)*")
+
+
+def _role_words(word: str) -> list[str]:
+    """A hyphenated seniority label ("mid-level", "entry-level") is split into its parts, so
+    they are dropped like "mid level". Other words are kept whole."""
+    parts = word.split("-")
+    return parts if len(parts) > 1 and all(part in SENIORITY_WORDS for part in parts) else [word]
 
 
 def title_words(title: str) -> dict[str, float]:
     """The words of a title that describe the role, each with its weight."""
     text = unicodedata.normalize("NFKC", title).casefold()
     words: dict[str, float] = {}
-    for word in _WORD.findall(text):
-        word = TITLE_SYNONYMS.get(word, word)
-        if word in SENIORITY_WORDS or word in FILLER_WORDS:
-            continue
-        words[word] = GENERIC_WEIGHT if word in GENERIC_WORDS else 1.0
+    for token in _WORD.findall(text):
+        for word in _role_words(token):
+            word = TITLE_SYNONYMS.get(word, word)
+            if word in SENIORITY_WORDS or word in FILLER_WORDS:
+                continue
+            words[word] = GENERIC_WEIGHT if word in GENERIC_WORDS else 1.0
     return words
 
 

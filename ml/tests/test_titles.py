@@ -24,6 +24,35 @@ def test_same_role_written_differently_is_a_full_match(first: str, second: str) 
     assert title_similarity(first, second) == 1.0
 
 
+@pytest.mark.parametrize("label", ["Mid-level", "Mid level", "Entry-Level", "Senior-level"])
+def test_hyphenated_seniority_labels_are_dropped(label: str) -> None:
+    assert title_words(f"{label} Backend Developer") == {"backend": 1.0, "engineer": 0.5}
+    assert title_similarity("Backend Developer", f"{label} Backend Developer") == 1.0
+
+
+def test_hyphenated_role_words_are_kept_whole() -> None:
+    assert title_words("Full-Stack Developer") == {"fullstack": 1.0, "engineer": 0.5}
+    assert title_words("Front-end Lead") == {"frontend": 1.0}
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [
+        ("C Developer", "C++ Developer"),
+        ("C Developer", "C# Developer"),
+        ("C++ Developer", "C# Developer"),
+    ],
+)
+def test_plus_and_hash_tell_languages_apart(first: str, second: str) -> None:
+    # Only "engineer" is shared: 2 * 0.5 / (1.5 + 1.5).
+    assert title_similarity(first, second) == pytest.approx(1 / 3)
+
+
+def test_the_same_language_still_matches() -> None:
+    assert title_words("Senior C# Developer") == {"c#": 1.0, "engineer": 0.5}
+    assert title_similarity("C++ Developer", "Senior C++ Engineer") == 1.0
+
+
 def test_a_shared_generic_word_counts_little() -> None:
     # Only "engineer" is shared, and it weighs half: 2 * 0.5 / (1.5 + 1.5).
     assert title_similarity("Backend Engineer", "Frontend Engineer") == pytest.approx(1 / 3)
