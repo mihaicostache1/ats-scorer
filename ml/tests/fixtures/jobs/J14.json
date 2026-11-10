@@ -1,0 +1,23 @@
+{
+  "job_id": "J14",
+  "synthetic": true,
+  "title": "DevOps Engineer",
+  "department": "Platform",
+  "location": "Amsterdam, Netherlands",
+  "employment_type": "full_time",
+  "description": "About the role\nWe are hiring a DevOps Engineer for our Platform team (Amsterdam, Netherlands).\n\nWhat you will do\n- Set up monitoring, alerting and incident response\n- Help development teams ship safely and often\n- Run and improve our cloud infrastructure\n\nWhat you bring\n- At least 2 years of relevant experience\n- Solid working knowledge of CI/CD, Docker, Ansible and Kubernetes\n\nNice to have\n- Prometheus, Linux and Nginx",
+  "required_skills": [
+    "CI/CD",
+    "Docker",
+    "Ansible",
+    "Kubernetes"
+  ],
+  "preferred_skills": [
+    "Prometheus",
+    "Linux",
+    "Nginx"
+  ],
+  "min_experience_years": 2,
+  "role_family": "devops",
+  "seniority": "mid"
+}

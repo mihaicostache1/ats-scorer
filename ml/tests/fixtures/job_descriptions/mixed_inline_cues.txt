@@ -1,0 +1,16 @@
+Machine Learning Engineer
+
+Join our applied AI team. Founded in 2009, we have been building search products for 15 years.
+
+Responsibilities
+- Train and deploy ranking models
+- Build feature pipelines in Spark
+
+Requirements
+- 3-5 years of experience in ML engineering
+- Python and PyTorch; ideally also TensorFlow
+- Docker. Kubernetes is a plus.
+- Required: SQL. Preferred: Airflow.
+
+Benefits
+- Yearly bonus and 25 days of holiday
