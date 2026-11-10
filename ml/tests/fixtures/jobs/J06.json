@@ -1,0 +1,26 @@
+{
+  "job_id": "J06",
+  "synthetic": true,
+  "title": "Senior Mobile Engineer",
+  "department": "Engineering",
+  "location": "Berlin, Germany (hybrid)",
+  "employment_type": "full_time",
+  "description": "About the role\nWe are hiring a Senior Mobile Engineer for our Engineering team (Berlin, Germany (hybrid)).\n\nWhat you will do\n- Integrate APIs, offline storage and notifications\n- Work with designers and backend developers\n- Publish releases to the app stores\n- Build and ship features for our mobile apps\n\nWhat you bring\n- At least 6 years of relevant experience\n- Solid working knowledge of Flutter, Firebase, iOS, Mobile UI Design, React Native and Jetpack Compose\n\nNice to have\n- Swift, SQLite, Fastlane and Push Notifications",
+  "required_skills": [
+    "Flutter",
+    "Firebase",
+    "iOS",
+    "Mobile UI Design",
+    "React Native",
+    "Jetpack Compose"
+  ],
+  "preferred_skills": [
+    "Swift",
+    "SQLite",
+    "Fastlane",
+    "Push Notifications"
+  ],
+  "min_experience_years": 6,
+  "role_family": "mobile",
+  "seniority": "senior"
+}

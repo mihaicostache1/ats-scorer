@@ -1,0 +1,14 @@
+Medior QA Engineer – Utrecht
+
+Your tasks:
+• Write and maintain end-to-end tests with Cypress
+• Review pull requests
+
+Your profile:
+• At least two years’ experience in software testing
+• Good command of Java or Kotlin
+• Fluent English; Dutch is an advantage
+
+Desirable:
+• ISTQB certification
+• Appium

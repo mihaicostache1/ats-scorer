@@ -1,0 +1,24 @@
+{
+  "job_id": "J11",
+  "synthetic": true,
+  "title": "Lead Backend Engineer",
+  "department": "Engineering",
+  "location": "Paris, France",
+  "employment_type": "full_time",
+  "description": "Our Engineering team is growing and we are looking for a Lead Backend Engineer. You will work with product, frontend and QA to ship features end to end, design, build and operate the services and APIs behind our product and monitor production and fix issues quickly. At least 8 years of relevant experience. You should be confident with Spring Boot, FastAPI, Microservices, Docker and Java. Experience with gRPC, GraphQL and Redis is a plus. Location: Paris, France.",
+  "required_skills": [
+    "Spring Boot",
+    "FastAPI",
+    "Microservices",
+    "Docker",
+    "Java"
+  ],
+  "preferred_skills": [
+    "gRPC",
+    "GraphQL",
+    "Redis"
+  ],
+  "min_experience_years": 8,
+  "role_family": "backend",
+  "seniority": "lead"
+}

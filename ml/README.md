@@ -118,6 +118,18 @@ normalizer = SkillNormalizer(load_esco("skills_en.csv"))
 normalizer.normalize_skills(["JS", "k8s"])  # JavaScript (ESCO), Kubernetes (not in ESCO)
 ```
 
+### Job description parsing
+
+`ats_scoring.job_parser.parse_job_description` reads required and nice-to-have skills, the minimum years of experience and the seniority from a job's text, for the backend to suggest a job's fields. If the text has no detectable sections, every skill counts as required. Output format and rules: [docs/ml/job-description-parsing.md](../docs/ml/job-description-parsing.md).
+
+```python
+from ats_scoring.job_parser import parse_job_description
+
+parse_job_description(description, title="Senior Backend Engineer").to_dict()
+# {"required_skills": [...], "preferred_skills": [...], "min_experience_years": 5,
+#  "seniority": "senior", "seniority_source": "title", "sections_detected": True, ...}
+```
+
 ### Evaluate
 
 `python -m ats_scoring.evaluate` compares a scorer's results with human ratings of 30 candidate/job pairs, and reports Spearman correlation and NDCG@10. It reads precomputed embeddings from `evaluation/data/embeddings.json`, so it needs no PyTorch. `python evaluation/ablation.py` scores each component alone and the scorer without each one. See [docs/ml/evaluation.md](../docs/ml/evaluation.md).

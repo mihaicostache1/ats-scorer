@@ -1,0 +1,24 @@
+{
+  "job_id": "J18",
+  "synthetic": true,
+  "title": "Head of Product",
+  "department": "Product",
+  "location": "London, UK (hybrid)",
+  "employment_type": "full_time",
+  "description": "Our Product team is growing and we are looking for a Head of Product. You will work daily with engineering, design and stakeholders, write clear user stories and acceptance criteria, talk to users and turn what you learn into priorities and own the roadmap and backlog for a product area. At least 9 years of relevant experience. You should be confident with Stakeholder Management, Backlog Prioritization, Roadmapping, Data Analysis, Agile and KPI Definition. Experience with Customer Interviews and Go-to-Market is a plus. Location: London, UK (hybrid).",
+  "required_skills": [
+    "Stakeholder Management",
+    "Backlog Prioritization",
+    "Roadmapping",
+    "Data Analysis",
+    "Agile",
+    "KPI Definition"
+  ],
+  "preferred_skills": [
+    "Customer Interviews",
+    "Go-to-Market"
+  ],
+  "min_experience_years": 9,
+  "role_family": "product",
+  "seniority": "lead"
+}
