@@ -1,27 +1,16 @@
-import Link from "next/link";
-import { FileSearch } from "lucide-react";
+import { CvReview, CvReviewAccess } from "@/components/cv-review/cv-review";
 
-import { CandidateAccess } from "@/components/candidates/candidate-access";
-import { EmptyState } from "@/components/common/empty-state";
-import { buttonVariants } from "@/components/ui/button";
-
-/** Placeholder so the "Review" link on a parsed CV has somewhere to go. F-11 builds the real screen. */
+/**
+ * F-11: the original PDF next to the parsed fields, which can be corrected and saved. Every role may
+ * open it; roles that can't edit candidates see it read-only.
+ */
 export default async function CvReviewPage({
   params,
 }: PageProps<"/candidates/[id]/cvs/[cvId]/review">) {
-  const { id } = await params;
+  const { id, cvId } = await params;
   return (
-    <CandidateAccess>
-      <EmptyState
-        icon={FileSearch}
-        title="CV review is coming soon"
-        description="You'll be able to check the parsed fields against the original PDF and correct them here."
-        action={
-          <Link href={`/candidates/${id}`} className={buttonVariants({ variant: "outline" })}>
-            Back to candidate
-          </Link>
-        }
-      />
-    </CandidateAccess>
+    <CvReviewAccess>
+      <CvReview candidateId={id} cvId={cvId} />
+    </CvReviewAccess>
   );
 }

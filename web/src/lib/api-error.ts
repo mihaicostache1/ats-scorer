@@ -10,6 +10,11 @@ export interface ApiFailure {
   message: string;
   /** Per-field messages, keyed by the API's field name (422 only). */
   fields: Record<string, string>;
+  /**
+   * The same messages keyed by the full location without the leading `body`, joined with dots
+   * (`skills.2.raw`), for nested forms where the last segment alone is ambiguous.
+   */
+  paths?: Record<string, string>;
 }
 
 type Unknown = Record<string, unknown>;
@@ -21,6 +26,7 @@ const cleanMessage = (msg: string) => msg.replace(/^Value error,\s*/i, "");
 
 export function parseApiFailure(error: unknown, status?: number): ApiFailure {
   const fields: Record<string, string> = {};
+  const paths: Record<string, string> = {};
 
   if (status === 429) {
     return { message: "Too many attempts. Please wait a minute and try again.", fields };
@@ -39,8 +45,10 @@ export function parseApiFailure(error: unknown, status?: number): ApiFailure {
         const loc = Array.isArray(item.loc) ? item.loc : [];
         const field = String(loc[loc.length - 1] ?? "");
         if (field && !(field in fields)) fields[field] = cleanMessage(item.msg);
+        const path = (loc[0] === "body" ? loc.slice(1) : loc).join(".");
+        if (path && !(path in paths)) paths[path] = cleanMessage(item.msg);
       }
-      return { message: "Please fix the highlighted fields.", fields };
+      return { message: "Please fix the highlighted fields.", fields, paths };
     }
 
     const envelope = error.error;

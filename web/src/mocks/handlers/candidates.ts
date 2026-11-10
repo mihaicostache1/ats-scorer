@@ -8,10 +8,56 @@ import {
   type CvScenario,
 } from "../scenarios/cv-scenarios";
 import type { components } from "@/api/generated/schema";
+import {
+  mergeForValidation,
+  parsedCvSchema,
+  type ParsedCV,
+  type ParsedProfilePatch,
+} from "@/components/cv-review/parsed-cv-schema";
+import { sessionAccount } from "./auth";
 import { BASE, detailResponse, errorResponse, notFound, paginate, sortItems, wait } from "./utils";
 
 type CandidateResponse = components["schemas"]["CandidateResponse"];
 type CvDocumentResponse = components["schemas"]["CvDocumentResponse"];
+
+type Json = Record<string, unknown>;
+const isJson = (v: unknown): v is Json => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** Pointers of every value that differs, like the API's `_changes`. */
+function changedPointers(before: unknown, after: unknown, path = ""): string[] {
+  if (JSON.stringify(before) === JSON.stringify(after)) return [];
+  if (isJson(before) && isJson(after)) {
+    return [...new Set([...Object.keys(before), ...Object.keys(after)])]
+      .sort()
+      .flatMap((key) => changedPointers(before[key], after[key], `${path}/${key}`));
+  }
+  return [path];
+}
+
+/** Confidence 1 for a corrected value and for everything inside it, with indexes of the new list. */
+function leafPointers(value: unknown, path: string): string[] {
+  if (isJson(value) && Object.keys(value).length) {
+    return Object.entries(value).flatMap(([k, v]) => leafPointers(v, `${path}/${k}`));
+  }
+  if (Array.isArray(value) && value.length) {
+    return value.flatMap((v, i) => leafPointers(v, `${path}/${i}`));
+  }
+  return [path];
+}
+
+const valueAt = (data: unknown, pointer: string): unknown =>
+  pointer
+    .split("/")
+    .slice(1)
+    .reduce<unknown>((node, part) => (node as Json | unknown[] | undefined)?.[part as never], data);
+
+/** Canonical `candidates` columns and the limits the API puts on them. */
+const CONTACT_COLUMNS = {
+  name: { column: "full_name", max: 255, nullable: false },
+  email: { column: "email", max: 255, nullable: false },
+  phone: { column: "phone", max: 50, nullable: true },
+  location: { column: "location", max: 255, nullable: true },
+} as const;
 
 const MAX_CV_SIZE_BYTES = 10 * 1024 * 1024;
 const TERMINAL = ["extracted", "parsed", "needs_review", "failed"];
@@ -162,6 +208,143 @@ export const candidateHandlers = [
       updated_at: new Date().toISOString(),
     };
     return HttpResponse.json(candidatesStore[idx]);
+  }),
+
+  /**
+   * PATCH /candidates/:id/parsed-profile (B-14) — recruiter corrections to the L-10 profile.
+   * Like the API: nested objects merge and lists replace; the merged profile must be valid L-10
+   * (422 otherwise); the server sets `source` and the confidence of what changed; explicit contact
+   * fields also update the candidate's columns (409 for a taken email). Viewers are stopped by the
+   * session guard with a 403.
+   */
+  http.patch(`${BASE}/candidates/:id/parsed-profile`, async ({ params, request, cookies }) => {
+    await wait(300);
+    const idx = candidatesStore.findIndex((c) => c.id === params.id);
+    if (idx === -1) return notFound("Candidate", params.id);
+    const candidate = candidatesStore[idx];
+
+    const latest = cvStore
+      .filter((d) => d.candidate_id === candidate.id)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    if (latest && latest.status !== "parsed" && latest.status !== "needs_review") {
+      return detailResponse(
+        409,
+        "The latest CV must finish parsing before its profile can be reviewed."
+      );
+    }
+    if (!parsedCvSchema.safeParse(candidate.parsed_data).success) {
+      return detailResponse(409, "The candidate does not have a valid parsed profile yet.");
+    }
+    const original = candidate.parsed_data as unknown as ParsedCV;
+
+    const patch = (await request.json()) as ParsedProfilePatch;
+    const merged = parsedCvSchema.safeParse(mergeForValidation(original, patch));
+    if (!merged.success) {
+      return HttpResponse.json(
+        {
+          detail: merged.error.issues.map((issue) => ({
+            loc: ["body", ...issue.path],
+            msg: issue.message,
+            type: issue.code,
+          })),
+        },
+        { status: 422 }
+      );
+    }
+    const corrected = mergeForValidation(original, patch) as Json;
+
+    // Explicit contact fields are checked against the canonical columns.
+    const contactPatch = (patch.contact ?? {}) as Record<string, unknown>;
+    const columns: Partial<CandidateResponse> = {};
+    const problems: { loc: (string | number)[]; msg: string; type: string }[] = [];
+    for (const [field, rule] of Object.entries(CONTACT_COLUMNS)) {
+      if (!(field in contactPatch)) continue;
+      const value = contactPatch[field];
+      if (value === null && !rule.nullable) {
+        problems.push({
+          loc: ["body", "contact", field],
+          msg: `${field} cannot be null`,
+          type: "value_error",
+        });
+      } else if (
+        typeof value === "string" &&
+        (value.length > rule.max || (!rule.nullable && !value))
+      ) {
+        problems.push({
+          loc: ["body", "contact", field],
+          msg: `String should have at most ${rule.max} characters`,
+          type: "string_too_long",
+        });
+      } else if (
+        field === "email" &&
+        typeof value === "string" &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+      ) {
+        problems.push({
+          loc: ["body", "contact", "email"],
+          msg: "value is not a valid email address",
+          type: "value_error",
+        });
+      } else {
+        (columns as Record<string, unknown>)[rule.column] =
+          field === "email" && typeof value === "string" ? value.toLowerCase() : value;
+      }
+    }
+    if (problems.length) return HttpResponse.json({ detail: problems }, { status: 422 });
+    if (
+      typeof columns.email === "string" &&
+      candidatesStore.some((c) => c.id !== candidate.id && c.email.toLowerCase() === columns.email)
+    ) {
+      return HttpResponse.json(
+        {
+          detail: [
+            {
+              loc: ["body", "contact", "email"],
+              msg: "A candidate with this email already exists.",
+              type: "value_error",
+            },
+          ],
+        },
+        { status: 409 }
+      );
+    }
+
+    // Changed values get confidence 1; so does everything inside a replaced list, renumbered.
+    const strip = (data: unknown) =>
+      isJson(data)
+        ? Object.fromEntries(
+            Object.entries(data).filter(([k]) => k !== "confidence" && k !== "source")
+          )
+        : data;
+    let confidence = { ...(original.confidence ?? {}) };
+    for (const pointer of changedPointers(strip(original), strip(corrected))) {
+      confidence = Object.fromEntries(
+        Object.entries(confidence).filter(
+          ([key]) => key !== pointer && !key.startsWith(`${pointer}/`)
+        )
+      );
+      for (const leaf of leafPointers(valueAt(corrected, pointer), pointer)) confidence[leaf] = 1;
+      confidence[pointer] = 1;
+    }
+
+    const reviewedAt = new Date().toISOString();
+    const reviewer = sessionAccount(cookies)?.user.id ?? MOCK_USER_ID;
+    const parsed = { ...corrected, source: "recruiter", confidence } as unknown as ParsedCV;
+    candidatesStore[idx] = {
+      ...candidate,
+      ...columns,
+      parsed_data: parsed as unknown as CandidateResponse["parsed_data"],
+      parsed_profile_reviewed_by: reviewer,
+      parsed_profile_reviewed_at: reviewedAt,
+      updated_at: reviewedAt,
+    };
+    const body: components["schemas"]["ParsedProfileResponse"] = {
+      candidate_id: candidate.id,
+      parsed_data: parsed,
+      reviewed_by: reviewer,
+      reviewed_at: reviewedAt,
+    };
+    return HttpResponse.json(body);
   }),
 
   /**

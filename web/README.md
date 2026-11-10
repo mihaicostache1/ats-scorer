@@ -62,6 +62,39 @@ before the first paint, so there is no flash of the wrong theme. Dark mode is th
 To reset it, delete `ats-theme` in DevTools > Application > Local Storage. In Playwright, use
 `test.use({ colorScheme: "dark" })` to emulate a dark OS (see `e2e/theme.spec.ts`).
 
+## Dev-only routes and the labeling tool
+
+A route file named `page.dev.tsx` or `route.dev.ts` exists **only while `npm run dev` runs**.
+`next.config.ts` adds the `dev.tsx` / `dev.ts` page extensions for the dev server and for nothing else, so
+`next build` and `next start` treat these files as ordinary unused files: the route is not compiled, not
+traced into the standalone image and answers 404. `src/lib/dev-routes.ts` holds the rule. The first such
+route is `/dev/labeling` (not linked from the app; type the URL).
+
+**`/dev/labeling`** is the tool for rating the L-9 evaluation set (`ml/evaluation/`: 30 pairs, 3 jobs, 22 CVs).
+It shows a CV in the browser's PDF viewer next to its job, and saves your progress in `localStorage`
+(per name, so several raters can share a browser).
+
+| Key                        | Does                                                                |
+| -------------------------- | ------------------------------------------------------------------- |
+| `0` `1` `2` `3`            | Rate the pair and move on                                           |
+| `S`                        | Skip (leave it unrated; an existing rating is kept)                 |
+| `U`, `Backspace`, `Ctrl+Z` | Undo the last rate or skip, as often as you like. Survives a reload |
+| `←` `→`                    | Look at the previous or next pair without changing anything         |
+| `E`                        | Export the CSV                                                      |
+| `?`                        | Help                                                                |
+
+Enter your name first (Enter in the box hands the keyboard to the shortcuts); it names the file. **Export CSV**
+downloads `<name>.csv`: a copy of `ml/evaluation/pairs.csv` with the `rating` column filled in, which is what
+L-9 reads. Save it in `ml/evaluation/ratings/` and run `python -m ats_scoring.evaluate` from `ml/`. Pairs you
+did not rate stay empty, and L-9 ignores them. Keys go to the PDF viewer while it has the focus: click outside
+it to use the shortcuts again. If `ml/evaluation/` is rebuilt, ratings saved for the old version are not applied;
+the page offers to download them and start over.
+
+**Adding another dev-only route:** name it `page.dev.tsx` / `route.dev.ts`, keep its code inside its folder,
+do not import it or link to it from other code, and do not use the typed `PageProps<"…">` helpers (they do not
+exist for a route a build leaves out). `src/app/dev/labeling/isolation.test.ts` and
+`e2e/dev-routes.spec.ts` (which checks a real production build) will tell you if it leaks.
+
 ## Checks
 
 ```bash

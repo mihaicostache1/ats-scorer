@@ -16,6 +16,7 @@ interface ParsedInput {
   education: { degree: string; institution: string; grad_year: number }[];
   languages?: { language: string; level: string }[];
   certifications?: string[];
+  confidence?: Record<string, number>;
 }
 
 /** Builds `parsed_data` in parsed-CV schema 1.0 (docs/ml/parsed-cv-schema.md). */
@@ -43,7 +44,7 @@ function parsedV1(i: ParsedInput): Record<string, unknown> {
     education: i.education,
     languages: i.languages ?? [],
     certifications: i.certifications ?? [],
-    confidence: {},
+    confidence: i.confidence ?? {},
   };
 }
 
@@ -136,6 +137,14 @@ export const mockCandidates: CandidateResponse[] = [
       education: [{ degree: "B.S. Computer Science", institution: "UC Berkeley", grad_year: 2020 }],
       languages: [{ language: "English", level: "native" }],
       certifications: ["AWS Certified Developer"],
+      // A few values the parser was unsure about, so the review screen has something to highlight.
+      confidence: {
+        "/contact/name": 0.97,
+        "/contact/email": 0.99,
+        "/contact/phone": 0.5,
+        "/skills/3/normalized": 0.62,
+        "/experiences/0/start": 0.7,
+      },
     }),
   },
   {
