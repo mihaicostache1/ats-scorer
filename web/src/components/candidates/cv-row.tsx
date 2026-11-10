@@ -11,6 +11,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { NETWORK_ERROR_MESSAGE, parseApiFailure } from "@/lib/api-error";
 import { formatBytes, formatDate } from "@/lib/format";
+import { staggerStyle } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import {
   CV_STATUS_BADGE,
@@ -81,9 +82,12 @@ export function CvRow({
   candidateId,
   cv,
   onUpdate,
+  index = 0,
 }: {
   candidateId: string;
   cv: CvDocument;
+  /** Position in the list, for the entrance animation. */
+  index?: number;
   /** A fresher copy of this CV, with the one it replaces. */
   onUpdate: (next: CvDocument, previous: CvDocument) => void;
 }) {
@@ -113,7 +117,10 @@ export function CvRow({
   };
 
   return (
-    <li className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0">
+    <li
+      style={staggerStyle(index)}
+      className="animate-row-in flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
+    >
       <div className="flex min-w-0 items-start gap-3">
         <FileText className="text-muted-foreground mt-0.5 size-5 shrink-0" aria-hidden="true" />
         <div className="min-w-0">

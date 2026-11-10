@@ -109,10 +109,10 @@ export function AppSidebar({
                 const content = (
                   <div
                     className={cn(
-                      "group flex min-h-10 items-center justify-between rounded-[10px] px-3 py-2 text-[15px] font-medium transition-all duration-200 ease-out",
+                      "group ease-fluid flex min-h-10 items-center justify-between rounded-[10px] px-3 py-2 text-[15px] font-medium transition-[color,background-color,box-shadow,scale,translate] duration-(--motion-fast)",
                       isActive
                         ? "glass-subtle text-sidebar-accent-foreground ring-primary/25 font-semibold ring-1"
-                        : "text-sidebar-foreground hover:bg-foreground/5 active:scale-[0.99]"
+                        : "text-sidebar-foreground hover:bg-foreground/5 motion-safe:hover:translate-x-0.5 motion-safe:active:scale-[0.99]"
                     )}
                   >
                     <div className="flex items-center gap-3">
