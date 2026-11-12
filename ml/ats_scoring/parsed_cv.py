@@ -1,4 +1,4 @@
-"""Pydantic models of the parsed-CV schema, version 1.0.
+"""Pydantic models of the parsed-CV schema, version 1.1 (also reads 1.0).
 
 The JSON Schema in `schemas/parsed_cv.schema.json` describes the same shape for
 non-Python readers. Both are checked against the fixtures in `schemas/fixtures/`, so
@@ -9,7 +9,7 @@ from typing import Annotated, Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-SCHEMA_VERSION: Final = "1.0"
+SCHEMA_VERSION: Final = "1.1"
 
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
 YearMonth = Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-(0[1-9]|1[0-2])$")]
@@ -38,6 +38,7 @@ class Contact(_Model):
 class Skill(_Model):
     raw: NonEmptyStr  # as written in the CV
     normalized: NonEmptyStr | None  # canonical name, or null when it is not recognized
+    suggestion: NonEmptyStr | None = None  # unconfirmed fuzzy or embedding match
 
 
 class Experience(_Model):
@@ -64,7 +65,7 @@ class Language(_Model):
 class ParsedCV(_Model):
     """The content of `candidates.parsed_data` once a CV has been parsed."""
 
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     source: Literal["parser", "recruiter"]  # who wrote this version of the record
     contact: Contact = Field(default_factory=Contact)
     headline: str | None = None  # current or most recent job title

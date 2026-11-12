@@ -68,6 +68,7 @@ function generatedCandidates(): CandidateResponse[] {
     return {
       id: `c0000000-0000-4000-8000-0000000000${String(n + 1).padStart(2, "0")}`,
       org_id: MOCK_ORG_ID,
+      possible_duplicates: [],
       full_name: name,
       email,
       phone,
@@ -108,6 +109,7 @@ export const mockCandidates: CandidateResponse[] = [
   {
     id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     full_name: "Alex Mercer",
     email: "alex.mercer@example.com",
     phone: "+1-555-0199",
@@ -150,6 +152,7 @@ export const mockCandidates: CandidateResponse[] = [
   {
     id: "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     full_name: "Priya Nair",
     email: "priya.nair@example.com",
     phone: "+44-7700-900123",
@@ -192,6 +195,7 @@ export const mockCandidates: CandidateResponse[] = [
   {
     id: "b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     full_name: "Daniel Okonkwo",
     email: "d.okonkwo@example.com",
     phone: "+1-555-0247",
@@ -216,6 +220,7 @@ export const mockCandidates: CandidateResponse[] = [
   {
     id: "c4d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     full_name: "Emilia Santos",
     email: "emilia.santos@example.com",
     phone: "+55-11-98765-4321",
@@ -229,6 +234,7 @@ export const mockCandidates: CandidateResponse[] = [
   {
     id: "d5e6f7a8-b9c0-1d2e-3f4a-5b6c7d8e9f0a",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     full_name: "Jordan Kim",
     email: "jordan.kim@example.com",
     phone: "+82-10-9876-5432",
@@ -274,6 +280,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[0].id,
     original_filename: "alex-mercer.pdf",
     content_type: "application/pdf",
@@ -293,6 +300,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90ae8",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[1].id,
     original_filename: "priya-nair-cv.pdf",
     content_type: "application/pdf",
@@ -312,6 +320,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90ae9",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[2].id,
     original_filename: "okonkwo_scan.pdf",
     content_type: "application/pdf",
@@ -332,6 +341,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
     // An older upload for Alex; the newer one above supersedes it.
     id: "7c9e6679-7425-40de-944b-e07fc1f90aea",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[0].id,
     original_filename: "alex-mercer-2025.pdf",
     content_type: "application/pdf",
@@ -351,6 +361,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90aeb",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[5].id,
     original_filename: "scan-no-text.pdf",
     content_type: "application/pdf",
@@ -370,6 +381,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90aec",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[6].id,
     original_filename: "extracted-only.pdf",
     content_type: "application/pdf",
@@ -390,6 +402,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
     // Still waiting in the queue: opening this profile resumes polling (see handlers/candidates.ts).
     id: "7c9e6679-7425-40de-944b-e07fc1f90aed",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[7].id,
     original_filename: "waiting-in-queue.pdf",
     content_type: "application/pdf",
@@ -409,6 +422,7 @@ export const mockCvDocuments: CvDocumentResponse[] = [
   {
     id: "7c9e6679-7425-40de-944b-e07fc1f90aee",
     org_id: MOCK_ORG_ID,
+    possible_duplicates: [],
     candidate_id: mockCandidates[8].id,
     original_filename: "being-extracted.pdf",
     content_type: "application/pdf",

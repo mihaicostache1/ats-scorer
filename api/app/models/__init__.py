@@ -12,11 +12,13 @@ from app.models.organization import Organization
 from app.models.pipeline_stage import PipelineStage
 from app.models.score import Score
 from app.models.user import User
+from app.models.user_invitation import UserInvitation
 
 __all__ = [
     "Base",
     "Organization",
     "User",
+    "UserInvitation",
     "Job",
     "PipelineStage",
     "Candidate",

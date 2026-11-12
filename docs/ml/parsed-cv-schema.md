@@ -1,6 +1,6 @@
-# Parsed-CV schema (version 1.0)
+# Parsed-CV schema (version 1.1)
 
-**Status:** version 1.0, final once the backend and frontend developers have approved the PR (L-10). Owner: ML/DevOps lead. Used by B-13 (CV parser) and F-11 (CV review screen).
+**Status:** version 1.1, also accepts existing 1.0 records. Schema changes require backend and frontend review before merge. Owner: ML/DevOps lead. Used by B-13 (CV parser) and F-11 (CV review screen).
 
 This is the shape of `candidates.parsed_data`: what the CV parser writes, what the recruiter corrects on the review screen, and what the scorer reads.
 
@@ -28,7 +28,7 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `schema_version` | `"1.0"` | **Yes** | See [Versions](#versions) |
+| `schema_version` | `"1.0"` or `"1.1"` | **Yes** | B-13 writes `1.1`. See [Versions](#versions) |
 | `source` | `"parser"` or `"recruiter"` | **Yes** | Who wrote this version of the record. The parser writes `parser`. When a recruiter saves a correction, the backend sets `recruiter` |
 | `contact` | object | No | Defaults to an empty contact |
 | `contact.name`, `.email`, `.phone`, `.location` | string or null | No | As read from the CV |
@@ -38,6 +38,7 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 | `skills` | list of skills | **Yes**, may be empty | |
 | `skills[].raw` | string, not empty | **Yes** | The skill as written in the CV |
 | `skills[].normalized` | string or null | **Yes** | Canonical name, or `null` when the skill is not recognized. The key must be present |
+| `skills[].suggestion` | string, not empty, or null | No | Unconfirmed fuzzy or embedding match for recruiter review. Omitted or `null` means no suggestion |
 | `experience_years` | number or null, at least 0 | No | Total years of work experience |
 | `experiences` | list | No | Most recent first |
 | `experiences[].title` | string, not empty | **Yes** | |
@@ -67,6 +68,24 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 - The schema checks the form of the key and the range of the value. It does not check that the pointer leads to a field that exists. The producer keeps them in step: when it adds or removes an entry in a list, it renumbers the pointers.
 - When a recruiter corrects a field, the backend sets that field's confidence to `1` and `source` to `recruiter`.
 
+### Skill suggestions (L-11 review decision)
+
+Schema 1.1 adds the optional `skills[].suggestion` label. B-13 stores it alongside
+the original skill, so parser snapshots and recruiter corrections keep the skill
+and its suggestion together without a separate store or a database migration.
+
+```json
+{ "raw": "project managment", "normalized": null, "suggestion": "project management" }
+```
+
+Fuzzy and embedding matches leave `normalized` null. A suggestion is an offer for
+review, never an automatically accepted match. To accept it, the recruiter explicitly
+sets `normalized`; the review client should clear `suggestion` in the replacement
+skills list. Alias/exact matches and unmatched skills have no suggestion. The
+normalizer's method, similarity score and ESCO identifiers remain internal; a
+similarity score does not become field confidence. B-13 keeps its low confidence
+for an unconfirmed normalization. The scorer ignores suggestions.
+
 ## Rules
 
 - **The scorer reads only qualifications:** `headline`, `summary`, `skills[].raw`, `experiences[].title`, `.summary` and `.bullets`, `education[].degree` and `certifications`. Contact details, employer and school names, dates, graduation years, languages and confidence are never read, so they cannot change a score (US-06). `test_contact_and_confidence_do_not_change_the_score` checks this.
@@ -80,7 +99,7 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 
 `schema_version` is `MAJOR.MINOR`, and the schema file lists the versions it accepts.
 
-- **Minor** (1.1): a change that keeps every 1.0 record valid, for example a new optional field. Add the version to the `schema_version` list. Readers of 1.0 can ignore the new field, but note that the closed objects mean a 1.0 validator rejects 1.1 records, so the backend must validate with the schema file that matches the record's version.
+- **Minor** (1.1): a change that keeps every 1.0 record valid, for example a new optional field. Add the version to the `schema_version` list in both descriptions. The shared 1.1 validator reads both 1.0 and 1.1; existing records need no migration. Deploy updated readers before 1.1 writers, because an older, closed 1.0 validator rejects 1.1 records.
 - **Major** (2.0): anything else, such as renaming or removing a field or making an optional field required. It gets a new schema file, and old records are migrated or kept under the old file.
 
 ### Changing the schema after it is merged
@@ -95,6 +114,7 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 
 | Version | Date | Change |
 |---|---|---|
+| 1.1 | 2026-11-05 | Adds optional, nullable `skills[].suggestion` for unconfirmed fuzzy and embedding matches. B-13 preserves suggestions and writes 1.1. Continues to accept 1.0 records. Suggestions never affect scoring |
 | 1.0 | 2026-10 | First final version. Adds `contact`, `source`, `confidence`, `skills[].normalized`, `languages[].level`, `experiences[].is_current`. Renames `work_history` to `experiences`. Skills and languages become objects. Drops `experiences[].years`. `schema_version` is required. Objects are closed |
 | 0.1 | 2026-10 | Draft from L-7. Never written by a parser |
 
@@ -148,4 +168,4 @@ Details of the scoring are in [ml/README.md](../../ml/README.md).
 - **B-13 integration:** the API image now builds from the repository root and installs
   `ml/` directly. The parser validates with `ParsedCV`; tests also validate its output
   against the JSON Schema. See [CV extraction](cv-structured-extraction.md).
-- **TypeScript types for F-11.** The web app generates its types from `docs/openapi.yaml`, where `parsed_data` is still an open object. Either describe the schema there, or generate types from the JSON Schema. The frontend developer decides.
+- **TypeScript types for F-11.** `ParsedCV`, `ParsedCvSkill` and `ParsedProfilePatch` in `docs/openapi.yaml` mirror the shared schema, including 1.1 suggestions. The web app generates its types from that contract. Generic candidate GET responses retain an open `parsed_data` object for older draft data.

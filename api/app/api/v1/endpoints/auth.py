@@ -14,6 +14,7 @@ from app.core.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest, OrgRegisterRequest, TokenResponse, UserPublic
+from app.schemas.user import AcceptInvitationRequest
 from app.services.auth_service import (
     login as svc_login,
 )
@@ -26,11 +27,29 @@ from app.services.auth_service import (
 from app.services.auth_service import (
     register_org_and_admin,
 )
+from app.services.user_service import accept_invitation
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 # Rate limiter keyed on client IP
 limiter = Limiter(key_func=get_remote_address)
+
+
+@router.post(
+    "/accept-invite",
+    response_model=UserPublic,
+    status_code=201,
+    summary="Accept a single-use workspace invitation",
+)
+def accept_invite(
+    payload: AcceptInvitationRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> User:
+    """Create the invited account without an existing session; sign in normally afterwards."""
+    response.headers["Cache-Control"] = "no-store"
+    return accept_invitation(db, payload, request)
 
 
 # ---------------------------------------------------------------------------

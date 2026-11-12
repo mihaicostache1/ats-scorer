@@ -60,7 +60,7 @@ score(candidate, job, candidate_embedding=cv_vector, job_embedding=job_vector)
 # }
 ```
 
-`candidate` follows the parsed-CV schema (version 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
+`candidate` follows the parsed-CV schema (version 1.1, also accepting 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
 
 The embeddings come from `ats_scoring.embeddings.Embedder`, computed once per CV and per job and stored. `score()` never loads a model and makes no network call. Without embeddings it still works, and the embedding weight is shared among the other components.
 
