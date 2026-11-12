@@ -306,7 +306,7 @@ GDPR / Privacy compliance consent tracking for candidate data processing and AI 
 - `idx_users_org_role`: `users(org_id, role)` - Fast lookup of org recruiters/admins.
 - `idx_jobs_org_status`: `jobs(org_id, status)` - Filtering active job listings per workspace.
 - `idx_pipeline_stages_org_job`: `pipeline_stages(org_id, job_id, stage_order)` - Ordering pipeline board stages.
-- `idx_candidates_org_email`: `candidates(org_id, email)` - Fast candidate deduplication and search.
+- `ix_candidates_org_email`: nonunique index on `candidates(org_id, email)`. Shared emails are allowed and produce a possible-duplicate warning.
 - `idx_applications_org_job_stage`: `applications(org_id, job_id, stage_id)` - KanBan board stage column rendering.
 - `idx_scores_org_job_score`: `scores(org_id, job_id, overall_score DESC)` - High-performance candidate ranking retrieval.
 

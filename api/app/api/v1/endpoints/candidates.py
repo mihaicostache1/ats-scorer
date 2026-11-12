@@ -5,7 +5,6 @@ from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy import or_
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import (
@@ -28,6 +27,7 @@ from app.schemas.candidate import (
 from app.schemas.job import SortOrder
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.duplicate_detection import DuplicateDetector
 from app.services.parsed_profile_service import correct_parsed_profile
 from app.services.storage import Storage, get_storage
 
@@ -40,10 +40,11 @@ _SORT_COLUMNS = {
     CandidateSortField.EMAIL: Candidate.email,
 }
 
-_DUPLICATE_EMAIL = HTTPException(
-    status_code=status.HTTP_409_CONFLICT,
-    detail="A candidate with this email already exists.",
-)
+
+def _candidate_response(candidate: Candidate, detector: DuplicateDetector) -> CandidateResponse:
+    response = CandidateResponse.model_validate(candidate)
+    response.possible_duplicates = detector.find(candidate)
+    return response
 
 
 def _get_candidate_or_404(db: Session, candidate_id: uuid.UUID) -> Candidate:
@@ -91,9 +92,10 @@ def list_candidates(
     items = (
         query.order_by(ordering, Candidate.id).offset((page - 1) * per_page).limit(per_page).all()
     )
+    detector = DuplicateDetector(db, _current_user.org_id)
 
     return PaginatedCandidatesResponse(
-        items=[CandidateResponse.model_validate(item) for item in items],
+        items=[_candidate_response(item, detector) for item in items],
         pagination=PaginationMeta.build(page=page, per_page=per_page, total_items=total),
     )
 
@@ -109,7 +111,7 @@ def create_candidate(
     request: Request,
     db: Session = Depends(get_tenant_db),
     current_user: User = Depends(get_current_recruiter_or_admin),
-) -> Candidate:
+) -> CandidateResponse:
     """Add a candidate to the current organization. Admin or recruiter only."""
     candidate = Candidate(
         id=uuid.uuid4(),
@@ -128,13 +130,9 @@ def create_candidate(
         details={"consent_given": candidate.consent_given_at is not None},
         request=request,
     )
-    try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        raise _DUPLICATE_EMAIL from None
+    db.commit()
     db.refresh(candidate)
-    return candidate
+    return _candidate_response(candidate, DuplicateDetector(db, candidate.org_id))
 
 
 @router.get(
@@ -146,9 +144,10 @@ def get_candidate(
     id: uuid.UUID,
     db: Session = Depends(get_tenant_db),
     _current_user: User = Depends(get_current_user),
-) -> Candidate:
+) -> CandidateResponse:
     """Return a single candidate from the current organization."""
-    return _get_candidate_or_404(db, id)
+    candidate = _get_candidate_or_404(db, id)
+    return _candidate_response(candidate, DuplicateDetector(db, candidate.org_id))
 
 
 @router.patch(
@@ -162,7 +161,7 @@ def update_candidate(
     request: Request,
     db: Session = Depends(get_tenant_db),
     current_user: User = Depends(get_current_recruiter_or_admin),
-) -> Candidate:
+) -> CandidateResponse:
     """Partially update a candidate. Admin or recruiter only."""
     candidate = _get_candidate_or_404(db, id)
 
@@ -172,7 +171,7 @@ def update_candidate(
         if getattr(candidate, field) != value
     }
     if not changes:
-        return candidate
+        return _candidate_response(candidate, DuplicateDetector(db, candidate.org_id))
 
     for field, value in changes.items():
         setattr(candidate, field, value)
@@ -186,13 +185,9 @@ def update_candidate(
         details={"changed_fields": sorted(changes)},
         request=request,
     )
-    try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        raise _DUPLICATE_EMAIL from None
+    db.commit()
     db.refresh(candidate)
-    return candidate
+    return _candidate_response(candidate, DuplicateDetector(db, candidate.org_id))
 
 
 @router.patch(
@@ -209,20 +204,7 @@ def update_parsed_profile(
 ) -> ParsedProfileResponse:
     """Merge corrections, validate L-10, and record the authenticated reviewer."""
     candidate = _get_candidate_or_404(db, id)
-    try:
-        return correct_parsed_profile(db, candidate, payload, current_user, request)
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=409,
-            detail=[
-                {
-                    "loc": ["body", "contact", "email"],
-                    "msg": "A candidate with this email already exists.",
-                    "type": "value_error",
-                }
-            ],
-        ) from None
+    return correct_parsed_profile(db, candidate, payload, current_user, request)
 
 
 @router.delete(

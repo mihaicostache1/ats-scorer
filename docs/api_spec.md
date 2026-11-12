@@ -51,7 +51,7 @@ All non-2xx API error responses return a uniform JSON error envelope:
 - `FORBIDDEN` (403): User role lacks required permission (e.g. `viewer` trying to delete candidate).
 - `RESOURCE_NOT_FOUND` (404): Target entity does not exist in workspace.
 - `VALIDATION_ERROR` (422): Input field failed format/type validation.
-- `CONFLICT` (409): Duplicate email or duplicate candidate application for job.
+- `CONFLICT` (409): Duplicate user email or duplicate candidate application for job.
 - `INTERNAL_SERVER_ERROR` (500): Unexpected system error.
 
 ### 1.4 Standard Pagination Envelope
@@ -271,7 +271,7 @@ Returns the job's pipeline stages in order. Any role can read. Every organizatio
 ### 2.3 Candidates & CV Upload
 
 #### `POST /api/v1/candidates`
-Adds a candidate to the organization. Requires the `admin` or `recruiter` role; only `full_name` and `email` are required. `consent_given_at` is the time the candidate consented to data processing and stays `null` until consent is recorded; it must include a timezone. Emails are stored lowercase and are unique per organization (`409` on a duplicate).
+Adds a candidate to the organization. Requires the `admin` or `recruiter` role; only `full_name` and `email` are required. `consent_given_at` is the time the candidate consented to data processing and stays `null` until consent is recorded; it must include a timezone. Emails are stored lowercase. Shared candidate emails are allowed and produce review-only `possible_duplicates` warnings.
 
 **Request Body**:
 ```json
@@ -295,11 +295,42 @@ Adds a candidate to the organization. Requires the `admin` or `recruiter` role; 
   "location": "San Francisco, CA",
   "cv_file_path": null,
   "parsed_data": {},
+  "possible_duplicates": [],
   "consent_given_at": "2026-10-01T09:00:00Z",
   "created_at": "2026-10-01T09:15:00Z",
   "updated_at": "2026-10-01T09:15:00Z"
 }
 ```
+
+#### Possible-duplicate warnings (B-16)
+
+Candidate creation, detail, list and update responses include `possible_duplicates`.
+CV upload/status/list/retry and parsed-profile correction responses include the current
+candidate's suggestions too. Polling CV status after `parsed` or `needs_review` therefore
+returns matches from the newly saved parsed contact details without changing canonical
+identity fields. Both sides of a comparison use canonical and latest parsed name/email/phone.
+The array is empty when there are no matches. Suggestions are recalculated on reads, so corrected
+contacts and deleted candidates cannot leave stale warnings. The original parser snapshot is not
+used after recruiter corrections. The candidate list flags matches, and the profile and CV review
+show the matching candidates and reasons.
+
+Matching is restricted to the candidate's organization and excludes the candidate itself:
+
+- Email: exact equality after trimming whitespace and case folding; dots and plus tags stay intact.
+- Phone: exact equality after removing spaces and punctuation, treating `00` and `+` as equivalent
+  international prefixes. Only 7–15 digit numbers participate. No country code is inferred, so a
+  local number and a country-prefixed number do not match unless their normalized digits agree.
+- Name: RapidFuzz ratio of at least 85/100 after case folding, accent/punctuation normalization and
+  token sorting. This tolerates typos and name-order differences.
+
+Each match appears once, with `candidate_id`, `full_name`, `matched_on` (one or more of
+`email`, `phone`, `name`), and `name_similarity` (0–100, or null without a name match).
+Exact email matches sort before phone matches, followed by descending name similarity and
+candidate ID for stable ties. Empty contact values do not match. Records are never merged.
+
+Apply migration `010_candidate_duplicate_warnings` before deploying B-16. It replaces the
+candidate email uniqueness constraint with a nonunique index. A downgrade refuses to proceed
+while an organization has repeated emails; it never deletes or merges records to restore uniqueness.
 
 #### `GET /api/v1/candidates`
 Lists the organization's candidates in the standard pagination envelope. Any role can read.
@@ -346,6 +377,7 @@ The file is checked by its content, not its extension or declared type, and may 
   "error_code": null,
   "error_message": null,
   "attempts": 0,
+  "possible_duplicates": [],
   "processed_at": null,
   "uploaded_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
   "created_at": "2026-10-01T09:15:00Z",
@@ -439,8 +471,8 @@ changed JSON pointers and the schema version; profile values stay out of the aud
 
 Explicitly supplied contact name/email/phone/location fields also update canonical
 candidate columns using their existing validation and limits. Name and email cannot
-be cleared; phone and location can be null. Duplicate email returns 409 with a field
-error for `contact.email`. The original parser snapshot and extracted text remain intact.
+be cleared; phone and location can be null. Shared emails are allowed and reported in
+`possible_duplicates`. The original parser snapshot and extracted text remain intact.
 The latest document is `parsed` only when the B-13 review policy passes; otherwise
 it stays `needs_review`.
 
@@ -455,6 +487,7 @@ Success returns 200:
 {
   "candidate_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "parsed_data": { "schema_version": "1.0", "source": "recruiter", "skills": [] },
+  "possible_duplicates": [],
   "reviewed_by": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
   "reviewed_at": "2026-11-01T18:00:00Z"
 }

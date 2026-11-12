@@ -90,6 +90,11 @@ export function CandidatesTable({
                     <div className="text-muted-foreground mt-0.5 text-xs break-all">
                       {candidate.email}
                     </div>
+                    {!!candidate.possible_duplicates?.length && (
+                      <Badge variant="warning" className="mt-1">
+                        Possible duplicate
+                      </Badge>
+                    )}
                   </td>
                   <td className="px-4 py-3 align-top">
                     {candidate.location ? (

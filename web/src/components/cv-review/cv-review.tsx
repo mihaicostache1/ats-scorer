@@ -23,6 +23,7 @@ import {
   updateCandidateParsedProfile,
 } from "@/api";
 import { CV_STATUS_BADGE, describeCvStatus, isReviewable } from "@/components/candidates/cv-status";
+import { PossibleDuplicates } from "@/components/candidates/possible-duplicates";
 import type { CandidateResponse } from "@/components/candidates/use-candidates";
 import { unwrap, useResource } from "@/components/candidates/use-resource";
 import { EmptyState } from "@/components/common/empty-state";
@@ -298,6 +299,9 @@ function ReviewEditor({
   const [saved, setSaved] = React.useState<ParsedCV>(initial);
   const [reviewedAt, setReviewedAt] = React.useState(candidate.parsed_profile_reviewed_at ?? null);
   const [name, setName] = React.useState(candidate.full_name);
+  const [matches, setMatches] = React.useState(
+    cv.possible_duplicates ?? candidate.possible_duplicates
+  );
 
   const resolver = React.useMemo(() => zodResolver(reviewFormSchema(saved)), [saved]);
   const form = useForm<ReviewFormValues>({
@@ -348,6 +352,7 @@ function ReviewEditor({
       const changed = Object.keys(check.patch).length > 0;
       setSaved(data.parsed_data);
       setReviewedAt(data.reviewed_at);
+      setMatches(data.possible_duplicates ?? []);
       if (check.patch.contact?.name) setName(check.patch.contact.name);
       form.reset(toFormValues(data.parsed_data));
       toast.success(
@@ -399,6 +404,7 @@ function ReviewEditor({
           </p>
         </header>
 
+        <PossibleDuplicates matches={matches} />
         {!canEdit && (
           <Banner tone="info" icon={Lock}>
             You can look at this CV and its parsed fields, but your role can&apos;t change them.

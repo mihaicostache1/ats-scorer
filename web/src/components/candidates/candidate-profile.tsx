@@ -13,6 +13,7 @@ import { formatDate, getInitials } from "@/lib/format";
 import { CandidateApplications } from "./candidate-applications";
 import { CandidateCvs } from "./candidate-cvs";
 import { ParsedSummary } from "./parsed-summary";
+import { PossibleDuplicates, type PossibleDuplicate } from "./possible-duplicates";
 import { ProfileSection } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
 import type { CandidateResponse } from "./use-candidates";
@@ -87,6 +88,11 @@ function ContactCard({ candidate }: { candidate: CandidateResponse }) {
 export function CandidateProfile({ id }: { id: string }) {
   const load = React.useCallback(async () => unwrap(await getCandidate(id)), [id]);
   const { state, refetch } = useResource(load);
+  const [latest, setLatest] = React.useState<{ id: string; matches: PossibleDuplicate[] }>();
+  const onParsedMatches = React.useCallback(
+    (matches: PossibleDuplicate[]) => setLatest({ id, matches }),
+    [id]
+  );
 
   if (state.phase === "loading") return <CandidateProfileSkeleton />;
 
@@ -139,9 +145,12 @@ export function CandidateProfile({ id }: { id: string }) {
         </div>
       </div>
 
+      <PossibleDuplicates
+        matches={latest?.id === id ? latest.matches : candidate.possible_duplicates}
+      />
       <ContactCard candidate={candidate} />
       <CandidateApplications candidateId={candidate.id} />
-      <CandidateCvs candidateId={candidate.id} />
+      <CandidateCvs candidateId={candidate.id} onParsedMatches={onParsedMatches} />
       <ParsedSummary data={candidate.parsed_data} />
     </div>
   );

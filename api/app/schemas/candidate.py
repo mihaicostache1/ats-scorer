@@ -16,6 +16,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.schemas.duplicate import PossibleDuplicate
 from app.schemas.pagination import PaginationMeta
 
 
@@ -40,7 +41,7 @@ class CreateCandidateRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def _lowercase_email(cls, value: str) -> str:
-        """Emails are unique per organization regardless of case."""
+        """Store emails in lowercase; duplicate detection supplies review-only warnings."""
         return value.lower()
 
 
@@ -56,7 +57,7 @@ class UpdateCandidateRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def _lowercase_email(cls, value: str | None) -> str | None:
-        """Emails are unique per organization regardless of case."""
+        """Store emails in lowercase; duplicate detection supplies review-only warnings."""
         return value.lower() if value else value
 
     @model_validator(mode="after")
@@ -84,6 +85,7 @@ class CandidateResponse(BaseModel):
     consent_given_at: datetime | None
     created_at: datetime
     updated_at: datetime
+    possible_duplicates: list[PossibleDuplicate] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -95,6 +97,7 @@ class ParsedProfileResponse(BaseModel):
     parsed_data: ParsedCV
     reviewed_by: uuid.UUID
     reviewed_at: datetime
+    possible_duplicates: list[PossibleDuplicate] = Field(default_factory=list)
 
 
 class PaginatedCandidatesResponse(BaseModel):

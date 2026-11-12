@@ -4,7 +4,9 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.schemas.duplicate import PossibleDuplicate
 
 
 class CvStatus(StrEnum):
@@ -38,5 +40,6 @@ class CvDocumentResponse(BaseModel):
     uploaded_by: uuid.UUID | None
     created_at: datetime
     updated_at: datetime
+    possible_duplicates: list[PossibleDuplicate] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
