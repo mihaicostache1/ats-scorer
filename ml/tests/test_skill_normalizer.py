@@ -16,7 +16,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ats_scoring.esco import ESCO_ATTRIBUTION, EscoIndex, load_esco
-from ats_scoring.parsed_cv import ParsedCV
+from ats_scoring.parsed_cv import SCHEMA_VERSION, ParsedCV
 from ats_scoring.skill_normalizer import (
     ALIASES,
     ESCO_SKILLS_ENV,
@@ -196,6 +196,11 @@ def test_typos_get_a_fuzzy_suggestion(
     assert result.suggestion == suggestion
     assert result.normalized is None
     assert 0.9 <= (result.score or 0) < 1
+    assert result.to_parsed_cv() == {
+        "raw": raw,
+        "normalized": None,
+        "suggestion": suggestion,
+    }
 
 
 @pytest.mark.parametrize("raw", ["Jav", "Pyhton", "Unit Testing", "Underwater basket weaving"])
@@ -250,6 +255,11 @@ def test_embedding_match_is_a_suggestion() -> None:
     assert result.suggestion == "perform software unit testing"
     assert result.esco_uri == UNIT_TESTING
     assert result.score == pytest.approx(1.0)
+    assert result.to_parsed_cv() == {
+        "raw": "Unit Testing",
+        "normalized": None,
+        "suggestion": "perform software unit testing",
+    }
 
 
 def test_embedding_match_under_the_threshold_is_dropped() -> None:
@@ -412,12 +422,16 @@ def test_without_esco_only_the_alias_table_is_used() -> None:
 def test_output_fits_the_parsed_cv_schema(normalizer: SkillNormalizer) -> None:
     skills = normalizer.normalize_skills(["JS", "Video Production", "Docker"])
     record = {
-        "schema_version": "1.0",
+        "schema_version": SCHEMA_VERSION,
         "source": "parser",
         "skills": [skill.to_parsed_cv() for skill in skills],
     }
 
-    ParsedCV.model_validate(record)
+    parsed = ParsedCV.model_validate(record)
+    assert parsed.skills[0].normalized == "JavaScript"
+    assert parsed.skills[0].suggestion is None
+    assert parsed.skills[1].normalized is None
+    assert parsed.skills[1].suggestion == "vine production"
 
 
 def test_aliases_agree_with_the_scorer() -> None:

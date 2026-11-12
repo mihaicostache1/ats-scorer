@@ -126,6 +126,54 @@ async def test_correct_profile_records_reviewer_preserves_snapshot_and_audits(
 
 
 @pytest.mark.parametrize(
+    "raw,suggestion",
+    [
+        ("project managment", "project management"),
+        ("Unit Testing", "perform software unit testing"),
+    ],
+)
+async def test_suggestions_survive_review_until_explicitly_accepted(
+    profile: Profile,
+    async_client: AsyncClient,
+    committed_db: Session,
+    raw: str,
+    suggestion: str,
+) -> None:
+    _, candidate, document = profile
+    parsed = ParsedCV.model_validate(candidate.parsed_data)
+    parsed.schema_version = "1.1"
+    parsed.skills = [Skill(raw=raw, normalized=None, suggestion=suggestion)]
+    parsed.confidence = {"/skills/0/normalized": 0.6}
+    candidate.parsed_data = parsed.model_dump(mode="json")
+    candidate.parsed_data_original = copy.deepcopy(candidate.parsed_data)
+    committed_db.commit()
+    original = copy.deepcopy(candidate.parsed_data_original)
+
+    response = await async_client.patch(_url(candidate), json={"summary": "Reviewed summary"})
+    assert response.status_code == 200, response.text
+    data = response.json()["parsed_data"]
+    jsonschema.validate(data, load_parsed_cv_schema())
+    assert data["schema_version"] == "1.1"
+    assert data["skills"] == original["skills"]
+    assert data["skills"][0]["normalized"] is None
+    assert data["confidence"]["/skills/0/normalized"] == 0.6
+    committed_db.refresh(document)
+    assert document.status == "needs_review"
+
+    accepted = await async_client.patch(
+        _url(candidate), json={"skills": [{"raw": raw, "normalized": suggestion}]}
+    )
+    assert accepted.status_code == 200, accepted.text
+    skill = accepted.json()["parsed_data"]["skills"][0]
+    assert skill["normalized"] == suggestion
+    assert skill["suggestion"] is None
+    committed_db.refresh(candidate)
+    committed_db.refresh(document)
+    assert candidate.parsed_data_original == original
+    assert document.status == "parsed"
+
+
+@pytest.mark.parametrize(
     "patch,location",
     [
         ({"skills": ["Python"]}, ["body", "skills", 0]),

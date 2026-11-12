@@ -63,6 +63,20 @@ event. Apply migration `007_parsed_profile_review` before using the endpoint.
 See the [parsed-profile API contract](docs/api_spec.md#patch-apiv1candidatesidparsed-profile)
 for partial-update semantics and field errors.
 
+### User administration (B-15)
+
+Admins can list workspace members, invite colleagues, change roles and deactivate accounts.
+Invitations expire after 48 hours by default and are returned as a link for the admin to share;
+no email service is required. Only a SHA-256 digest is stored. Reissuing an invitation invalidates
+the older link, and accepting one creates the account atomically with its audit event.
+
+Apply migration `008_user_invitations` before using these endpoints. Set `INVITE_ACCEPT_URL`
+to the frontend's invitation form and optionally change `USER_INVITE_EXPIRE_HOURS` (1–720).
+The form reads `#token=` from the link, asks for a name and password, and calls
+`POST /api/v1/auth/accept-invite`; the new user can then sign in normally. The API does not send
+email or render that form. See the [user-management contract](docs/api_spec.md#user-administration-b-15)
+for endpoint details and protections.
+
 ### Demo Data (Dev-only)
 You can populate the database with synthetic data (a demo organization, users, and 20 job postings) by running:
 ```bash
