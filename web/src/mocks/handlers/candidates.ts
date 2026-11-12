@@ -15,7 +15,8 @@ import {
   type ParsedProfilePatch,
 } from "@/components/cv-review/parsed-cv-schema";
 import { sessionAccount } from "./auth";
-import { BASE, detailResponse, errorResponse, notFound, paginate, sortItems, wait } from "./utils";
+import { possibleDuplicates } from "./candidate-duplicates";
+import { BASE, detailResponse, notFound, paginate, sortItems, wait } from "./utils";
 
 type CandidateResponse = components["schemas"]["CandidateResponse"];
 type CvDocumentResponse = components["schemas"]["CvDocumentResponse"];
@@ -65,6 +66,18 @@ const TERMINAL = ["extracted", "parsed", "needs_review", "failed"];
 /** In-memory stores — mutations persist for the browser session. */
 let candidatesStore: CandidateResponse[] = [...mockCandidates];
 let cvStore: CvDocumentResponse[] = [...mockCvDocuments];
+
+function withDuplicates(candidate: CandidateResponse): CandidateResponse {
+  return { ...candidate, possible_duplicates: possibleDuplicates(candidate, candidatesStore) };
+}
+
+function withCvDuplicates(document: CvDocumentResponse): CvDocumentResponse {
+  const candidate = candidatesStore.find((item) => item.id === document.candidate_id);
+  return {
+    ...document,
+    possible_duplicates: candidate ? possibleDuplicates(candidate, candidatesStore) : [],
+  };
+}
 
 /**
  * Where each CV is in its scenario. A status poll moves it one step on; the clock plays no part, so
@@ -147,21 +160,18 @@ export const candidateHandlers = [
       : candidatesStore;
 
     const response: components["schemas"]["PaginatedCandidatesResponse"] = paginate(
-      sortItems(filtered, url, "created_at"),
+      sortItems(filtered, url, "created_at").map(withDuplicates),
       url
     );
     return HttpResponse.json(response);
   }),
 
   /**
-   * POST /candidates — emails are stored lowercase and unique per organization.
+   * POST /candidates — shared emails are allowed and produce review-only warnings.
    */
   http.post(`${BASE}/candidates`, async ({ request }) => {
     const body = (await request.json()) as components["schemas"]["CreateCandidateRequest"];
-    const email = body.email.toLowerCase();
-    if (candidatesStore.some((c) => c.email.toLowerCase() === email)) {
-      return errorResponse(409, "CONFLICT", "A candidate with this email already exists.");
-    }
+    const email = body.email.trim().toLowerCase();
     const now = new Date().toISOString();
     const candidate: CandidateResponse = {
       id: crypto.randomUUID(),
@@ -172,12 +182,13 @@ export const candidateHandlers = [
       location: body.location ?? null,
       cv_file_path: null,
       parsed_data: {},
+      possible_duplicates: [],
       consent_given_at: body.consent_given_at ?? null,
       created_at: now,
       updated_at: now,
     };
     candidatesStore = [candidate, ...candidatesStore];
-    return HttpResponse.json(candidate, { status: 201 });
+    return HttpResponse.json(withDuplicates(candidate), { status: 201 });
   }),
 
   /**
@@ -186,7 +197,9 @@ export const candidateHandlers = [
   http.get(`${BASE}/candidates/:id`, async ({ params }) => {
     await wait(200);
     const candidate = candidatesStore.find((c) => c.id === params.id);
-    return candidate ? HttpResponse.json(candidate) : notFound("Candidate", params.id);
+    return candidate
+      ? HttpResponse.json(withDuplicates(candidate))
+      : notFound("Candidate", params.id);
   }),
 
   /**
@@ -207,15 +220,15 @@ export const candidateHandlers = [
       ...patch,
       updated_at: new Date().toISOString(),
     };
-    return HttpResponse.json(candidatesStore[idx]);
+    return HttpResponse.json(withDuplicates(candidatesStore[idx]));
   }),
 
   /**
    * PATCH /candidates/:id/parsed-profile (B-14) — recruiter corrections to the L-10 profile.
    * Like the API: nested objects merge and lists replace; the merged profile must be valid L-10
    * (422 otherwise); the server sets `source` and the confidence of what changed; explicit contact
-   * fields also update the candidate's columns (409 for a taken email). Viewers are stopped by the
-   * session guard with a 403.
+   * fields also update the candidate's columns. Shared emails produce warnings.
+   * Viewers are stopped by the session guard with a 403.
    */
   http.patch(`${BASE}/candidates/:id/parsed-profile`, async ({ params, request, cookies }) => {
     await wait(300);
@@ -291,23 +304,6 @@ export const candidateHandlers = [
       }
     }
     if (problems.length) return HttpResponse.json({ detail: problems }, { status: 422 });
-    if (
-      typeof columns.email === "string" &&
-      candidatesStore.some((c) => c.id !== candidate.id && c.email.toLowerCase() === columns.email)
-    ) {
-      return HttpResponse.json(
-        {
-          detail: [
-            {
-              loc: ["body", "contact", "email"],
-              msg: "A candidate with this email already exists.",
-              type: "value_error",
-            },
-          ],
-        },
-        { status: 409 }
-      );
-    }
 
     // Changed values get confidence 1; so does everything inside a replaced list, renumbered.
     const strip = (data: unknown) =>
@@ -343,6 +339,7 @@ export const candidateHandlers = [
       parsed_data: parsed,
       reviewed_by: reviewer,
       reviewed_at: reviewedAt,
+      possible_duplicates: possibleDuplicates(candidatesStore[idx], candidatesStore),
     };
     return HttpResponse.json(body);
   }),
@@ -367,7 +364,7 @@ export const candidateHandlers = [
     const docs = cvStore
       .filter((d) => d.candidate_id === params.id)
       .sort((a, b) => b.created_at.localeCompare(a.created_at));
-    return HttpResponse.json(docs);
+    return HttpResponse.json(docs.map(withCvDuplicates));
   }),
 
   /**
@@ -410,6 +407,7 @@ export const candidateHandlers = [
           b.toString(16).padStart(2, "0")
         ).join(""),
         status: "queued",
+        possible_duplicates: [],
         page_count: null,
         ocr_used: false,
         error_code: null,
@@ -424,7 +422,7 @@ export const candidateHandlers = [
     );
     cvStore = [doc, ...cvStore];
     runtimes.set(doc.id, { scenario, steps: scenario.steps, step: 0, retries: 0, pollsSeen: 0 });
-    return HttpResponse.json(doc, { status: 201 });
+    return HttpResponse.json(withCvDuplicates(doc), { status: 201 });
   }),
 
   /**
@@ -437,7 +435,7 @@ export const candidateHandlers = [
     if (!doc) return notFound("CV document", params.cvId);
 
     const runtime = runtimes.get(doc.id);
-    if (!runtime) return HttpResponse.json(doc);
+    if (!runtime) return HttpResponse.json(withCvDuplicates(doc));
 
     runtime.pollsSeen += 1;
     const failure = runtime.scenario.pollFailure;
@@ -451,9 +449,9 @@ export const candidateHandlers = [
       const next = apply(doc, runtime.steps[runtime.step]);
       runtime.step += 1;
       save(next);
-      return HttpResponse.json(next);
+      return HttpResponse.json(withCvDuplicates(next));
     }
-    return HttpResponse.json(doc);
+    return HttpResponse.json(withCvDuplicates(doc));
   }),
 
   /**
@@ -465,7 +463,9 @@ export const candidateHandlers = [
     const doc = cvStore.find((d) => d.id === params.cvId && d.candidate_id === params.id);
     if (!doc) return notFound("CV document", params.cvId);
 
-    if (doc.status === "queued" || doc.status === "extracting") return HttpResponse.json(doc);
+    if (doc.status === "queued" || doc.status === "extracting") {
+      return HttpResponse.json(withCvDuplicates(doc));
+    }
     if (doc.status !== "failed") {
       return detailResponse(409, `A CV document with status '${doc.status}' cannot be retried.`);
     }
@@ -489,7 +489,7 @@ export const candidateHandlers = [
       retries: (runtime?.retries ?? 0) + 1,
       pollsSeen: 0,
     });
-    return HttpResponse.json(next);
+    return HttpResponse.json(withCvDuplicates(next));
   }),
 
   /**
