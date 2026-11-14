@@ -1,0 +1,25 @@
+{
+  "job_id": "J12",
+  "synthetic": true,
+  "title": "Junior Frontend Developer",
+  "department": "Engineering",
+  "location": "Remote (US/EU)",
+  "employment_type": "full_time",
+  "description": "Our Engineering team is growing and we are looking for a Junior Frontend Developer. You will measure and improve front-end performance, build accessible, responsive user interfaces and turn designs into reusable components. No professional experience needed; internships and personal projects count. You should be confident with Responsive Design, Web Accessibility, Redux, Vue.js, TypeScript and JavaScript. Experience with Playwright, GraphQL and CSS is a plus. Location: Remote (US/EU).",
+  "required_skills": [
+    "Responsive Design",
+    "Web Accessibility",
+    "Redux",
+    "Vue.js",
+    "TypeScript",
+    "JavaScript"
+  ],
+  "preferred_skills": [
+    "Playwright",
+    "GraphQL",
+    "CSS"
+  ],
+  "min_experience_years": 0,
+  "role_family": "frontend",
+  "seniority": "junior"
+}

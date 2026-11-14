@@ -1,0 +1,23 @@
+{
+  "job_id": "J03",
+  "synthetic": true,
+  "title": "Junior Data Scientist",
+  "department": "Data",
+  "location": "Amsterdam, Netherlands",
+  "employment_type": "full_time",
+  "description": "Junior Data Scientist - Amsterdam, Netherlands\nMust have: Jupyter, Python, NLP, SQL, TensorFlow\nExperience: At least 1 year of relevant experience\nGood to have: pandas, Machine Learning\nTasks: Monitor model quality and investigate errors; Explore data and communicate findings clearly; Work with engineers to put models into production; Develop, evaluate and improve machine-learning models",
+  "required_skills": [
+    "Jupyter",
+    "Python",
+    "NLP",
+    "SQL",
+    "TensorFlow"
+  ],
+  "preferred_skills": [
+    "pandas",
+    "Machine Learning"
+  ],
+  "min_experience_years": 1,
+  "role_family": "data_science",
+  "seniority": "junior"
+}
