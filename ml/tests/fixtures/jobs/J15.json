@@ -1,0 +1,26 @@
+{
+  "job_id": "J15",
+  "synthetic": true,
+  "title": "Senior QA Automation Engineer",
+  "department": "Quality Assurance",
+  "location": "Bucharest, Romania",
+  "employment_type": "part_time",
+  "description": "Our Quality Assurance team is growing and we are looking for a Senior QA Automation Engineer. You will take part in refinement to make stories testable, plan and run tests for new features, build and maintain automated test suites and report and track defects with developers. At least 5 years of relevant experience. You should be confident with Test Automation, JIRA, Regression Testing, Performance Testing, Test Planning and Java. Experience with k6, Playwright, Cypress and Appium is a plus. Location: Bucharest, Romania.",
+  "required_skills": [
+    "Test Automation",
+    "JIRA",
+    "Regression Testing",
+    "Performance Testing",
+    "Test Planning",
+    "Java"
+  ],
+  "preferred_skills": [
+    "k6",
+    "Playwright",
+    "Cypress",
+    "Appium"
+  ],
+  "min_experience_years": 5,
+  "role_family": "qa",
+  "seniority": "senior"
+}
