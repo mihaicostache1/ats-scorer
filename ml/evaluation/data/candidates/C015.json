@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior QA Tester",
+  "summary": "My most recent role is Junior QA Tester; most of my work involves Test Automation, API Testing and Java. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Linux",
+    "Agile",
+    "Terraform",
+    "Java",
+    "Test Automation",
+    "Test Planning",
+    "Cucumber",
+    "API Testing",
+    "Appium"
+  ],
+  "experience_years": 0.8,
+  "work_history": [
+    {
+      "title": "Junior QA Tester",
+      "company": "Stonebridge Health",
+      "years": 0.8,
+      "summary": "Coached 5 testers on writing maintainable automated tests",
+      "start": "2025-08",
+      "end": "2026-06",
+      "bullets": [
+        "Coached 5 testers on writing maintainable automated tests",
+        "Reported, reproduced and tracked defects together with developers"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Software Engineering",
+      "institution": "Valmont University",
+      "grad_year": 2024
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Polish (professional)"
+  ],
+  "certifications": [
+    "Certified Agile Tester",
+    "ISTQB Certified Tester Foundation Level"
+  ]
+}

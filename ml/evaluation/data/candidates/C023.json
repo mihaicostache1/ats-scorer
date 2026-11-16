@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1",
+  "headline": "Lead Data Scientist",
+  "summary": "12 years of hands-on work with pandas and Statistics, most recently as Lead Data Scientist. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Data Visualization",
+    "Machine Learning",
+    "Airflow",
+    "Python",
+    "Computer Vision",
+    "SQL",
+    "Statistics",
+    "pandas",
+    "scikit-learn",
+    "Mentoring",
+    "TensorFlow",
+    "NLP"
+  ],
+  "experience_years": 12.8,
+  "work_history": [
+    {
+      "title": "Lead Data Scientist",
+      "company": "Bluepeak Systems",
+      "years": 2.0,
+      "summary": "Designed and analysed 5 online experiments",
+      "start": "2024-09",
+      "end": null,
+      "bullets": [
+        "Designed and analysed 5 online experiments",
+        "Set up experiment tracking and reproducible training runs",
+        "Built data pipelines and notebooks used by 8 analysts (Data Visualization, Airflow)"
+      ]
+    },
+    {
+      "title": "Senior Data Scientist",
+      "company": "Northgate Devices",
+      "years": 3.9,
+      "summary": "Improved model precision by 20% through feature work and error analysis (Airflow, scikit-learn)",
+      "start": "2020-07",
+      "end": "2024-06",
+      "bullets": [
+        "Improved model precision by 20% through feature work and error analysis (Airflow, scikit-learn)",
+        "Set up experiment tracking and reproducible training runs (pandas, Airflow)"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Halcyon Freight",
+      "years": 2.1,
+      "summary": "Presented findings to non-technical stakeholders and turned them into roadmap items (Computer Vision, Statistics)",
+      "start": "2018-05",
+      "end": "2020-06",
+      "bullets": [
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (Computer Vision, Statistics)",
+        "Built data pipelines and notebooks used by 6 analysts (scikit-learn, Computer Vision)",
+        "Set up experiment tracking and reproducible training runs (Machine Learning, NLP)",
+        "Designed and analysed 5 online experiments"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Vantaro Group",
+      "years": 2.8,
+      "summary": "Set up experiment tracking and reproducible training runs (Airflow, TensorFlow)",
+      "start": "2015-07",
+      "end": "2018-05",
+      "bullets": [
+        "Set up experiment tracking and reproducible training runs (Airflow, TensorFlow)",
+        "Designed and analysed 7 online experiments (Statistics, Data Visualization)"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Wavecrest Telecom",
+      "years": 2.0,
+      "summary": "Set up experiment tracking and reproducible training runs (TensorFlow, Computer Vision)",
+      "start": "2013-05",
+      "end": "2015-05",
+      "bullets": [
+        "Set up experiment tracking and reproducible training runs (TensorFlow, Computer Vision)",
+        "Built data pipelines and notebooks used by 7 analysts (TensorFlow, Data Visualization)",
+        "Designed and analysed 4 online experiments",
+        "Improved model precision by 30% through feature work and error analysis"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Statistics",
+      "institution": "Valmont University",
+      "grad_year": 2013
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Portuguese (B2)",
+    "Romanian (C1)"
+  ],
+  "certifications": [
+    "TensorFlow Developer Certificate"
+  ]
+}

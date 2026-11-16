@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior DevOps Engineer",
+  "summary": "My most recent role is Junior DevOps Engineer; most of my work involves Terraform, Monitoring and Docker. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "GCP",
+    "Grafana",
+    "Terraform",
+    "Docker",
+    "Azure",
+    "Monitoring",
+    "Linux"
+  ],
+  "experience_years": 1.5,
+  "work_history": [
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Tallgrass Cloud",
+      "years": 1.5,
+      "summary": "Automated deployments, reducing release time by 20%",
+      "start": "2025-03",
+      "end": null,
+      "bullets": [
+        "Automated deployments, reducing release time by 20%",
+        "Wrote infrastructure as code and reviewed changes from other teams"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Software Engineering",
+      "institution": "Eastbridge Institute of Technology",
+      "grad_year": 2024
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Portuguese (basic)"
+  ],
+  "certifications": [
+    "AWS Certified Solutions Architect - Associate"
+  ]
+}

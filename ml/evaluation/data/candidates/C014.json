@@ -1,0 +1,102 @@
+{
+  "schema_version": "0.1",
+  "headline": "Lead Platform Engineer",
+  "summary": "12 years of hands-on work with Networking and GitHub Actions, most recently as Lead Platform Engineer. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Kubernetes",
+    "Docker",
+    "AWS",
+    "Azure",
+    "Nginx",
+    "Prometheus",
+    "Monitoring",
+    "Linux",
+    "Scrum",
+    "GitHub Actions",
+    "Presentation Skills",
+    "Networking"
+  ],
+  "experience_years": 12.3,
+  "work_history": [
+    {
+      "title": "Lead Platform Engineer",
+      "company": "Meridian Nine",
+      "years": 2.7,
+      "summary": "Automated deployments, reducing release time by 10%",
+      "start": "2024-01",
+      "end": null,
+      "bullets": [
+        "Automated deployments, reducing release time by 10%",
+        "Wrote infrastructure as code and reviewed changes from other teams (Nginx, Azure)",
+        "Ran and monitored production clusters serving 3 services (Prometheus, Azure)",
+        "Introduced alerting and dashboards that shortened incident response by 25% (Docker, Azure)"
+      ]
+    },
+    {
+      "title": "Lead Platform Engineer",
+      "company": "Skylark Education",
+      "years": 2.3,
+      "summary": "Hardened build pipelines and moved secrets into a managed store (Prometheus, Nginx)",
+      "start": "2021-06",
+      "end": "2023-10",
+      "bullets": [
+        "Hardened build pipelines and moved secrets into a managed store (Prometheus, Nginx)",
+        "Cut the monthly cloud bill by 20% by right-sizing workloads",
+        "Introduced alerting and dashboards that shortened incident response by 15% (AWS, Linux)",
+        "Ran and monitored production clusters serving 2 services (Prometheus, Azure)"
+      ]
+    },
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Tidewater Robotics",
+      "years": 2.6,
+      "summary": "Ran and monitored production clusters serving 4 services",
+      "start": "2018-08",
+      "end": "2021-03",
+      "bullets": [
+        "Ran and monitored production clusters serving 4 services",
+        "Hardened build pipelines and moved secrets into a managed store",
+        "Automated deployments, reducing release time by 30% (Docker, Prometheus)",
+        "Introduced alerting and dashboards that shortened incident response by 10% (Monitoring, Linux)"
+      ]
+    },
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Zephyr Travel Tech",
+      "years": 1.8,
+      "summary": "Introduced alerting and dashboards that shortened incident response by 35% (Linux, Kubernetes)",
+      "start": "2016-08",
+      "end": "2018-05",
+      "bullets": [
+        "Introduced alerting and dashboards that shortened incident response by 35% (Linux, Kubernetes)",
+        "Cut the monthly cloud bill by 25% by right-sizing workloads",
+        "Wrote infrastructure as code and reviewed changes from other teams (Linux, Prometheus)",
+        "Automated deployments, reducing release time by 35% (AWS, Networking)"
+      ]
+    },
+    {
+      "title": "DevOps Engineer",
+      "company": "Corvid Logic",
+      "years": 3.0,
+      "summary": "Ran and monitored production clusters serving 8 services (Linux, AWS)",
+      "start": "2013-07",
+      "end": "2016-07",
+      "bullets": [
+        "Ran and monitored production clusters serving 8 services (Linux, AWS)",
+        "Introduced alerting and dashboards that shortened incident response by 15% (Azure, Monitoring)",
+        "Wrote infrastructure as code and reviewed changes from other teams"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Ardenne Business School",
+      "grad_year": 2013
+    }
+  ],
+  "languages": [
+    "English (native)"
+  ],
+  "certifications": []
+}

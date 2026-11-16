@@ -1,0 +1,93 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Backend Engineer",
+  "summary": "8 years of hands-on work with Spring Boot and PostgreSQL, most recently as Senior Backend Engineer. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Problem Solving",
+    "Interaction Design",
+    "Redis",
+    "SQL",
+    "Microservices",
+    "PostgreSQL",
+    "Figma",
+    "Java",
+    "Django",
+    "Go",
+    "REST APIs",
+    "gRPC",
+    "Kubernetes",
+    "Spring Boot"
+  ],
+  "experience_years": 8.2,
+  "work_history": [
+    {
+      "title": "Senior Backend Engineer",
+      "company": "Aurelia Payments",
+      "years": 2.1,
+      "summary": "Migrated a legacy module to a new stack together with QA and product (Kubernetes, Go)",
+      "start": "2024-08",
+      "end": null,
+      "bullets": [
+        "Migrated a legacy module to a new stack together with QA and product (Kubernetes, Go)",
+        "Built and maintained backend services used by 5 internal teams (Django, Redis)",
+        "Reviewed pull requests and supported 3 newer developers",
+        "Cut average response time by 20% by profiling queries and adding caching"
+      ]
+    },
+    {
+      "title": "Backend Developer",
+      "company": "Skylark Education",
+      "years": 2.5,
+      "summary": "Designed REST endpoints and data models for new product features",
+      "start": "2021-11",
+      "end": "2024-05",
+      "bullets": [
+        "Designed REST endpoints and data models for new product features",
+        "Built and maintained backend services used by 4 internal teams (Go, REST APIs)",
+        "Cut average response time by 40% by profiling queries and adding caching (Kubernetes, SQL)",
+        "Wrote unit and integration tests, raising coverage by 35 percentage points (Spring Boot, REST APIs)"
+      ]
+    },
+    {
+      "title": "Junior Backend Developer",
+      "company": "Ironbark Logistics",
+      "years": 1.4,
+      "summary": "Cut average response time by 25% by profiling queries and adding caching",
+      "start": "2020-04",
+      "end": "2021-09",
+      "bullets": [
+        "Cut average response time by 25% by profiling queries and adding caching",
+        "Designed REST endpoints and data models for new product features (gRPC, Java)",
+        "Migrated a legacy module to a new stack together with QA and product (SQL, Django)",
+        "Wrote unit and integration tests, raising coverage by 10 percentage points (Spring Boot, Django)"
+      ]
+    },
+    {
+      "title": "Junior Backend Developer",
+      "company": "Saffron Street Bank",
+      "years": 2.2,
+      "summary": "Wrote unit and integration tests, raising coverage by 40 percentage points (PostgreSQL, Microservices)",
+      "start": "2018-01",
+      "end": "2020-03",
+      "bullets": [
+        "Wrote unit and integration tests, raising coverage by 40 percentage points (PostgreSQL, Microservices)",
+        "Cut average response time by 10% by profiling queries and adding caching (Redis, Kubernetes)",
+        "Migrated a legacy module to a new stack together with QA and product (Spring Boot, Microservices)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Northfield Technical University",
+      "grad_year": 2017
+    }
+  ],
+  "languages": [
+    "English (C1)"
+  ],
+  "certifications": [
+    "Oracle Certified Professional: Java SE Programmer",
+    "AWS Certified Developer - Associate"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Product Manager",
+  "summary": "Senior Product Manager with 7 years of experience in Go-to-Market, Backlog Prioritization and Agile. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Go-to-Market",
+    "Scrum",
+    "Product Strategy",
+    "Problem Solving",
+    "Data Analysis",
+    "KPI Definition",
+    "User Research",
+    "OKRs",
+    "Roadmapping",
+    "Agile",
+    "A/B Testing",
+    "Backlog Prioritization"
+  ],
+  "experience_years": 7.6,
+  "work_history": [
+    {
+      "title": "Senior Product Manager",
+      "company": "Brightloom Studio",
+      "years": 2.7,
+      "summary": "Launched a feature that raised activation by 15% (Go-to-Market, Roadmapping)",
+      "start": "2024-01",
+      "end": null,
+      "bullets": [
+        "Launched a feature that raised activation by 15% (Go-to-Market, Roadmapping)",
+        "Owned the roadmap and backlog for a product used by 3 customer teams (KPI Definition, A/B Testing)"
+      ]
+    },
+    {
+      "title": "Product Manager",
+      "company": "Meridian Nine",
+      "years": 3.0,
+      "summary": "Launched a feature that raised activation by 15% (Backlog Prioritization, KPI Definition)",
+      "start": "2020-12",
+      "end": "2023-12",
+      "bullets": [
+        "Launched a feature that raised activation by 15% (Backlog Prioritization, KPI Definition)",
+        "Coordinated 4 releases across engineering, sales and support (Roadmapping, Data Analysis)",
+        "Worked daily with engineering and design in an agile team"
+      ]
+    },
+    {
+      "title": "Associate Product Manager",
+      "company": "Stonebridge Health",
+      "years": 1.9,
+      "summary": "Ran user interviews and turned the findings into prioritised user stories (User Research, Roadmapping)",
+      "start": "2019-01",
+      "end": "2020-12",
+      "bullets": [
+        "Ran user interviews and turned the findings into prioritised user stories (User Research, Roadmapping)",
+        "Coordinated 3 releases across engineering, sales and support (A/B Testing, Go-to-Market)",
+        "Worked daily with engineering and design in an agile team"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Economics",
+      "institution": "Lakeshore University",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Dutch (C1)"
+  ],
+  "certifications": [
+    "Certified Scrum Product Owner (CSPO)"
+  ]
+}

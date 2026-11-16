@@ -1,0 +1,58 @@
+{
+  "schema_version": "0.1",
+  "headline": "DevOps Engineer",
+  "summary": "3 years of hands-on work with AWS and Terraform, most recently as DevOps Engineer. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "AWS",
+    "Bash",
+    "Stakeholder Communication",
+    "Prometheus",
+    "Helm",
+    "Terraform",
+    "Linux"
+  ],
+  "experience_years": 3.2,
+  "work_history": [
+    {
+      "title": "DevOps Engineer",
+      "company": "Brightloom Studio",
+      "years": 1.8,
+      "summary": "Ran and monitored production clusters serving 4 services",
+      "start": "2024-11",
+      "end": null,
+      "bullets": [
+        "Ran and monitored production clusters serving 4 services",
+        "Cut the monthly cloud bill by 30% by right-sizing workloads"
+      ]
+    },
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Stonebridge Health",
+      "years": 1.3,
+      "summary": "Automated deployments, reducing release time by 35% (Prometheus, Terraform)",
+      "start": "2023-04",
+      "end": "2024-08",
+      "bullets": [
+        "Automated deployments, reducing release time by 35% (Prometheus, Terraform)",
+        "Hardened build pipelines and moved secrets into a managed store (Prometheus, Bash)",
+        "Cut the monthly cloud bill by 15% by right-sizing workloads"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Harcastle University",
+      "grad_year": 2023
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "French (B2)",
+    "German (B2)"
+  ],
+  "certifications": [
+    "Certified Kubernetes Administrator (CKA)",
+    "AWS Certified Solutions Architect - Associate"
+  ]
+}

@@ -1,0 +1,437 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 8 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 7 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/PageMode /UseNone /Pages 7 0 R /Type /Catalog
+>>
+endobj
+6 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C093) /Trapped /False
+>>
+endobj
+7 0 obj
+<<
+/Count 1 /Kids [ 4 0 R ] /Type /Pages
+>>
+endobj
+8 0 obj
+<<
+/Length 8260
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.933333 .945098 .960784 rg
+n 28.34646 0 181.4173 841.8898 re f*
+Q
+q
+1 0 0 1 40.01575 788.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10 Tf 13.5 TL (Contact) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 773.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (eckart.fischer50@example.org) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 761.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (+1-415-555-0178) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 749.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Paris, France) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 726.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10 Tf 13.5 TL (Key Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 711.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Computer Vision) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 699.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Data Visualization) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 687.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Statistics) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 675.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Docker) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 663.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Machine Learning) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 651.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (scikit-learn) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 639.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Jupyter) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 627.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (pandas) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 615.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Python) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 603.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (TensorFlow) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 591.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (Java) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 579.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 8.5 Tf 10.2 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 8.5 Tf 12 TL .826 0 Td (PyTorch) Tj T* -0.826 0 Td ET
+Q
+Q
+q
+1 0 0 1 40.01575 557.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10 Tf 13.5 TL (Academic Background) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 542.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (M.Sc. Statistics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 531.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 7.5 Tf 10.5 TL (Saint Albrecht University, 2018) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 519.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (B.Sc. Applied Mathematics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 509.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 7.5 Tf 10.5 TL (Dunmore Institute of Design, 2016) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 486.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10 Tf 13.5 TL (Language Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 471.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (English \(C1\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 449.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10 Tf 13.5 TL (Certifications) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 434.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Machine Learning Specialization) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 779.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18.5 Tf 22.5 TL (Eckart Fischer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 761.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F1 11.5 Tf 15.5 TL (Senior Data Scientist) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 738.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Summary) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 696.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 29.5 Tm /F1 9.5 Tf 13 TL (My most recent role is Senior Data Scientist; most of my work involves) Tj T* (Jupyter, Python and Statistics. Comfortable working in cross-functional agile) Tj T* (teams.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 672.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Professional Experience) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 656.874 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Data Scientist) Tj /F1 9.5 Tf (, Lumenfold Digital) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 645.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (06/2024 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 619.374 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Improved model precision by 25% through feature work and error analysis) Tj T* -1.982 0 Td (\(Machine Learning, TensorFlow\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 606.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Built data pipelines and notebooks used by 4 analysts) Tj T* -1.982 0 Td ET
+Q
+Q
+q
+1 0 0 1 227.1024 593.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Trained and evaluated models for a ranking problem \(Statistics, pandas\)) Tj T* -1.982 0 Td ET
+Q
+Q
+q
+1 0 0 1 227.1024 567.374 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Presented findings to non-technical stakeholders and turned them into) Tj T* -1.982 0 Td (roadmap items) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 562.374 cm
+Q
+q
+1 0 0 1 227.1024 549.374 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Data Scientist) Tj /F1 9.5 Tf (, Skylark Education) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 537.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (01/2022 - 03/2024) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 524.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Set up experiment tracking and reproducible training runs) Tj T* -1.982 0 Td ET
+Q
+Q
+q
+1 0 0 1 227.1024 511.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Trained and evaluated models for a ranking problem) Tj T* -1.982 0 Td ET
+Q
+Q
+q
+1 0 0 1 227.1024 485.874 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Built data pipelines and notebooks used by 2 analysts \(TensorFlow, Data) Tj T* -1.982 0 Td (Visualization\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 459.874 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Improved model precision by 40% through feature work and error analysis) Tj T* -1.982 0 Td (\(Computer Vision, Machine Learning\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 454.874 cm
+Q
+q
+1 0 0 1 227.1024 441.874 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Junior Data Scientist) Tj /F1 9.5 Tf (, Ironbark Logistics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 430.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (11/2019 - 10/2021) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 404.374 cm
+q
+BT 1 0 0 1 1 16.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Presented findings to non-technical stakeholders and turned them into) Tj T* -1.982 0 Td (roadmap items \(Python, Jupyter\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 391.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\226) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL 1.982 0 Td (Trained and evaluated models for a ranking problem) Tj T* -1.982 0 Td ET
+Q
+Q
+q
+1 0 0 1 227.1024 386.374 cm
+Q
+ 
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000592 00000 n 
+0000000922 00000 n 
+0000000981 00000 n 
+trailer
+<<
+/ID 
+[<18ec9adce428d0f484b916e8e87aa2d4><18ec9adce428d0f484b916e8e87aa2d4>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 6 0 R
+/Root 5 0 R
+/Size 9
+>>
+startxref
+9292
+%%EOF

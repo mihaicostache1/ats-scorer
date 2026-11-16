@@ -1,0 +1,73 @@
+{
+  "schema_version": "0.1",
+  "headline": "UX Designer",
+  "summary": "UX Designer with 4 years of experience in Usability Testing, Information Architecture and Visual Design. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "User Flows",
+    "Journey Mapping",
+    "HTML",
+    "Information Architecture",
+    "Usability Testing",
+    "Illustration",
+    "Figma",
+    "Wireframing",
+    "Visual Design"
+  ],
+  "experience_years": 4.6,
+  "work_history": [
+    {
+      "title": "UX Designer",
+      "company": "Saffron Street Bank",
+      "years": 1.0,
+      "summary": "Redesigned a key journey, lifting task completion by 10% (Visual Design, Wireframing)",
+      "start": "2025-09",
+      "end": null,
+      "bullets": [
+        "Redesigned a key journey, lifting task completion by 10% (Visual Design, Wireframing)",
+        "Designed user flows, wireframes and interactive prototypes (Illustration, Figma)",
+        "Ran usability tests with 8 participants and iterated on the results (Usability Testing, User Flows)",
+        "Facilitated 3 discovery workshops with stakeholders (HTML, Illustration)"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Ironbark Logistics",
+      "years": 2.0,
+      "summary": "Ran usability tests with 6 participants and iterated on the results (HTML, User Flows)",
+      "start": "2023-07",
+      "end": "2025-07",
+      "bullets": [
+        "Ran usability tests with 6 participants and iterated on the results (HTML, User Flows)",
+        "Facilitated 7 discovery workshops with stakeholders (Information Architecture, Figma)",
+        "Worked with developers to ship accessible interfaces (Wireframing, Information Architecture)"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Meridian Nine",
+      "years": 1.6,
+      "summary": "Facilitated 3 discovery workshops with stakeholders (HTML, Visual Design)",
+      "start": "2021-11",
+      "end": "2023-06",
+      "bullets": [
+        "Facilitated 3 discovery workshops with stakeholders (HTML, Visual Design)",
+        "Redesigned a key journey, lifting task completion by 30% (User Flows, Visual Design)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Media Design",
+      "institution": "Greyfield College",
+      "grad_year": 2020
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Romanian (fluent)"
+  ],
+  "certifications": [
+    "Google UX Design Certificate",
+    "Certified Usability Analyst"
+  ]
+}

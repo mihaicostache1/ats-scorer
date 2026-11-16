@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1",
+  "headline": "Marketing Specialist",
+  "summary": "3 years of hands-on work with Marketing Automation and Social Media, most recently as Marketing Specialist. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Copywriting",
+    "Power BI",
+    "Email Marketing",
+    "SEO",
+    "Social Media",
+    "CRM",
+    "HubSpot",
+    "Brand Strategy",
+    "Marketing Automation",
+    "Problem Solving"
+  ],
+  "experience_years": 3.2,
+  "work_history": [
+    {
+      "title": "Marketing Specialist",
+      "company": "Halcyon Freight",
+      "years": 1.0,
+      "summary": "Managed a monthly budget and reported results to leadership",
+      "start": "2025-09",
+      "end": null,
+      "bullets": [
+        "Managed a monthly budget and reported results to leadership",
+        "Raised newsletter click-through by 10% with segmented content",
+        "Wrote and edited copy for web pages, newsletters and social posts"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Solstice Energy Labs",
+      "years": 0.9,
+      "summary": "Grew organic traffic by 35% through content and technical improvements (Copywriting, Marketing Automation)",
+      "start": "2024-09",
+      "end": "2025-08",
+      "bullets": [
+        "Grew organic traffic by 35% through content and technical improvements (Copywriting, Marketing Automation)",
+        "Raised newsletter click-through by 35% with segmented content",
+        "Coordinated 6 product launches with sales and product teams"
+      ]
+    },
+    {
+      "title": "Marketing Assistant",
+      "company": "Corvid Logic",
+      "years": 1.2,
+      "summary": "Coordinated 6 product launches with sales and product teams (Marketing Automation, Social Media)",
+      "start": "2023-06",
+      "end": "2024-09",
+      "bullets": [
+        "Coordinated 6 product launches with sales and product teams (Marketing Automation, Social Media)",
+        "Wrote and edited copy for web pages, newsletters and social posts (CRM, HubSpot)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Business Administration",
+      "institution": "Northfield Technical University",
+      "grad_year": 2022
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Spanish (fluent)"
+  ],
+  "certifications": []
+}

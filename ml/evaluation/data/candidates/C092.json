@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior Frontend Developer",
+  "summary": "1 year of hands-on work with Jest and Next.js, most recently as Junior Frontend Developer. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Node.js",
+    "Next.js",
+    "JavaScript",
+    "Responsive Design",
+    "React",
+    "Jest",
+    "Stakeholder Communication"
+  ],
+  "experience_years": 1.7,
+  "work_history": [
+    {
+      "title": "Junior Frontend Developer",
+      "company": "Zephyr Travel Tech",
+      "years": 0.8,
+      "summary": "Led the move of 8 legacy screens to a modern framework",
+      "start": "2025-12",
+      "end": null,
+      "bullets": [
+        "Led the move of 8 legacy screens to a modern framework",
+        "Maintained a shared component library used across 8 products (JavaScript, Responsive Design)"
+      ]
+    },
+    {
+      "title": "Junior Frontend Developer",
+      "company": "Emberline Games",
+      "years": 0.9,
+      "summary": "Built reusable UI components for the main web application (Node.js, Next.js)",
+      "start": "2024-10",
+      "end": "2025-09",
+      "bullets": [
+        "Built reusable UI components for the main web application (Node.js, Next.js)",
+        "Led the move of 8 legacy screens to a modern framework (Responsive Design, Next.js)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Dunmore Institute of Design",
+      "grad_year": 2023
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Italian (C1)",
+    "Romanian (intermediate)"
+  ],
+  "certifications": [
+    "Front-End Web Development Certificate",
+    "Web Accessibility Fundamentals"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Data Scientist",
+  "summary": "My most recent role is Senior Data Scientist; most of my work involves pandas, Data Visualization and NLP. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "NLP",
+    "pandas",
+    "scikit-learn",
+    "Python",
+    "Spark",
+    "Jupyter",
+    "Statistics",
+    "Technical Writing",
+    "REST APIs",
+    "Machine Learning",
+    "Data Visualization",
+    "Airflow"
+  ],
+  "experience_years": 8.3,
+  "work_history": [
+    {
+      "title": "Senior Data Scientist",
+      "company": "Kestrelworks",
+      "years": 2.7,
+      "summary": "Built data pipelines and notebooks used by 7 analysts",
+      "start": "2024-01",
+      "end": null,
+      "bullets": [
+        "Built data pipelines and notebooks used by 7 analysts",
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (Spark, pandas)",
+        "Designed and analysed 8 online experiments"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Wavecrest Telecom",
+      "years": 2.1,
+      "summary": "Trained and evaluated models for a ranking problem",
+      "start": "2021-10",
+      "end": "2023-11",
+      "bullets": [
+        "Trained and evaluated models for a ranking problem",
+        "Improved model precision by 25% through feature work and error analysis"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Bluepeak Systems",
+      "years": 2.1,
+      "summary": "Trained and evaluated models for a ranking problem (Statistics, Jupyter)",
+      "start": "2019-09",
+      "end": "2021-10",
+      "bullets": [
+        "Trained and evaluated models for a ranking problem (Statistics, Jupyter)",
+        "Set up experiment tracking and reproducible training runs"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Hollowell Foods",
+      "years": 1.5,
+      "summary": "Designed and analysed 3 online experiments (Statistics, Jupyter)",
+      "start": "2018-02",
+      "end": "2019-08",
+      "bullets": [
+        "Designed and analysed 3 online experiments (Statistics, Jupyter)",
+        "Set up experiment tracking and reproducible training runs",
+        "Improved model precision by 10% through feature work and error analysis (NLP, Python)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Dunmore Institute of Design",
+      "grad_year": 2017
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "German (B2)",
+    "Portuguese (fluent)"
+  ],
+  "certifications": [
+    "TensorFlow Developer Certificate",
+    "Machine Learning Specialization"
+  ]
+}

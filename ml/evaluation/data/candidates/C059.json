@@ -1,0 +1,98 @@
+{
+  "schema_version": "0.1",
+  "headline": "Lead Product Designer",
+  "summary": "Lead Product Designer with 10 years of experience in Accessibility, Sketch and Figma. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Sketch",
+    "SEO",
+    "Usability Testing",
+    "Adobe XD",
+    "Wireframing",
+    "User Research",
+    "Figma",
+    "Accessibility",
+    "Design Thinking",
+    "Design Systems",
+    "CSS",
+    "User Flows",
+    "Marketing Automation",
+    "Prototyping"
+  ],
+  "experience_years": 10.6,
+  "work_history": [
+    {
+      "title": "Lead Product Designer",
+      "company": "Ironbark Logistics",
+      "years": 2.5,
+      "summary": "Contributed components and guidelines to the design system",
+      "start": "2024-03",
+      "end": null,
+      "bullets": [
+        "Contributed components and guidelines to the design system",
+        "Facilitated 2 discovery workshops with stakeholders",
+        "Ran usability tests with 7 participants and iterated on the results (Figma, CSS)",
+        "Worked with developers to ship accessible interfaces (Accessibility, Prototyping)"
+      ]
+    },
+    {
+      "title": "Senior UX Designer",
+      "company": "Tallgrass Cloud",
+      "years": 1.8,
+      "summary": "Worked with developers to ship accessible interfaces (Prototyping, User Flows)",
+      "start": "2022-03",
+      "end": "2024-01",
+      "bullets": [
+        "Worked with developers to ship accessible interfaces (Prototyping, User Flows)",
+        "Designed user flows, wireframes and interactive prototypes"
+      ]
+    },
+    {
+      "title": "UX Designer",
+      "company": "Driftwood Media",
+      "years": 2.2,
+      "summary": "Worked with developers to ship accessible interfaces (Figma, Wireframing)",
+      "start": "2019-11",
+      "end": "2022-02",
+      "bullets": [
+        "Worked with developers to ship accessible interfaces (Figma, Wireframing)",
+        "Designed user flows, wireframes and interactive prototypes (Figma, User Research)",
+        "Contributed components and guidelines to the design system (CSS, Prototyping)",
+        "Facilitated 5 discovery workshops with stakeholders (Usability Testing, Figma)"
+      ]
+    },
+    {
+      "title": "UX Designer",
+      "company": "Northgate Devices",
+      "years": 4.0,
+      "summary": "Redesigned a key journey, lifting task completion by 35% (Accessibility, User Flows)",
+      "start": "2015-08",
+      "end": "2019-08",
+      "bullets": [
+        "Redesigned a key journey, lifting task completion by 35% (Accessibility, User Flows)",
+        "Ran usability tests with 6 participants and iterated on the results",
+        "Worked with developers to ship accessible interfaces (Design Systems, Design Thinking)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.A. Psychology",
+      "institution": "Lakeshore University",
+      "grad_year": 2015
+    },
+    {
+      "degree": "B.A. Media Design",
+      "institution": "Ardenne Business School",
+      "grad_year": 2013
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Spanish (B2)",
+    "Polish (C1)"
+  ],
+  "certifications": [
+    "Certified Usability Analyst",
+    "Google UX Design Certificate"
+  ]
+}
