@@ -91,6 +91,7 @@ Each run prints the metrics and saves them to `results/<date>_<model version>.js
 |---|---|---|---|---|
 | `tfidf-skills-0.1.0` (L-7 baseline) | 0.701 | 0.740 | 0.982 | [ml/README.md](../../ml/README.md) |
 | `hybrid-1.0.0` (L-13) | 0.739 | 0.809 | 0.985 | [hybrid-scorer.md](hybrid-scorer.md) |
+| `hybrid-1.1.0` (L-14, 1.0.0 plus redaction) | 0.739 | 0.809 | 0.985 | [redaction.md](redaction.md). Same scores: the set has no identity details in the fields the scorer reads |
 
 A random order gets an NDCG@10 of 0.784.
 

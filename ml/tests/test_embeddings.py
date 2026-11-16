@@ -174,6 +174,25 @@ def test_only_qualifications_are_embedded(tmp_path: Path, fake_sentence_transfor
     assert "Maria" not in with_identity and "1994" not in with_identity
 
 
+def test_identity_details_in_the_text_are_not_embedded(
+    tmp_path: Path, fake_sentence_transformers: Any
+) -> None:
+    with_text = {
+        **CANDIDATE,
+        "contact": {"name": "Maria Ionescu", "email": "maria.ionescu@example.com"},
+        "summary": "Ms Maria Ionescu (born 1994, maria.ionescu@example.com) builds REST "
+        "services in Python. She mentors her team.",
+    }
+    embedder = Embedder(model_folder(tmp_path))
+
+    embedder.embed_candidates([with_text])
+
+    (text,) = fake_sentence_transformers.instances[0].encoded
+    assert "Python" in text and "They mentors their team" in text
+    for value in ("Maria", "Ionescu", "example.com", "1994", "Ms ", "She", "her "):
+        assert value not in text
+
+
 def test_nothing_to_embed_gives_none(tmp_path: Path, fake_sentence_transformers: Any) -> None:
     embedder = Embedder(model_folder(tmp_path))
 

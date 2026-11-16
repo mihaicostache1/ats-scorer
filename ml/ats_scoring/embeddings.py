@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from ats_scoring.config import DEFAULT_CONFIG, EmbeddingSettings
+from ats_scoring.redaction import redact
 from ats_scoring.text import candidate_text, job_text
 
 # Folder with the downloaded model, used when Embedder is not given one.
@@ -146,11 +147,12 @@ class Embedder:
         return result
 
     def embed_candidates(self, candidates: Iterable[Mapping[str, Any]]) -> list[list[float] | None]:
-        """One vector per parsed CV, from its qualifications only (the scorer's CV text).
+        """One vector per parsed CV, from its redacted qualifications (the scorer's CV text).
 
         None for a CV with nothing to embed.
         """
-        return self._embed([candidate_text(candidate) for candidate in candidates], PASSAGE_PREFIX)
+        texts = [candidate_text(redact(candidate)) for candidate in candidates]
+        return self._embed(texts, PASSAGE_PREFIX)
 
     def embed_jobs(self, jobs: Iterable[Mapping[str, Any]]) -> list[list[float] | None]:
         """One vector per job, from its title, description and skills. None if all are empty."""

@@ -11,7 +11,9 @@
 
 ## ats_scoring
 
-Scores how well a parsed CV fits a job. Version 1 (`hybrid-1.0.0`, L-13) mixes skill overlap, embedding similarity, experience fit, title similarity and TF-IDF text similarity. Design, evaluation and timing: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md).
+Scores how well a parsed CV fits a job. Version 1 (`hybrid-1.1.0`, L-13 and L-14) mixes skill overlap, embedding similarity, experience fit, title similarity and TF-IDF text similarity. Design, evaluation and timing: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md).
+
+The CV is redacted first: `redact(parsed_cv)` removes the name, contact details, street address, photo references, birth date, graduation years and other dates, and gendered titles and pronouns, keeping city or region and country. `score()` and `Embedder` call it themselves. What it does and does not remove: [docs/ml/redaction.md](../docs/ml/redaction.md).
 
 ### Install
 
@@ -56,7 +58,7 @@ score(candidate, job, candidate_embedding=cv_vector, job_embedding=job_vector)
 #     "matched_skills": ["Python", "PostgreSQL"],
 #     "missing_skills": ["Docker", "REST APIs"],
 #     "score_explanations": ["Has 2 of 4 required skills.", ...],
-#     "model_version": "hybrid-1.0.0",
+#     "model_version": "hybrid-1.1.0",
 # }
 ```
 

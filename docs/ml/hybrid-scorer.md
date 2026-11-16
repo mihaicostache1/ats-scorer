@@ -1,6 +1,6 @@
 # Hybrid scorer v1 (L-13)
 
-**Status:** implemented, `model_version` `hybrid-1.0.0`. Not called by the API yet. Owner: ML/DevOps lead.
+**Status:** implemented, `model_version` `hybrid-1.1.0` (1.0.0 plus redaction, L-14). Not called by the API yet. Owner: ML/DevOps lead.
 
 | What | Where |
 |---|---|
@@ -8,13 +8,14 @@
 | Weights and model version | [ml/ats_scoring/weights.yaml](../../ml/ats_scoring/weights.yaml), loaded by [config.py](../../ml/ats_scoring/config.py) |
 | Embeddings (offline) | [ml/ats_scoring/embeddings.py](../../ml/ats_scoring/embeddings.py) |
 | Title similarity | [ml/ats_scoring/titles.py](../../ml/ats_scoring/titles.py) |
-| Evaluation result | [ml/evaluation/results/2026-11-07_hybrid-1.0.0.json](../../ml/evaluation/results/2026-11-07_hybrid-1.0.0.json) |
+| Redaction (L-14) | [ml/ats_scoring/redaction.py](../../ml/ats_scoring/redaction.py), see [redaction.md](redaction.md) |
+| Evaluation result | [ml/evaluation/results/2026-11-10_hybrid-1.1.0.json](../../ml/evaluation/results/2026-11-10_hybrid-1.1.0.json) (same scores as [1.0.0](../../ml/evaluation/results/2026-11-07_hybrid-1.0.0.json)) |
 | Ablation | [ml/evaluation/ablation.py](../../ml/evaluation/ablation.py) |
 | Timing | [ml/benchmarks/time_scoring.py](../../ml/benchmarks/time_scoring.py) |
 
 ## Result in one paragraph
 
-The hybrid scorer beats the L-7 baseline on all three L-9 metrics: Spearman over all pairs 0.739 against 0.701, mean Spearman per job 0.809 against 0.740, and NDCG@10 0.985 against 0.982. Only the per-job Spearman gain is clearly more than noise on 30 pairs. Ranking 1,000 candidates takes about **0.5 s** on a laptop CPU, with no network access. Embedding 1,000 CVs takes about **16 s**, but that is done once per CV when it is parsed, not each time candidates are ranked.
+The hybrid scorer beats the L-7 baseline on all three L-9 metrics: Spearman over all pairs 0.739 against 0.701, mean Spearman per job 0.809 against 0.740, and NDCG@10 0.985 against 0.982. Only the per-job Spearman gain is clearly more than noise on 30 pairs. Ranking 1,000 candidates takes about **0.8 s** on a laptop CPU, redaction included, with no network access. Embedding 1,000 CVs takes about **16 s**, but that is done once per CV when it is parsed, not each time candidates are ranked.
 
 ## Components
 
@@ -37,7 +38,7 @@ The total is the weighted mean of the components that are present. When a compon
 - **Experience: only a minimum, no upper limit.** Years of experience track age, so penalizing too much experience would penalize older candidates. The checklist rules this out ([privacy-ethics-checklist.md](../privacy-ethics-checklist.md)).
 - **A minimum of 0 years is not scored.** Every candidate meets it, so it would add the same points to everyone and push unrelated candidates up to about 15/100.
 - **Title: seniority words are removed.** "Senior Backend Engineer", "Mid-level Backend Engineer" and "Backend Developer" count as the same role (hyphenated labels such as "mid-level" and "entry-level" are removed like "mid level"). Seniority is the experience component's job. `+` and `#` are kept, so "C", "C++" and "C#" Developer are different roles. Developer and engineer are treated as synonyms. Generic words (engineer, manager, specialist) count half, so "Backend Engineer" and "Frontend Engineer" score only 33.
-- **Qualifications only (US-06).** Embeddings are built from the same text as TF-IDF: headline, summary, skills, titles, bullets, degrees and certifications. A test checks that a name, contact details and a birth date leave both the embedding text and the score unchanged.
+- **Qualifications only (US-06).** `score()` and `Embedder` first pass the CV through `redact()` (L-14, [redaction.md](redaction.md)), which removes the name, contact details, dates, birth date, photo references and gendered words, also inside the summary and bullets. Embeddings are then built from the same text as TF-IDF: headline, summary, skills, titles, bullets, degrees and certifications. Tests check that no redacted value reaches the scorer and that a different name gives an identical score.
 - **`score_explanations`** has one plain sentence per component, for example "Has 1.5 years of experience, below the 3 years the job asks for." or "Closest job title: Data Analyst (title fit 100/100, seniority aside).".
 
 ## Weights
@@ -107,16 +108,16 @@ Proposed mapping to the `scores` table (backend to confirm):
 
 ## Speed
 
-`python benchmarks/time_scoring.py --data <synthetic output with --cvs 1000> --model-dir <model>`: 1,000 distinct synthetic CVs against job J01, network blocked throughout. Measured on an Apple M5 (10 cores, 24 GB), macOS 26.7, Python 3.12.16, PyTorch 2.15, sentence-transformers 6.2. Two runs:
+`python benchmarks/time_scoring.py --data <synthetic output with --cvs 1000> --model-dir <model>`: 1,000 distinct synthetic CVs against job J01, network blocked throughout. Measured on an Apple M5 (10 cores, 24 GB), macOS 26.7, Python 3.12.16, PyTorch 2.15, sentence-transformers 6.2. Two runs, with redaction (`hybrid-1.1.0`):
 
 | Step | Time | How often |
 |---|---|---|
-| Rank 1,000 candidates, with embeddings (score each, then sort) | 0.52 s (0.52 ms each) | Every ranking |
-| Rank 1,000 candidates, without embeddings | 0.49-0.50 s | Every ranking |
-| Load the model | 2.3 s | Once per worker |
-| Embed 1,000 CVs and the job | 16.4 s (16.4 ms per CV) | Once per CV |
+| Rank 1,000 candidates, with embeddings (score each, then sort) | 0.81-0.82 s (0.82 ms each) | Every ranking |
+| Rank 1,000 candidates, without embeddings | 0.75-0.80 s | Every ranking |
+| Load the model | 2.0-2.5 s | Once per worker |
+| Embed 1,000 CVs and the job | 16.7-17.0 s (17 ms per CV) | Once per CV |
 
-Almost all of the ranking time is TF-IDF, which fits a vectorizer for every pair. The embedding comparison adds about 0.03 ms per candidate. L-6 measured 86 ms per CV on older hardware, so expect 3 to 5 times slower embedding on a typical laptop or a small cloud CPU.
+Most of the ranking time is TF-IDF, which fits a vectorizer for every pair (about 0.5 ms). Redaction adds about 0.25 ms per candidate (`hybrid-1.0.0` without it: 0.49-0.52 s), spread over its patterns with no single hot spot. The embedding comparison adds about 0.03 ms per candidate. L-6 measured 86 ms per CV on older hardware, so expect 3 to 5 times slower embedding on a typical laptop or a small cloud CPU.
 
 ## Evaluation (L-9 set: 30 pairs, 3 jobs, 1 rater)
 
@@ -175,4 +176,5 @@ Every component ranks C003, a Senior Data Scientist rated 0, above C008, a Produ
 - **The cosine range [0.80, 0.95] was measured on synthetic CVs.** Real CVs are longer and messier. Check the range on real data before relying on the embedding score as an absolute number. The ranking does not depend on it.
 - **Titles:** the synonym table is small and English only. A title the table does not know, such as "Insights Lead", matches nothing, even where the embedding sees a link.
 - **Experience** relies on the CV's total `experience_years`. It does not tell relevant years from years in another field.
+- **Redaction is rule-based and reduces proxy bias without removing it.** Schools, employers, languages and hobbies can still correlate with protected traits. Details: [redaction.md#limits](redaction.md#limits).
 - **The total is a ranking score, not a probability.** Compare it within a job. Totals are only roughly comparable across jobs, because different jobs leave different components `None`.

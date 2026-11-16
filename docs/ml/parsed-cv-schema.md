@@ -69,7 +69,7 @@ Every object is **closed**: a field that is not listed is an error. Null means "
 
 ## Rules
 
-- **The scorer reads only qualifications:** `headline`, `summary`, `skills[].raw`, `experiences[].title`, `.summary` and `.bullets`, `education[].degree` and `certifications`. Contact details, employer and school names, dates, graduation years, languages and confidence are never read, so they cannot change a score (US-06). `test_contact_and_confidence_do_not_change_the_score` checks this.
+- **The scorer reads only qualifications, after redaction.** `score()` first passes the record through `redact()` (L-14, [redaction.md](redaction.md)), which also scrubs names, contact details, dates and gendered words out of the free text. It then reads `headline`, `summary`, `skills[].raw`, `experiences[].title`, `.summary` and `.bullets`, `education[].degree` and `certifications`. Contact details, employer and school names, dates, graduation years, languages and confidence are never read, so they cannot change a score (US-06). `test_contact_and_confidence_do_not_change_the_score` checks this.
 - **Contact is a copy of what the CV says,** for the review screen. The `candidates` columns `full_name`, `email`, `phone` and `location` stay the record the rest of the app uses. When the recruiter accepts the review, the backend copies the corrected values there (B-14 decides how).
 - **`skills[].raw` is what the scorer compares.** `normalized` is for display and later matching. The scorer does not use it yet.
 - **`end: null` is not "current".** Use `is_current` for that.
