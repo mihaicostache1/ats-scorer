@@ -1,0 +1,307 @@
+{
+  "date": "2026-11-17",
+  "model_version": "hybrid-1.1.0",
+  "raters": [
+    "mihai"
+  ],
+  "pairs_rated": 60,
+  "tune_jobs": [
+    "J01",
+    "J07",
+    "J09"
+  ],
+  "held_out_jobs": [
+    "J04",
+    "J10",
+    "J13"
+  ],
+  "grid": {
+    "step": 0.05,
+    "min_weight": 0.05
+  },
+  "min_gain": 0.01,
+  "results": {
+    "baseline (L-7)": {
+      "weights": {
+        "skill_overlap": 0.6,
+        "embedding_similarity": 0.0,
+        "experience_fit": 0.0,
+        "title_similarity": 0.0,
+        "text_similarity": 0.4
+      },
+      "tune": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.7248785658858392,
+        "spearman_mean_per_job": 0.7495318252946603,
+        "ndcg_at_10_mean_per_job": 0.986542420909034,
+        "spearman_per_job": {
+          "J01": 0.699205898780101,
+          "J07": 0.6119527105427882,
+          "J09": 0.937436866561092
+        }
+      },
+      "held_out": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.8510976450943095,
+        "spearman_mean_per_job": 0.8840028022556324,
+        "ndcg_at_10_mean_per_job": 0.9674687056857927,
+        "spearman_per_job": {
+          "J04": 0.8528277136287792,
+          "J10": 0.9092822765088989,
+          "J13": 0.8898984166292194
+        }
+      },
+      "all": {
+        "pairs": 60,
+        "spearman_all_pairs": 0.7704866704872443,
+        "spearman_mean_per_job": 0.8167673137751464,
+        "ndcg_at_10_mean_per_job": 0.9770055632974134,
+        "spearman_per_job": {
+          "J01": 0.699205898780101,
+          "J04": 0.8528277136287792,
+          "J07": 0.6119527105427882,
+          "J09": 0.937436866561092,
+          "J10": 0.9092822765088989,
+          "J13": 0.8898984166292194
+        }
+      }
+    },
+    "hybrid (weights.yaml)": {
+      "weights": {
+        "skill_overlap": 0.3,
+        "embedding_similarity": 0.35,
+        "experience_fit": 0.1,
+        "title_similarity": 0.15,
+        "text_similarity": 0.1
+      },
+      "tune": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.7573104930809613,
+        "spearman_mean_per_job": 0.8178972419274357,
+        "ndcg_at_10_mean_per_job": 0.9900155013333469,
+        "spearman_per_job": {
+          "J01": 0.832690661274484,
+          "J07": 0.6835641979467314,
+          "J09": 0.937436866561092
+        }
+      },
+      "held_out": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.8761430338320314,
+        "spearman_mean_per_job": 0.918364848188407,
+        "ndcg_at_10_mean_per_job": 0.9866388294927658,
+        "spearman_per_job": {
+          "J04": 0.9114189305956418,
+          "J10": 0.9092822765088989,
+          "J13": 0.9343933374606804
+        }
+      },
+      "all": {
+        "pairs": 60,
+        "spearman_all_pairs": 0.8101341560815702,
+        "spearman_mean_per_job": 0.8681310450579214,
+        "ndcg_at_10_mean_per_job": 0.9883271654130564,
+        "spearman_per_job": {
+          "J01": 0.832690661274484,
+          "J04": 0.9114189305956418,
+          "J07": 0.6835641979467314,
+          "J09": 0.937436866561092,
+          "J10": 0.9092822765088989,
+          "J13": 0.9343933374606804
+        }
+      }
+    },
+    "tuned": {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.15,
+        "title_similarity": 0.3,
+        "text_similarity": 0.35
+      },
+      "tune": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.8221033871532055,
+        "spearman_mean_per_job": 0.8327288822045894,
+        "ndcg_at_10_mean_per_job": 0.9906657335803867,
+        "spearman_per_job": {
+          "J01": 0.8771855821059449,
+          "J07": 0.6835641979467314,
+          "J09": 0.937436866561092
+        }
+      },
+      "held_out": {
+        "pairs": 30,
+        "spearman_all_pairs": 0.8502981065803491,
+        "spearman_mean_per_job": 0.8522442327399627,
+        "ndcg_at_10_mean_per_job": 0.9382636711908167,
+        "spearman_per_job": {
+          "J04": 0.8202770375360778,
+          "J10": 0.7829930714382185,
+          "J13": 0.9534625892455922
+        }
+      },
+      "all": {
+        "pairs": 60,
+        "spearman_all_pairs": 0.8178408054996253,
+        "spearman_mean_per_job": 0.8424865574722761,
+        "ndcg_at_10_mean_per_job": 0.9644647023856017,
+        "spearman_per_job": {
+          "J01": 0.8771855821059449,
+          "J04": 0.8202770375360778,
+          "J07": 0.6835641979467314,
+          "J09": 0.937436866561092,
+          "J10": 0.7829930714382185,
+          "J13": 0.9534625892455922
+        }
+      }
+    }
+  },
+  "top_on_tuning_jobs": [
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.15,
+        "title_similarity": 0.3,
+        "text_similarity": 0.35
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8221033871532055,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867,
+      "weightings_tied_for_best": 2,
+      "weightings_searched": 3876
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.15,
+        "title_similarity": 0.35,
+        "text_similarity": 0.3
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8221033871532055,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.15,
+        "title_similarity": 0.2,
+        "text_similarity": 0.45
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8186198982245902,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.15,
+        "title_similarity": 0.25,
+        "text_similarity": 0.4
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8186198982245902,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.2,
+        "title_similarity": 0.3,
+        "text_similarity": 0.3
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8186198982245902,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.05,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.2,
+        "title_similarity": 0.3,
+        "text_similarity": 0.35
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8186198982245902,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.15,
+        "experience_fit": 0.15,
+        "title_similarity": 0.3,
+        "text_similarity": 0.3
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.816065339676939,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.15,
+        "experience_fit": 0.2,
+        "title_similarity": 0.35,
+        "text_similarity": 0.2
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.816065339676939,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.1,
+        "embedding_similarity": 0.1,
+        "experience_fit": 0.2,
+        "title_similarity": 0.35,
+        "text_similarity": 0.25
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.816065339676939,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    },
+    {
+      "weights": {
+        "skill_overlap": 0.05,
+        "embedding_similarity": 0.2,
+        "experience_fit": 0.15,
+        "title_similarity": 0.3,
+        "text_similarity": 0.3
+      },
+      "pairs": 30,
+      "spearman_all_pairs": 0.8151364092959749,
+      "spearman_mean_per_job": 0.8327288822045894,
+      "ndcg_at_10_mean_per_job": 0.9906657335803867
+    }
+  ],
+  "held_out_gain_bootstrap": {
+    "spearman_mean_per_job": [
+      -0.06732123544717804,
+      -0.24033318130292858,
+      0.02273728594005553
+    ],
+    "ndcg_at_10_mean_per_job": [
+      -0.03497424188171084,
+      -0.08424769940319488,
+      0.006079477698449409
+    ]
+  },
+  "decision": "keep"
+}
