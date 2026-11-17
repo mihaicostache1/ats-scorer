@@ -2,11 +2,16 @@
 
     python evaluation/merge_ratings.py ~/Downloads/mihai.csv            # into ratings/mihai.csv
     python evaluation/merge_ratings.py ~/Downloads/mihai.csv --rater mihai
+    python evaluation/merge_ratings.py ~/Downloads/mihai.csv --only-new  # keep existing ratings
 
 For adding pairs to a set someone has already rated: the labeling tool exports every pair of
 pairs.csv, empty where it was not rated, so rating only the new pairs gives a file with the old
 ones empty. The result is a copy of pairs.csv, in its order, holding the ratings of both files.
 A pair rated differently in the two files is an error, and nothing is written.
+
+With --only-new, only pairs the target has not rated are taken from the source; the target's
+ratings are kept as they are, and how many source ratings differ from them is printed. Use it
+when the old pairs were rated again (to compare, see retest.py) but must not change.
 """
 
 import argparse
@@ -37,6 +42,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("source", type=Path, help="CSV with the new ratings")
     parser.add_argument("--rater", help="rater name (default: the source file name)")
+    parser.add_argument(
+        "--only-new", action="store_true", help="take only pairs the target has not rated"
+    )
     args = parser.parse_args()
 
     rater = args.rater or args.source.stem
@@ -46,6 +54,11 @@ def main() -> int:
 
     old = read(target) if target.is_file() else {}
     new = read(args.source)
+    if args.only_new:
+        differ = sum(1 for pair in old.keys() & new.keys() if old[pair] != new[pair])
+        ignored = len(old.keys() & new.keys())
+        new = {pair: value for pair, value in new.items() if pair not in old}
+        print(f"Kept {ignored} existing ratings ({differ} rated differently in {args.source.name})")
     unknown = sorted(set(old) - set(pairs) | set(new) - set(pairs))
     if unknown:
         raise SystemExit(f"Not in pairs.csv: {', '.join(f'{c}/{j}' for c, j in unknown)}")

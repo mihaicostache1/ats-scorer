@@ -36,6 +36,8 @@ The pairs were picked from the generator's metadata (role family and seniority) 
 | `build_eval_set.py` | Rebuilds `data/`, `pdfs/` and `jobs.md` from the synthetic dataset |
 | `add_pairs.py` | Added the L-15 pairs to `pairs.csv` (run once) |
 | `merge_ratings.py` | Merges new ratings into an existing `ratings/<name>.csv` |
+| `retest/<name>_<date>.csv` | A later rating of pairs already rated, by the same rater. Never used by the evaluation |
+| `retest.py` | Compares a file in `retest/` with `ratings/<name>.csv`: how consistent one rater is |
 | `tune_weights.py` | The L-15 grid search over the scorer weights |
 
 ## The ratings file
@@ -78,7 +80,9 @@ copy of `pairs.csv` with the same rows in the same order and empty ratings where
 offers to download the old progress first), because saved progress belongs to one version of the set. Move past the
 pairs you have already rated with `→`, rate the new ones, export, and merge the export into your file instead of
 replacing it: `python evaluation/merge_ratings.py ~/Downloads/<your-name>.csv` from `ml/`. It refuses a pair rated
-differently in the two files.
+differently in the two files. If you rated the old pairs again as well, add `--only-new`: it keeps the ratings you already had and takes only
+the pairs that were not rated yet. Keep the export as `retest/<your-name>_<date>.csv` and compare the two ratings with
+`python evaluation/retest.py retest/<your-name>_<date>.csv`.
 
 ## How to run it
 
