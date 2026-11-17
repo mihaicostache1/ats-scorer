@@ -1,0 +1,509 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/Contents 10 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C014) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 2 /Kids [ 4 0 R 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 9263
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 57.02362 768.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18 Tf 22 TL (Angela Durham) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 751.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F1 11 Tf 15 TL (Lead Platform Engineer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 736.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (angela.durham@example.com | +1-617-555-0145 | Bucharest, Romania) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 713.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Summary) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 685.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16 Tm /F1 9 Tf 12.5 TL (12 years of hands-on work with Networking and GitHub Actions, most recently as Lead Platform Engineer. Comfortable) Tj T* (working in cross-functional agile teams.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 662.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Key Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 647.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Kubernetes) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 634.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Docker) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 622.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (AWS) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 609.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Azure) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 597.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Nginx) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 584.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Prometheus) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 572.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Monitoring) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 559.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Linux) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 547.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Scrum) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 534.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (GitHub Actions) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 522.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Presentation Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 509.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Networking) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 486.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Employment History) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 471.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Lead Platform Engineer) Tj /F1 9 Tf (, Meridian Nine) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 460.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (2024 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 447.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Automated deployments, reducing release time by 10%) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 435.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Wrote infrastructure as code and reviewed changes from other teams \(Nginx, Azure\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 422.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Ran and monitored production clusters serving 3 services \(Prometheus, Azure\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 410.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Introduced alerting and dashboards that shortened incident response by 25% \(Docker, Azure\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 405.0354 cm
+Q
+q
+1 0 0 1 57.02362 392.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Lead Platform Engineer) Tj /F1 9 Tf (, Skylark Education) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 381.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (2021 - 2023) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 369.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Hardened build pipelines and moved secrets into a managed store \(Prometheus, Nginx\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 356.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Cut the monthly cloud bill by 20% by right-sizing workloads) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 344.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Introduced alerting and dashboards that shortened incident response by 15% \(AWS, Linux\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 331.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Ran and monitored production clusters serving 2 services \(Prometheus, Azure\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 326.5354 cm
+Q
+q
+1 0 0 1 57.02362 314.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Senior DevOps Engineer) Tj /F1 9 Tf (, Tidewater Robotics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 303.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (2018 - 2021) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 290.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Ran and monitored production clusters serving 4 services) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 278.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Hardened build pipelines and moved secrets into a managed store) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 265.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Automated deployments, reducing release time by 30% \(Docker, Prometheus\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 253.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Introduced alerting and dashboards that shortened incident response by 10% \(Monitoring, Linux\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 248.0354 cm
+Q
+q
+1 0 0 1 57.02362 235.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Senior DevOps Engineer) Tj /F1 9 Tf (, Zephyr Travel Tech) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 224.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (2016 - 2018) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 212.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Introduced alerting and dashboards that shortened incident response by 35% \(Linux, Kubernetes\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 199.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Cut the monthly cloud bill by 25% by right-sizing workloads) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 187.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Wrote infrastructure as code and reviewed changes from other teams \(Linux, Prometheus\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 174.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Automated deployments, reducing release time by 35% \(AWS, Networking\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 169.5354 cm
+Q
+q
+1 0 0 1 57.02362 157.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (DevOps Engineer) Tj /F1 9 Tf (, Corvid Logic) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 146.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (2013 - 2016) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 133.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Ran and monitored production clusters serving 8 services \(Linux, AWS\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 121.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Introduced alerting and dashboards that shortened incident response by 15% \(Azure, Monitoring\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 108.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9 Tf 10.8 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9 Tf 12.5 TL (Wrote infrastructure as code and reviewed changes from other teams) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 103.5354 cm
+Q
+q
+1 0 0 1 57.02362 80.53543 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Education) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 65.03543 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9 Tf 12.5 TL (B.Sc. Computer Engineering) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 54.03543 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8 Tf 11 TL (Ardenne Business School, 2013) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+10 0 obj
+<<
+/Length 266
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 57.02362 776.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Language Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 761.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 9 Tf 12.5 TL (English \(native\)) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000728 00000 n 
+0000000796 00000 n 
+0000001126 00000 n 
+0000001191 00000 n 
+0000010505 00000 n 
+trailer
+<<
+/ID 
+[<97981536ca052b55fe061ea0e85a4ff4><97981536ca052b55fe061ea0e85a4ff4>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 11
+>>
+startxref
+10822
+%%EOF

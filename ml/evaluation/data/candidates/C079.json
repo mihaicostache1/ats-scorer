@@ -1,0 +1,85 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior UX Designer",
+  "summary": "7 years of hands-on work with Design Systems and Sketch, most recently as Senior UX Designer. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "User Flows",
+    "HTML",
+    "Interaction Design",
+    "Visual Design",
+    "Design Systems",
+    "Figma",
+    "Prototyping",
+    "Sketch",
+    "User Research"
+  ],
+  "experience_years": 7.5,
+  "work_history": [
+    {
+      "title": "Senior UX Designer",
+      "company": "Pinecrest Mobility",
+      "years": 1.6,
+      "summary": "Contributed components and guidelines to the design system (HTML, Prototyping)",
+      "start": "2025-02",
+      "end": null,
+      "bullets": [
+        "Contributed components and guidelines to the design system (HTML, Prototyping)",
+        "Designed user flows, wireframes and interactive prototypes (User Research, Interaction Design)"
+      ]
+    },
+    {
+      "title": "UX Designer",
+      "company": "Zephyr Travel Tech",
+      "years": 2.2,
+      "summary": "Facilitated 4 discovery workshops with stakeholders (Interaction Design, Sketch)",
+      "start": "2022-11",
+      "end": "2025-02",
+      "bullets": [
+        "Facilitated 4 discovery workshops with stakeholders (Interaction Design, Sketch)",
+        "Ran usability tests with 2 participants and iterated on the results (User Flows, Interaction Design)",
+        "Contributed components and guidelines to the design system",
+        "Redesigned a key journey, lifting task completion by 45%"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Skylark Education",
+      "years": 1.8,
+      "summary": "Facilitated 4 discovery workshops with stakeholders (Interaction Design, Sketch)",
+      "start": "2020-12",
+      "end": "2022-09",
+      "bullets": [
+        "Facilitated 4 discovery workshops with stakeholders (Interaction Design, Sketch)",
+        "Ran usability tests with 6 participants and iterated on the results",
+        "Redesigned a key journey, lifting task completion by 20% (Figma, Visual Design)"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Bluepeak Systems",
+      "years": 1.9,
+      "summary": "Designed user flows, wireframes and interactive prototypes",
+      "start": "2018-10",
+      "end": "2020-09",
+      "bullets": [
+        "Designed user flows, wireframes and interactive prototypes",
+        "Facilitated 3 discovery workshops with stakeholders"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Interaction Design",
+      "institution": "Harcastle University",
+      "grad_year": 2017
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "German (professional)",
+    "Portuguese (fluent)"
+  ],
+  "certifications": [
+    "Google UX Design Certificate"
+  ]
+}

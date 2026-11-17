@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "headline": "Junior UX Designer",
+  "summary": "Under a year of hands-on work with Usability Testing and Design Systems, most recently as Junior UX Designer. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Figma",
+    "Motion Design",
+    "Presentation Skills",
+    "User Research",
+    "Design Systems",
+    "Agile",
+    "Usability Testing"
+  ],
+  "experience_years": 0.5,
+  "work_history": [
+    {
+      "title": "Junior UX Designer",
+      "company": "Quartzline Software",
+      "years": 0.5,
+      "summary": "Contributed components and guidelines to the design system",
+      "start": "2026-03",
+      "end": null,
+      "bullets": [
+        "Contributed components and guidelines to the design system",
+        "Designed user flows, wireframes and interactive prototypes (Motion Design, Design Systems)",
+        "Ran usability tests with 7 participants and iterated on the results",
+        "Facilitated 6 discovery workshops with stakeholders"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Graphic Design",
+      "institution": "Harcastle University",
+      "grad_year": 2026
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Polish (intermediate)"
+  ],
+  "certifications": [
+    "Google UX Design Certificate",
+    "Certified Usability Analyst"
+  ]
+}

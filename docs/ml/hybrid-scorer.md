@@ -60,6 +60,8 @@ How the values were chosen:
 
 The weights were **not** searched to maximize the metrics. With 30 pairs and one rater, a search would fit this rater and these 3 jobs. Skills keep the second-largest weight even though leaving them out scores slightly higher on this set. They are the part a recruiter can check ("has 4 of 6 required skills"), and exact matching will improve when the scorer uses L-11 normalization.
 
+L-15 later searched the weights on 60 pairs, tuning on three jobs and checking on three others. The best weighting it found was worse than these weights on the held-out jobs, so these were kept ([experiments.md](experiments.md#l-15-tuning-the-hybrid-scorers-weights)).
+
 ## Embeddings offline
 
 The model runs on the local CPU. Only the one-off download uses the network:

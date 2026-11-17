@@ -1,0 +1,501 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Times-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C023) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 1 /Kids [ 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 9050
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.933333 .945098 .960784 rg
+n 28.34646 0 181.4173 841.8898 re f*
+Q
+q
+1 0 0 1 40.01575 788.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Contact) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 774.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 8 Tf 11.5 TL (martin.ochoa@example.com) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 762.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 8 Tf 11.5 TL (+1-512-555-0130) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 751.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 8 Tf 11.5 TL (Chicago, IL) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 729.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Core Competencies) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 714.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Data Visualization) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 703.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Machine Learning) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 691.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Airflow) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 680.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Python) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 668.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Computer Vision) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 657.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (SQL) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 645.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Statistics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 634.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (pandas) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 622.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (scikit-learn) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 611.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (Mentoring) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 599.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (TensorFlow) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 588.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 8 Tf 9.6 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 8 Tf 11.5 TL (NLP) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 566.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Education) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 551.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8 Tf 11.5 TL (B.Sc. Statistics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 541.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 7 Tf 10 TL (Valmont University, 2013) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 519.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Language Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 493.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 15 Tm /F3 8 Tf 11.5 TL (English \(fluent\), Portuguese \(B2\), Romanian) Tj T* (\(C1\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 471.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (Certifications) Tj T* ET
+Q
+Q
+q
+1 0 0 1 40.01575 457.374 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F3 8 Tf 11.5 TL (TensorFlow Developer Certificate) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 779.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18 Tf 22 TL (Martin Ochoa) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 762.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F3 11 Tf 15 TL (Lead Data Scientist) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 739.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Profile) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 711.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16 Tm /F3 9 Tf 12.5 TL -0.092609 Tw (12 years of hands-on work with pandas and Statistics, most recently as Lead Data Scientist.) Tj T* 0 Tw (Looking for a role with ownership and room to grow.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 688.874 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 10.5 Tf 14 TL (Employment History) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 673.374 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Lead Data Scientist) Tj /F3 9 Tf (, Bluepeak Systems) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 662.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8 Tf 11 TL (09/2024 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 649.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Designed and analysed 5 online experiments) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 637.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Set up experiment tracking and reproducible training runs) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 624.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Built data pipelines and notebooks used by 8 analysts \(Data Visualization, Airflow\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 619.874 cm
+Q
+q
+1 0 0 1 227.1024 607.374 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Senior Data Scientist) Tj /F3 9 Tf (, Northgate Devices) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 596.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8 Tf 11 TL (07/2020 - 06/2024) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 571.374 cm
+q
+BT 1 0 0 1 1 16 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16 Tm /F3 9 Tf 12.5 TL (Improved model precision by 20% through feature work and error analysis \(Airflow,) Tj T* (scikit-learn\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 558.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Set up experiment tracking and reproducible training runs \(pandas, Airflow\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 553.874 cm
+Q
+q
+1 0 0 1 227.1024 541.374 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Data Scientist) Tj /F3 9 Tf (, Halcyon Freight) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 530.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8 Tf 11 TL (05/2018 - 06/2020) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 505.374 cm
+q
+BT 1 0 0 1 1 16 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16 Tm /F3 9 Tf 12.5 TL (Presented findings to non-technical stakeholders and turned them into roadmap items) Tj T* (\(Computer Vision, Statistics\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 492.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Built data pipelines and notebooks used by 6 analysts \(scikit-learn, Computer Vision\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 480.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Set up experiment tracking and reproducible training runs \(Machine Learning, NLP\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 467.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Designed and analysed 5 online experiments) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 462.874 cm
+Q
+q
+1 0 0 1 227.1024 450.374 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Junior Data Scientist) Tj /F3 9 Tf (, Vantaro Group) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 439.374 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8 Tf 11 TL (07/2015 - 05/2018) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 426.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Set up experiment tracking and reproducible training runs \(Airflow, TensorFlow\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 414.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Designed and analysed 7 online experiments \(Statistics, Data Visualization\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 409.374 cm
+Q
+q
+1 0 0 1 227.1024 396.874 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12.5 TL /F2 9 Tf 0 0 0 rg (Junior Data Scientist) Tj /F3 9 Tf (, Wavecrest Telecom) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 385.874 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F3 8 Tf 11 TL (05/2013 - 05/2015) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 360.874 cm
+q
+BT 1 0 0 1 1 16 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 16 Tm /F3 9 Tf 12.5 TL (Set up experiment tracking and reproducible training runs \(TensorFlow, Computer) Tj T* (Vision\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 348.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Built data pipelines and notebooks used by 7 analysts \(TensorFlow, Data Visualization\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 335.874 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Designed and analysed 4 online experiments) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 323.374 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F3 9 Tf 10.8 TL 0 0 0 rg (-) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F3 9 Tf 12.5 TL (Improved model precision by 30% through feature work and error analysis) Tj T* ET
+Q
+Q
+q
+1 0 0 1 227.1024 318.374 cm
+Q
+ 
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000061 00000 n 
+0000000112 00000 n 
+0000000219 00000 n 
+0000000327 00000 n 
+0000000436 00000 n 
+0000000639 00000 n 
+0000000707 00000 n 
+0000001037 00000 n 
+0000001096 00000 n 
+trailer
+<<
+/ID 
+[<c602a4ed5a245d3eec272b8edb68cdc5><c602a4ed5a245d3eec272b8edb68cdc5>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 10
+>>
+startxref
+10197
+%%EOF

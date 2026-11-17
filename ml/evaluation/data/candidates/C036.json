@@ -1,0 +1,90 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior Mobile Engineer",
+  "summary": "Senior Mobile Engineer with 7 years of experience in Kotlin, Jetpack Compose and Mobile UI Design. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Jetpack Compose",
+    "Mobile UI Design",
+    "GraphQL",
+    "iOS",
+    "Kotlin",
+    "Firebase",
+    "Stakeholder Communication",
+    "SwiftUI",
+    "React Native",
+    "Technical Writing",
+    "CI/CD"
+  ],
+  "experience_years": 7.3,
+  "work_history": [
+    {
+      "title": "Senior Mobile Engineer",
+      "company": "Halcyon Freight",
+      "years": 1.9,
+      "summary": "Integrated REST back ends, offline storage and push notifications (React Native, CI/CD)",
+      "start": "2024-10",
+      "end": null,
+      "bullets": [
+        "Integrated REST back ends, offline storage and push notifications (React Native, CI/CD)",
+        "Reduced crash rate by 40% through better error handling and monitoring (SwiftUI, iOS)"
+      ]
+    },
+    {
+      "title": "Mobile Developer",
+      "company": "Bluepeak Systems",
+      "years": 1.8,
+      "summary": "Shipped new app features from design to store release (SwiftUI, Mobile UI Design)",
+      "start": "2023-01",
+      "end": "2024-10",
+      "bullets": [
+        "Shipped new app features from design to store release (SwiftUI, Mobile UI Design)",
+        "Refactored legacy screens, improving start-up time by 25%"
+      ]
+    },
+    {
+      "title": "Junior Mobile Developer",
+      "company": "Hollowell Foods",
+      "years": 1.2,
+      "summary": "Shipped new app features from design to store release (React Native, SwiftUI)",
+      "start": "2021-08",
+      "end": "2022-11",
+      "bullets": [
+        "Shipped new app features from design to store release (React Native, SwiftUI)",
+        "Reduced crash rate by 15% through better error handling and monitoring",
+        "Published 6 releases to the app stores and handled review feedback (React Native, Jetpack Compose)"
+      ]
+    },
+    {
+      "title": "Junior Mobile Developer",
+      "company": "Emberline Games",
+      "years": 2.4,
+      "summary": "Shipped new app features from design to store release (Firebase, React Native)",
+      "start": "2018-12",
+      "end": "2021-05",
+      "bullets": [
+        "Shipped new app features from design to store release (Firebase, React Native)",
+        "Set up automated builds and tests for 5 apps",
+        "Integrated REST back ends, offline storage and push notifications (React Native, Jetpack Compose)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Computer Engineering",
+      "institution": "Kestrel State University",
+      "grad_year": 2018
+    },
+    {
+      "degree": "B.Sc. Software Engineering",
+      "institution": "Greyfield College",
+      "grad_year": 2016
+    }
+  ],
+  "languages": [
+    "English (C1)",
+    "Spanish (fluent)"
+  ],
+  "certifications": [
+    "Associate Android Developer"
+  ]
+}
