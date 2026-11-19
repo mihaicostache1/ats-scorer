@@ -13,7 +13,7 @@ import pytest
 from fastapi import HTTPException, Request
 from httpx import AsyncClient
 from pydantic import SecretStr
-from sqlalchemy import Engine
+from sqlalchemy import Engine, func
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -162,7 +162,7 @@ async def test_invite_accept_and_login(
     assert token not in caplog.text and PASSWORD not in caplog.text
 
     login = await async_client.post(
-        "/api/v1/auth/login", json={"email": invitation.email, "password": PASSWORD}
+        "/api/v1/auth/login", json={"email": "Colleague@Example.com", "password": PASSWORD}
     )
     assert login.status_code == 200
     assert login.json()["user_id"] == str(user.id)
@@ -233,16 +233,20 @@ async def test_invitation_identity_cannot_be_overridden_and_invalid_input_does_n
 
 
 @pytest.mark.asyncio
-async def test_duplicate_members_cannot_be_invited_even_when_inactive_or_email_case_differs(
+@pytest.mark.parametrize("same_org", [True, False])
+@pytest.mark.parametrize("is_active", [True, False])
+async def test_existing_email_cannot_be_invited_in_any_organization(
+    same_org: bool,
+    is_active: bool,
     async_client: AsyncClient,
     committed_db: Session,
     create_user: Callable[..., User],
     login_as: Callable[[User], None],
 ) -> None:
     admin = create_user()
-    colleague = create_user("viewer", org_id=admin.org_id)
+    colleague = create_user("viewer", org_id=admin.org_id if same_org else None)
     colleague.email = colleague.email.upper()
-    colleague.is_active = False
+    colleague.is_active = is_active
     committed_db.commit()
     login_as(admin)
     response = await async_client.post(
@@ -250,6 +254,44 @@ async def test_duplicate_members_cannot_be_invited_even_when_inactive_or_email_c
     )
     assert response.status_code == 409
     assert committed_db.query(UserInvitation).count() == 0
+    assert committed_db.query(AuditEvent).count() == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("existing_email", ["colleague@example.com", "Colleague@Example.com"])
+async def test_accept_invitation_rechecks_email_across_organizations(
+    existing_email: str,
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    admin = create_user()
+    login_as(admin)
+    created = await async_client.post("/api/v1/users/invitations", json=INVITEE)
+    assert created.status_code == 201
+
+    # A different workspace claims the address after the invitation was issued.
+    outsider = create_user()
+    assert outsider.org_id != admin.org_id
+    outsider.email = existing_email
+    committed_db.commit()
+    async_client.cookies.clear()
+    response = await async_client.post(
+        "/api/v1/auth/accept-invite", json={**REDEMPTION, "token": token_from(created.json())}
+    )
+    assert response.status_code == 409
+    invitation = committed_db.get(UserInvitation, uuid.UUID(created.json()["id"]))
+    assert invitation is not None
+    assert invitation.used_at is None and invitation.accepted_by is None
+    assert (
+        committed_db.query(User).filter(func.lower(User.email) == INVITEE["email"]).one().id
+        == outsider.id
+    )
+    assert committed_db.query(User).filter(User.org_id == admin.org_id).count() == 1
+    assert (
+        committed_db.query(AuditEvent).filter(AuditEvent.action == "accept_invitation").count() == 0
+    )
 
 
 @pytest.mark.asyncio
@@ -430,6 +472,56 @@ def test_admin_deactivated_while_waiting_cannot_deactivate_another_admin(
     with Session(db_engine) as db:
         assert db.query(User).filter(User.role == "admin", User.is_active.is_(True)).count() == 1
         assert db.query(AuditEvent).filter(AuditEvent.action == "deactivate_user").count() == 1
+
+
+@pytest.mark.asyncio
+async def test_concurrent_redemption_across_organizations_creates_only_one_account(
+    db_engine: Engine,
+    async_client: AsyncClient,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    invitations = []
+    for admin in (create_user(), create_user()):
+        login_as(admin)
+        created = await async_client.post("/api/v1/users/invitations", json=INVITEE)
+        assert created.status_code == 201
+        invitations.append(created.json())
+
+    barrier = threading.Barrier(2)
+    email_exists = user_service._email_exists
+
+    def synchronized_email_exists(db: Session, email: str) -> bool:
+        exists = email_exists(db, email)
+        # Both requests must pass the precheck to exercise the database constraint.
+        barrier.wait(timeout=10)
+        return exists
+
+    monkeypatch.setattr(user_service, "_email_exists", synchronized_email_exists)
+
+    def accept(invitation: dict[str, str]) -> int:
+        with Session(db_engine) as db:
+            try:
+                user_service.accept_invitation(
+                    db,
+                    AcceptInvitationRequest(token=SecretStr(token_from(invitation)), **REDEMPTION),
+                    Request({"type": "http", "headers": []}),
+                )
+                return 201
+            except HTTPException as exc:
+                db.rollback()
+                return exc.status_code
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = list(pool.map(accept, invitations))
+    assert sorted(outcomes) == [201, 409]
+    with Session(db_engine) as db:
+        assert db.query(User).filter(func.lower(User.email) == INVITEE["email"]).count() == 1
+        assert db.query(UserInvitation).filter(UserInvitation.used_at.is_not(None)).count() == 1
+        pending = db.query(UserInvitation).filter(UserInvitation.used_at.is_(None)).one()
+        assert pending.accepted_by is None
+        assert db.query(AuditEvent).filter(AuditEvent.action == "accept_invitation").count() == 1
 
 
 @pytest.mark.asyncio

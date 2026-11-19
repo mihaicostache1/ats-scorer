@@ -8,6 +8,7 @@ Covers:
 """
 
 import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -99,6 +100,62 @@ async def test_login_happy_path(async_client: AsyncClient) -> None:
 
     assert settings.ACCESS_COOKIE_NAME in response.cookies
     assert settings.REFRESH_COOKIE_NAME in response.cookies
+
+
+@pytest.mark.asyncio
+async def test_registration_normalizes_email_and_login_accepts_mixed_case(
+    async_client: AsyncClient,
+    committed_db: Session,
+) -> None:
+    email = "Jane.Doe@Example.com"
+    registered = await async_client.post(
+        "/api/v1/auth/register", json={**REGISTER_PAYLOAD, "admin_email": email}
+    )
+    assert registered.status_code == 201
+    user = committed_db.get(User, uuid.UUID(registered.json()["user_id"]))
+    assert user is not None and user.email == email.lower()
+    async_client.cookies.clear()
+    login = await async_client.post(
+        "/api/v1/auth/login", json={"email": email, "password": LOGIN_PAYLOAD["password"]}
+    )
+    assert login.status_code == 200
+    assert login.json()["user_id"] == str(user.id)
+
+
+@pytest.mark.asyncio
+async def test_login_accepts_legacy_mixed_case_email(
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+) -> None:
+    user = create_user()
+    user.email = "Legacy.User@Example.com"
+    user.hashed_password = hash_password(LOGIN_PAYLOAD["password"])
+    committed_db.commit()
+    response = await async_client.post(
+        "/api/v1/auth/login",
+        json={"email": user.email.lower(), "password": LOGIN_PAYLOAD["password"]},
+    )
+    assert response.status_code == 200
+    assert response.json()["user_id"] == str(user.id)
+
+
+@pytest.mark.asyncio
+async def test_registration_rejects_email_registered_in_another_organization(
+    async_client: AsyncClient,
+    committed_db: Session,
+    create_user: Callable[..., User],
+) -> None:
+    existing = create_user()
+    existing.email = "Jane.Doe@Example.com"
+    committed_db.commit()
+    response = await async_client.post(
+        "/api/v1/auth/register",
+        json={**REGISTER_PAYLOAD, "admin_email": existing.email.lower()},
+    )
+    assert response.status_code == 409
+    assert committed_db.query(User).count() == 1
+    assert committed_db.query(Organization).count() == 1
 
 
 @pytest.mark.asyncio

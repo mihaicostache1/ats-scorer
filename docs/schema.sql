@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_users_org_email UNIQUE (org_id, email)
 );
+-- Login identifies users by email without an organization identifier.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email_lower ON users (lower(email));
 
 -- -----------------------------------------------------------------------------
 -- 3. JOBS

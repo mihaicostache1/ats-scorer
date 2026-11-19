@@ -3,6 +3,7 @@
 import uuid
 
 from fastapi import HTTPException, Request, Response, status
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -70,6 +71,12 @@ def register_org_and_admin(
     payload: OrgRegisterRequest, db: Session, response: Response, request: Request | None = None
 ) -> TokenResponse:
     """Create a new Organisation and its first admin User, then issue tokens."""
+    if db.query(User.id).filter(func.lower(User.email) == payload.admin_email).first() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Organisation slug or email already exists",
+        )
+
     # 1. Create org
     org = Organization(
         id=uuid.uuid4(),
@@ -143,9 +150,8 @@ def login(
 
     The plain password is *never* logged; only the email is referenced in logs.
     """
-    # Lookup by email – we find the user globally (email unique per org, but we
-    # allow login without specifying org slug for now).
-    user = db.query(User).filter(User.email == payload.email).first()
+    # Email identifies one account globally; lower() also handles legacy mixed-case rows.
+    user = db.query(User).filter(func.lower(User.email) == payload.email).first()
 
     # Use constant-time path: always call verify even on missing user to
     # avoid timing oracle.

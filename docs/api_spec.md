@@ -120,9 +120,18 @@ and `viewer`; unsupported roles and extra request fields return `422`.
 | `POST /api/v1/auth/accept-invite` | `{"token":"<token>","full_name":"New Colleague","password":"SecretPass123!"}` | `201`: new public user profile; no existing session required |
 
 The list includes inactive accounts unless filtered and never returns password hashes or
-invitation secrets. Email comparisons for invitations are case-insensitive, and invited
-emails are stored lowercase. Inviting an existing member, including an inactive one, returns
-`409`. The account is created only after the invitation is accepted.
+invitation secrets. User emails are globally unique across organizations, case-insensitively,
+because login identifies an account by email alone. Inviting an existing user, including an
+inactive user in another organization, returns `409`. Acceptance rechecks this rule and returns
+`409` without consuming the invitation if the email was registered after the link was issued.
+A unique index on `lower(email)` also enforces the rule during concurrent registration and
+acceptance. The account is created only after the invitation is accepted. Registration and
+invitation emails are stored lowercase; login accepts any email case, including for existing
+mixed-case accounts.
+
+Migration `009_global_user_email` refuses to upgrade if existing users share an email when
+compared case-insensitively. Resolve those account identities explicitly before retrying;
+the migration never merges or deletes users.
 
 The response to invitation creation contains a shareable link such as
 `http://localhost:3000/accept-invite#token=<secret>`. Set `INVITE_ACCEPT_URL` to the frontend

@@ -24,6 +24,16 @@ from app.services.pipeline_service import seed_default_stages
 from app.services.storage import LocalDiskStorage, get_storage
 
 
+@pytest.fixture(autouse=True)
+def reset_login_rate_limit() -> Generator[None, None, None]:
+    """Keep each test's login attempts independent while retaining real rate-limit behavior."""
+    from app.api.v1.endpoints.auth import limiter
+
+    limiter.reset()
+    yield
+    limiter.reset()
+
+
 @pytest.fixture
 async def async_client(db_engine) -> AsyncGenerator[AsyncClient, None]:
     """Async HTTP client fixture using httpx and ASGITransport."""

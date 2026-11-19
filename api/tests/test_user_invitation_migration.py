@@ -20,7 +20,8 @@ def test_invitation_migration_upgrade_and_downgrade(
     config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
     command.stamp(config, "007_parsed_profile_review")
 
-    command.upgrade(config, "head")
+    # Test this revision explicitly; later migrations have their own prior-schema fixtures.
+    command.upgrade(config, "008_user_invitations")
     inspector = inspect(db_engine)
     assert set(UserInvitation.__table__.columns.keys()) == {
         column["name"] for column in inspector.get_columns("user_invitations")
@@ -35,5 +36,5 @@ def test_invitation_migration_upgrade_and_downgrade(
     assert not inspect(db_engine).has_table("user_invitations")
     with Session(db_engine) as db:
         assert db.get(User, admin.id) is not None
-    command.upgrade(config, "head")
+    command.upgrade(config, "008_user_invitations")
     assert inspect(db_engine).has_table("user_invitations")

@@ -6,7 +6,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, Request, status
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -63,9 +63,11 @@ def _protect_last_admin(db: Session, user: User) -> None:
         raise HTTPException(status.HTTP_409_CONFLICT, "The last active admin cannot be removed")
 
 
-def _email_exists(db: Session, org_id: uuid.UUID, email: str) -> bool:
+def _email_exists(db: Session, email: str) -> bool:
+    # Core columns keep this global identity check outside the session's tenant ORM filter.
+    users = User.__table__.c
     return (
-        db.query(User.id).filter(User.org_id == org_id, func.lower(User.email) == email).first()
+        db.scalar(select(users.id).where(func.lower(users.email) == email.lower()).limit(1))
         is not None
     )
 
@@ -75,7 +77,7 @@ def invite_user(
 ) -> UserInvitationResponse:
     """Issue a 256-bit bearer secret; supersede any older unused invitation for this email."""
     _lock_admin(db, admin)
-    if _email_exists(db, admin.org_id, payload.email):
+    if _email_exists(db, payload.email):
         raise HTTPException(status.HTTP_409_CONFLICT, "A user with this email already exists")
 
     now = datetime.now(UTC)
@@ -153,7 +155,7 @@ def accept_invitation(db: Session, payload: AcceptInvitationRequest, request: Re
         or invitation.expires_at <= now
     ):
         raise invalid
-    if _email_exists(db, invitation.org_id, invitation.email):
+    if _email_exists(db, invitation.email):
         raise HTTPException(status.HTTP_409_CONFLICT, "A user with this email already exists")
 
     user = User(
