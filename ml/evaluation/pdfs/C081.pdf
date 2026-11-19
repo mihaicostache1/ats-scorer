@@ -1,0 +1,371 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 8 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 7 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/PageMode /UseNone /Pages 7 0 R /Type /Catalog
+>>
+endobj
+6 0 obj
+<<
+/Author (ats-scorer synthetic data generator) /CreationDate (D:20000101000000+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (Synthetic test data. Not a real person.) /Title (Synthetic CV C081) /Trapped /False
+>>
+endobj
+7 0 obj
+<<
+/Count 1 /Kids [ 4 0 R ] /Type /Pages
+>>
+endobj
+8 0 obj
+<<
+/Length 7513
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 57.02362 768.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 4 Tm /F2 18.5 Tf 22.5 TL (Hugo Mayoral) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 750.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 4 Tm /F1 11.5 Tf 15.5 TL (Senior Backend Engineer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 735.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (hugo.mayoral47@example.org | +1-646-555-0125 | Lisbon, Portugal) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 711.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (About Me) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 682.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16.5 Tm /F1 9.5 Tf 13 TL (8 years of hands-on work with Spring Boot and PostgreSQL, most recently as Senior Backend Engineer. Looking) Tj T* (for a role with ownership and room to grow.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 659.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Career History) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 643.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Senior Backend Engineer) Tj /F1 9.5 Tf (, Aurelia Payments) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 631.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (Aug 2024 - Present) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 618.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Migrated a legacy module to a new stack together with QA and product \(Kubernetes, Go\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 605.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Built and maintained backend services used by 5 internal teams \(Django, Redis\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 592.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Reviewed pull requests and supported 3 newer developers) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 579.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Cut average response time by 20% by profiling queries and adding caching) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 574.5354 cm
+Q
+q
+1 0 0 1 57.02362 561.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Backend Developer) Tj /F1 9.5 Tf (, Skylark Education) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 550.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (Nov 2021 - May 2024) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 537.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Designed REST endpoints and data models for new product features) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 524.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Built and maintained backend services used by 4 internal teams \(Go, REST APIs\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 511.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Cut average response time by 40% by profiling queries and adding caching \(Kubernetes, SQL\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 498.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Wrote unit and integration tests, raising coverage by 35 percentage points \(Spring Boot, REST APIs\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 493.0354 cm
+Q
+q
+1 0 0 1 57.02362 480.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Junior Backend Developer) Tj /F1 9.5 Tf (, Ironbark Logistics) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 468.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (Apr 2020 - Sep 2021) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 455.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Cut average response time by 25% by profiling queries and adding caching) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 442.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Designed REST endpoints and data models for new product features \(gRPC, Java\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 429.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Migrated a legacy module to a new stack together with QA and product \(SQL, Django\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 416.5354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Wrote unit and integration tests, raising coverage by 10 percentage points \(Spring Boot, Django\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 411.5354 cm
+Q
+q
+1 0 0 1 57.02362 398.5354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 13 TL /F2 9.5 Tf 0 0 0 rg (Junior Backend Developer) Tj /F1 9.5 Tf (, Saffron Street Bank) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 387.0354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (Jan 2018 - Mar 2020) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 374.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Wrote unit and integration tests, raising coverage by 40 percentage points \(PostgreSQL, Microservices\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 361.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Cut average response time by 10% by profiling queries and adding caching \(Redis, Kubernetes\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 348.0354 cm
+q
+BT 1 0 0 1 1 3.5 Tm /F1 9.5 Tf 11.4 TL 0 0 0 rg (\177) Tj ET
+0 0 0 rg
+BT 1 0 0 1 10 3.5 Tm /F1 9.5 Tf 13 TL .025 0 Td (Migrated a legacy module to a new stack together with QA and product \(Spring Boot, Microservices\)) Tj T* -0.025 0 Td ET
+Q
+Q
+q
+1 0 0 1 57.02362 343.0354 cm
+Q
+q
+1 0 0 1 57.02362 319.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Core Competencies) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 290.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16.5 Tm /F1 9.5 Tf 13 TL (Problem Solving | Interaction Design | Redis | SQL | Microservices | PostgreSQL | Figma | Java | Django | Go |) Tj T* (REST APIs | gRPC | Kubernetes | Spring Boot) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 267.0354 cm
+q
+BT 1 0 0 1 0 3.5 Tm 14.5 TL /F2 11 Tf 0 0 0 rg (Education & Training) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 251.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 9.5 Tf 13 TL (B.Sc. Computer Engineering) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 239.5354 cm
+q
+.333333 .333333 .333333 rg
+BT 1 0 0 1 0 3 Tm /F1 8.5 Tf 11.5 TL (Northfield Technical University, 2017) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 216.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Language Skills) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 200.0354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 9.5 Tf 13 TL (English \(C1\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 176.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F2 11 Tf 14.5 TL (Certifications) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 160.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 9.5 Tf 13 TL (Oracle Certified Professional: Java SE Programmer) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 147.5354 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 3.5 Tm /F1 9.5 Tf 13 TL (AWS Certified Developer - Associate) Tj T* ET
+Q
+Q
+ 
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000524 00000 n 
+0000000592 00000 n 
+0000000922 00000 n 
+0000000981 00000 n 
+trailer
+<<
+/ID 
+[<379ed19082ab34f15efd41569c2723eb><379ed19082ab34f15efd41569c2723eb>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 6 0 R
+/Root 5 0 R
+/Size 9
+>>
+startxref
+8545
+%%EOF

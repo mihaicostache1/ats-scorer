@@ -7,8 +7,11 @@ from pathlib import Path
 import pytest
 
 from ats_scoring import MODEL_VERSION, score
+from ats_scoring.config import DEFAULT_CONFIG
 from ats_scoring.evaluate import (
+    EMBEDDINGS_FILE,
     evaluate,
+    load_embeddings,
     load_scorer,
     main,
     ndcg_at_k,
@@ -152,3 +155,76 @@ def test_missing_ratings_are_reported(tmp_path: Path) -> None:
 
     with pytest.raises(SystemExit, match="No ratings"):
         evaluate(score, tmp_path)
+
+
+def unit(index: int) -> list[float]:
+    values = [0.0] * DEFAULT_CONFIG.embedding.dimensions
+    values[index] = 1.0
+    return values
+
+
+def write_embeddings(root: Path, **overrides: object) -> Path:
+    data = {
+        "model": DEFAULT_CONFIG.embedding.model,
+        "revision": DEFAULT_CONFIG.embedding.revision,
+        "candidates": {"C1": unit(0), "C2": unit(0), "C3": unit(1)},
+        "jobs": {"J1": unit(0)},
+        **overrides,
+    }
+    path = root / EMBEDDINGS_FILE
+    path.write_text(json.dumps(data), encoding="utf-8")
+    return path
+
+
+def test_embeddings_are_passed_to_the_scorer(tmp_path: Path) -> None:
+    write_eval_set(tmp_path, GOOD_RATINGS)
+    embeddings = load_embeddings(write_embeddings(tmp_path))
+    seen: list[dict[str, object]] = []
+
+    def scorer(candidate: object, job: object, **extra: object) -> float:
+        seen.append(extra)
+        return 1.0 if extra["candidate_embedding"] == unit(0) else 0.0
+
+    report = evaluate(scorer, tmp_path, "test:scorer", embeddings)
+
+    assert len(seen) == 3
+    assert all(extra["job_embedding"] == unit(0) for extra in seen)
+    assert report["embeddings"] == {
+        "model": DEFAULT_CONFIG.embedding.model,
+        "revision": DEFAULT_CONFIG.embedding.revision,
+    }
+
+
+def test_without_embeddings_the_scorer_gets_two_arguments(tmp_path: Path) -> None:
+    write_eval_set(tmp_path, GOOD_RATINGS)
+
+    report = evaluate(lambda candidate, job: 1.0, tmp_path, "test:scorer")
+
+    assert report["embeddings"] is None
+    assert report["pairs_scored"] == 3
+
+
+def test_embeddings_from_another_model_are_rejected(tmp_path: Path) -> None:
+    write_eval_set(tmp_path, GOOD_RATINGS)
+    path = write_embeddings(tmp_path, revision="0" * 40)
+
+    with pytest.raises(SystemExit, match="embed_eval_set.py"):
+        load_embeddings(path)
+
+
+def test_main_uses_the_embeddings_file_when_present(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    write_eval_set(tmp_path, GOOD_RATINGS)
+    write_embeddings(tmp_path)
+
+    assert main(["--eval-dir", str(tmp_path)]) == 0
+    assert main(["--eval-dir", str(tmp_path), "--no-embeddings"]) == 0
+
+    names = sorted(path.name for path in (tmp_path / "results").glob("*.json"))
+    with_embeddings, without = (json.loads((tmp_path / "results" / n).read_text()) for n in names)
+    assert names[0].endswith(f"{MODEL_VERSION}.json")
+    assert names[1].endswith(f"{MODEL_VERSION}_no-embeddings.json")
+    assert with_embeddings["embeddings"] is not None
+    assert without["embeddings"] is None
+    assert "embeddings from" in capsys.readouterr().out

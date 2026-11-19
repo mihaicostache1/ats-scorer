@@ -1,0 +1,75 @@
+{
+  "schema_version": "0.1",
+  "headline": "Data Scientist",
+  "summary": "My most recent role is Data Scientist; most of my work involves SQL, pandas and Python. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Jupyter",
+    "Agile",
+    "Python",
+    "Statistics",
+    "SQL",
+    "A/B Testing",
+    "Presentation Skills",
+    "XGBoost",
+    "MLflow",
+    "pandas"
+  ],
+  "experience_years": 5.0,
+  "work_history": [
+    {
+      "title": "Data Scientist",
+      "company": "Northgate Devices",
+      "years": 1.4,
+      "summary": "Designed and analysed 7 online experiments (pandas, MLflow)",
+      "start": "2025-04",
+      "end": null,
+      "bullets": [
+        "Designed and analysed 7 online experiments (pandas, MLflow)",
+        "Set up experiment tracking and reproducible training runs",
+        "Built data pipelines and notebooks used by 4 analysts (pandas, Python)",
+        "Presented findings to non-technical stakeholders and turned them into roadmap items (A/B Testing, Statistics)"
+      ]
+    },
+    {
+      "title": "Data Scientist",
+      "company": "Oakhaven Analytics",
+      "years": 1.5,
+      "summary": "Presented findings to non-technical stakeholders and turned them into roadmap items",
+      "start": "2023-08",
+      "end": "2025-02",
+      "bullets": [
+        "Presented findings to non-technical stakeholders and turned them into roadmap items",
+        "Built data pipelines and notebooks used by 4 analysts (A/B Testing, pandas)"
+      ]
+    },
+    {
+      "title": "Junior Data Scientist",
+      "company": "Tidewater Robotics",
+      "years": 2.1,
+      "summary": "Built data pipelines and notebooks used by 6 analysts",
+      "start": "2021-07",
+      "end": "2023-08",
+      "bullets": [
+        "Built data pipelines and notebooks used by 6 analysts",
+        "Trained and evaluated models for a ranking problem",
+        "Improved model precision by 35% through feature work and error analysis (XGBoost, A/B Testing)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Statistics",
+      "institution": "Lakeshore University",
+      "grad_year": 2021
+    },
+    {
+      "degree": "B.Sc. Computer Science",
+      "institution": "Riverton College",
+      "grad_year": 2019
+    }
+  ],
+  "languages": [
+    "English (C1)"
+  ],
+  "certifications": []
+}

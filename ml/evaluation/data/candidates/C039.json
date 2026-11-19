@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior UX Designer",
+  "summary": "7 years of hands-on work with Accessibility and Design Systems, most recently as Senior UX Designer. Enjoys mentoring and clear documentation.",
+  "skills": [
+    "Design Systems",
+    "User Research",
+    "Interaction Design",
+    "Mentoring",
+    "Prototyping",
+    "Accessibility",
+    "Stakeholder Communication",
+    "Figma",
+    "Sketch",
+    "Adobe XD"
+  ],
+  "experience_years": 7.2,
+  "work_history": [
+    {
+      "title": "Senior UX Designer",
+      "company": "Vantaro Group",
+      "years": 1.4,
+      "summary": "Worked with developers to ship accessible interfaces",
+      "start": "2025-04",
+      "end": null,
+      "bullets": [
+        "Worked with developers to ship accessible interfaces",
+        "Facilitated 5 discovery workshops with stakeholders (Figma, Interaction Design)"
+      ]
+    },
+    {
+      "title": "UX Designer",
+      "company": "Copperfield Insurance",
+      "years": 3.2,
+      "summary": "Designed user flows, wireframes and interactive prototypes (Sketch, Figma)",
+      "start": "2021-11",
+      "end": "2025-01",
+      "bullets": [
+        "Designed user flows, wireframes and interactive prototypes (Sketch, Figma)",
+        "Worked with developers to ship accessible interfaces (Figma, Prototyping)",
+        "Contributed components and guidelines to the design system (Adobe XD, Prototyping)"
+      ]
+    },
+    {
+      "title": "Junior UX Designer",
+      "company": "Bluepeak Systems",
+      "years": 2.7,
+      "summary": "Ran usability tests with 8 participants and iterated on the results (Accessibility, Sketch)",
+      "start": "2018-12",
+      "end": "2021-08",
+      "bullets": [
+        "Ran usability tests with 8 participants and iterated on the results (Accessibility, Sketch)",
+        "Contributed components and guidelines to the design system (Prototyping, Figma)",
+        "Facilitated 8 discovery workshops with stakeholders",
+        "Redesigned a key journey, lifting task completion by 20% (Adobe XD, Sketch)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.A. Psychology",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2017
+    },
+    {
+      "degree": "B.A. Psychology",
+      "institution": "Riverton College",
+      "grad_year": 2015
+    }
+  ],
+  "languages": [
+    "English (fluent)",
+    "Dutch (fluent)",
+    "German (B2)"
+  ],
+  "certifications": [
+    "Google UX Design Certificate"
+  ]
+}

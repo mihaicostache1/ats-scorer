@@ -1,6 +1,6 @@
 # Privacy and ethics checklist
 
-**Engineering guidance, not legal advice.** Owner: ML/DevOps lead · Last reviewed: 2026-10-06 · Review at every sprint review and before any real-data use.
+**Engineering guidance, not legal advice.** Owner: ML/DevOps lead · Last reviewed: 2026-11-10 · Review at every sprint review and before any real-data use.
 Drafted with AI assistance from public sources and not independently verified. Check each rule against the official text. See [scope](scope.md) for the stories referenced below (US-xx).
 
 > **Core principle: the system ranks and explains. People decide.** No score ever rejects, hides or contacts a candidate by itself.
@@ -16,7 +16,9 @@ Drafted with AI assistance from public sources and not independently verified. C
 - [ ] Keeping candidates in a talent pool beyond the process needs separate consent that can be withdrawn
 
 ### 2. No protected attributes
-- [ ] Scorer input excludes name, contact, address, photo, date of birth, graduation years and gendered titles, and a test proves it (US-06)
+- [x] Scorer input excludes name, contact, address, photo, date of birth, graduation years and gendered titles, and a test proves it (US-06). Done in L-14: `redact()` runs inside `score()` and the embedder, keeps only city or region and country, and computes years of experience before dropping dates. Tests check that no redacted value reaches the scorer and that a different name or gender-coded wording gives an identical score. See [redaction.md](ml/redaction.md)
+  - Redaction reduces proxy bias but does not remove it: schools, employers, languages and hobbies stay, and the rules are English-first. Limits: [redaction.md#limits](ml/redaction.md#limits)
+  - Stored CVs must be re-embedded once when `hybrid-1.1.0` is deployed, because older embeddings were built from unredacted text
 - [ ] Special categories (health, ethnicity, religion, union membership, sexual orientation, political views) are never extracted or stored from CVs
 - [ ] No inference of protected traits (gender from a name, age from dates) and no emotion, personality, video or voice analysis
 - [ ] Demographic data for fairness audits is voluntary, stored apart from candidate records, and never reachable by the scorer
@@ -43,7 +45,7 @@ Drafted with AI assistance from public sources and not independently verified. C
 - [ ] Every score stores the model version and component breakdown
 - [ ] Selection-rate ratios by group are checked on synthetic or consented test data before each scorer release (weeks 7-8)
 - [ ] The learned ranker ships only if it beats the baseline and passes the same checks. Recruiter decisions can contain human bias, so they are not ground truth
-- [ ] Known limits are written in `/docs/ml` (small synthetic data, proxies such as university or hobbies)
+- [x] Known limits are written in `/docs/ml` (small synthetic data, proxies such as university or hobbies): [hybrid-scorer.md#limits](ml/hybrid-scorer.md#limits), [redaction.md#limits](ml/redaction.md#limits), [evaluation.md](ml/evaluation.md)
 - [ ] A short risk assessment (DPIA-style) is written before real-data use
 
 ### 7. Security

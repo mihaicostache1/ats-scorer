@@ -16,9 +16,12 @@ LEGACY_SCHEMA_VERSION = "0.1"
 
 
 class ScoreComponents(TypedDict):
-    """Parts of a score, each from 0 to 100."""
+    """Parts of a score, each from 0 to 100. None when a part cannot be computed."""
 
     skill_overlap: float | None  # None when the job lists no skills
+    embedding_similarity: float | None  # None without both embeddings
+    experience_fit: float | None  # None when the job or the CV gives no years
+    title_similarity: float | None  # None when the job or the CV has no title
     text_similarity: float
 
 

@@ -67,7 +67,7 @@ describe("exportRatingsCsv", () => {
     expect(lines[30]).toBe(`${pairs[29].candidateId},${pairs[29].jobId},2`);
   });
 
-  it("keeps all 30 pairs in file order, with LF endings, no BOM and no blank lines", () => {
+  it("keeps every pair in file order, with LF endings, no BOM and no blank lines", () => {
     const text = exportRatingsCsv(pairs, { [pairKey(pairs[4])]: 1 });
     expect(text.startsWith(CSV_HEADER)).toBe(true);
     expect(text.charCodeAt(0)).not.toBe(0xfeff);
@@ -76,14 +76,14 @@ describe("exportRatingsCsv", () => {
     expect(text.endsWith("\n")).toBe(true);
     expect(text).not.toContain("\n\n");
     const rows = text.split("\n").slice(1, -1);
-    expect(rows).toHaveLength(30);
+    expect(rows).toHaveLength(pairs.length);
     expect(rows.map((row) => row.split(",").slice(0, 2).join("|"))).toEqual(pairs.map(pairKey));
   });
 
   it("writes a skipped or unrated pair as an empty cell, never as a placeholder", () => {
     const text = exportRatingsCsv(pairs, { [pairKey(pairs[0])]: 1 });
     const empty = text.split("\n").slice(2, -1);
-    expect(empty).toHaveLength(29);
+    expect(empty).toHaveLength(pairs.length - 1);
     for (const row of empty) expect(row).toMatch(/^C\d+,J\d+,$/);
   });
 });
@@ -106,7 +106,7 @@ describe("what L-9 does with the export", () => {
     const loaded = loadRatingsLikeL9(
       exportRatingsCsv(pairs, Object.fromEntries(pairs.map((p) => [pairKey(p), 2 as Rating])))
     );
-    expect(loaded.size).toBe(30);
+    expect(loaded.size).toBe(pairs.length);
     for (const key of loaded.keys()) {
       const [candidateId, jobId] = key.split("|");
       expect(evaluationCandidates.has(candidateId)).toBe(true);

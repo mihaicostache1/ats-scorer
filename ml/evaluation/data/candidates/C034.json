@@ -1,0 +1,93 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior DevOps Engineer",
+  "summary": "Senior DevOps Engineer with 9 years of experience in Linux, GitHub Actions and Kubernetes. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Grafana",
+    "Jenkins",
+    "Problem Solving",
+    "Monitoring",
+    "Prototyping",
+    "Vault",
+    "Linux",
+    "Prometheus",
+    "Kubernetes",
+    "GitHub Actions",
+    "Ansible",
+    "Visual Design",
+    "Networking"
+  ],
+  "experience_years": 9.5,
+  "work_history": [
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Oakhaven Analytics",
+      "years": 1.7,
+      "summary": "Ran and monitored production clusters serving 6 services (Prometheus, GitHub Actions)",
+      "start": "2025-01",
+      "end": null,
+      "bullets": [
+        "Ran and monitored production clusters serving 6 services (Prometheus, GitHub Actions)",
+        "Hardened build pipelines and moved secrets into a managed store (GitHub Actions, Monitoring)",
+        "Cut the monthly cloud bill by 30% by right-sizing workloads"
+      ]
+    },
+    {
+      "title": "DevOps Engineer",
+      "company": "Corvid Logic",
+      "years": 2.9,
+      "summary": "Wrote infrastructure as code and reviewed changes from other teams",
+      "start": "2022-02",
+      "end": "2025-01",
+      "bullets": [
+        "Wrote infrastructure as code and reviewed changes from other teams",
+        "Introduced alerting and dashboards that shortened incident response by 15% (Grafana, Monitoring)",
+        "Ran and monitored production clusters serving 8 services"
+      ]
+    },
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Brightloom Studio",
+      "years": 1.8,
+      "summary": "Cut the monthly cloud bill by 20% by right-sizing workloads (Monitoring, GitHub Actions)",
+      "start": "2020-01",
+      "end": "2021-11",
+      "bullets": [
+        "Cut the monthly cloud bill by 20% by right-sizing workloads (Monitoring, GitHub Actions)",
+        "Automated deployments, reducing release time by 20%"
+      ]
+    },
+    {
+      "title": "Junior DevOps Engineer",
+      "company": "Driftwood Media",
+      "years": 3.1,
+      "summary": "Automated deployments, reducing release time by 40%",
+      "start": "2016-10",
+      "end": "2019-11",
+      "bullets": [
+        "Automated deployments, reducing release time by 40%",
+        "Wrote infrastructure as code and reviewed changes from other teams (Prometheus, Grafana)",
+        "Ran and monitored production clusters serving 4 services"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Software Engineering",
+      "institution": "Kestrel State University",
+      "grad_year": 2015
+    },
+    {
+      "degree": "B.Sc. Computer Engineering",
+      "institution": "Lakeshore University",
+      "grad_year": 2013
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Portuguese (intermediate)"
+  ],
+  "certifications": [
+    "Certified Kubernetes Administrator (CKA)"
+  ]
+}

@@ -1,0 +1,1 @@
+We need someone who can hit the ground running on our Django monolith. You'll be shipping features in Python and React every week and helping us move from Heroku to AWS. A minimum of three years of experience as a developer is expected, along with comfort writing SQL by hand and using Git. Docker and TypeScript are part of the daily toolkit.

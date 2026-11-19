@@ -1,0 +1,3 @@
+Senior Frontend Engineer
+
+Requirements: 3+ years with React and TypeScript, testing with Jest. 5+ years is preferred. Nice-to-haves: Next.js, Storybook, e.g. design systems work.

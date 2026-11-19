@@ -1,0 +1,25 @@
+{
+  "job_id": "J13",
+  "synthetic": true,
+  "title": "Senior Data Scientist",
+  "department": "Data",
+  "location": "London, UK (hybrid)",
+  "employment_type": "full_time",
+  "description": "Senior Data Scientist - London, UK (hybrid)\nMust have: PyTorch, Statistics, NLP, Feature Engineering, Machine Learning\nExperience: At least 5 years of relevant experience\nGood to have: SQL, Airflow, Hugging Face Transformers, MLflow\nTasks: Monitor model quality and investigate errors; Build reproducible training and evaluation pipelines; Explore data and communicate findings clearly; Develop, evaluate and improve machine-learning models",
+  "required_skills": [
+    "PyTorch",
+    "Statistics",
+    "NLP",
+    "Feature Engineering",
+    "Machine Learning"
+  ],
+  "preferred_skills": [
+    "SQL",
+    "Airflow",
+    "Hugging Face Transformers",
+    "MLflow"
+  ],
+  "min_experience_years": 5,
+  "role_family": "data_science",
+  "seniority": "senior"
+}

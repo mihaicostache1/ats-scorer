@@ -66,12 +66,12 @@ describe("parsePairsCsv", () => {
 });
 
 describe("the real evaluation set", () => {
-  it("has the 30 pairs, 3 jobs and 22 CVs that docs/ml/evaluation.md describes", async () => {
+  it("has the 60 pairs, 6 jobs and 45 CVs that docs/ml/evaluation.md describes", async () => {
     const data = await loadLabelingData();
 
-    expect(data.pairs).toHaveLength(30);
-    expect(Object.keys(data.jobs).sort()).toEqual(["J01", "J07", "J10"]);
-    expect(new Set(data.pairs.map((pair) => pair.candidateId)).size).toBe(22);
+    expect(data.pairs).toHaveLength(60);
+    expect(Object.keys(data.jobs).sort()).toEqual(["J01", "J04", "J07", "J09", "J10", "J13"]);
+    expect(new Set(data.pairs.map((pair) => pair.candidateId)).size).toBe(45);
     expect(data.jobs.J01.title).toBe("Senior Backend Engineer");
     expect(data.jobs.J01.min_experience_years).toBe(6);
     expect(data.jobs.J01.required_skills).toContain("Python");
@@ -79,9 +79,11 @@ describe("the real evaluation set", () => {
 
   it("keeps the pairs grouped by job, as they are meant to be rated", async () => {
     const { pairs } = await loadLabelingData();
-    expect(pairs.slice(0, 10).every((pair) => pair.jobId === "J01")).toBe(true);
-    expect(pairs.slice(10, 20).every((pair) => pair.jobId === "J07")).toBe(true);
-    expect(pairs.slice(20).every((pair) => pair.jobId === "J10")).toBe(true);
+    // The L-9 jobs first, then the three that L-15 appended, 10 pairs each.
+    ["J01", "J07", "J10", "J04", "J09", "J13"].forEach((jobId, block) => {
+      const group = pairs.slice(block * 10, block * 10 + 10);
+      expect(group.every((pair) => pair.jobId === jobId)).toBe(true);
+    });
   });
 
   it("gives the same dataset id every time", async () => {

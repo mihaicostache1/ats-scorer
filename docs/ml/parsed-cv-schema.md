@@ -88,7 +88,7 @@ for an unconfirmed normalization. The scorer ignores suggestions.
 
 ## Rules
 
-- **The scorer reads only qualifications:** `headline`, `summary`, `skills[].raw`, `experiences[].title`, `.summary` and `.bullets`, `education[].degree` and `certifications`. Contact details, employer and school names, dates, graduation years, languages and confidence are never read, so they cannot change a score (US-06). `test_contact_and_confidence_do_not_change_the_score` checks this.
+- **The scorer reads only qualifications, after redaction.** `score()` first passes the record through `redact()` (L-14, [redaction.md](redaction.md)), which also scrubs names, contact details, dates and gendered words out of the free text. It then reads `headline`, `summary`, `skills[].raw`, `experiences[].title`, `.summary` and `.bullets`, `education[].degree` and `certifications`. Contact details, employer and school names, dates, graduation years, languages and confidence are never read, so they cannot change a score (US-06). `test_contact_and_confidence_do_not_change_the_score` checks this.
 - **Contact is a copy of what the CV says,** for the review screen. The `candidates` columns `full_name`, `email`, `phone` and `location` stay the record the rest of the app uses. When the recruiter accepts the review, the backend copies the corrected values there (B-14 decides how).
 - **`skills[].raw` is what the scorer compares.** `normalized` is for display and later matching. The scorer does not use it yet.
 - **`end: null` is not "current".** Use `is_current` for that.
@@ -127,20 +127,29 @@ The synthetic CVs from `ml/synthetic` and the evaluation set still use the draft
 ```python
 from ats_scoring import score
 
-result = score(candidate.parsed_data, job_fields)
+result = score(
+    candidate.parsed_data,
+    job_fields,
+    candidate_embedding=candidate.embedding,
+    job_embedding=job.embedding,
+)
 ```
 
-`job_fields` is a dict with `title`, `description`, `required_skills` and `preferred_skills`.
+`job_fields` is a dict with `title`, `description`, `required_skills`, `preferred_skills` and `min_experience_years`. The embeddings come from `ats_scoring.embeddings.Embedder` (see [hybrid-scorer.md](hybrid-scorer.md#embeddings-offline)).
+
+Proposed mapping for the hybrid scorer (`hybrid-1.0.0`, L-13), to be confirmed by the backend:
 
 | `score()` returns | Place in `scores` |
 |---|---|
 | `total` (0-100) | `overall_score` |
 | `components["skill_overlap"]` (0-100 or null) | `skill_overlap_score` |
-| `components["text_similarity"]` (0-100) | `semantic_score` |
-| `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |
+| `components["embedding_similarity"]`, or `text_similarity` when it is null | `semantic_score` |
+| `components["experience_fit"]` (0-100 or null) | `experience_score` |
+| `components["title_similarity"]` (0-100 or null) | `title_fit_score` |
+| `components`, `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |
 | `model_version` | `model_version` |
 
-`experience_score` and `title_fit_score` stay null, because the baseline does not compute them. `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has nothing to compare.
+Under the L-7 baseline (`tfidf-skills-0.1.0`), `semantic_score` held the TF-IDF similarity and `experience_score` and `title_fit_score` stayed null. `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has nothing to compare.
 
 Details of the scoring are in [ml/README.md](../../ml/README.md).
 
@@ -149,7 +158,7 @@ Details of the scoring are in [ml/README.md](../../ml/README.md).
 - **Nullable components:** `experience_score`, `title_fit_score` and `skill_overlap_score` are null when a model does not compute them (backend PR #22).
 - **Nothing to score:** no score is stored and the candidate goes to manual review. The backend catches `NothingToScoreError`, not every `ValueError`.
 - **Re-scoring:** the backend upserts on `(application_id, model_version)`, and every stage move keeps a copy of the score and model version it was based on (PR #22). `MODEL_VERSION` changes whenever the weights or the alias table change.
-- **`semantic_score` holds the TF-IDF similarity** for now. `model_version` tells it apart from embedding similarity later.
+- **`semantic_score` held the TF-IDF similarity** under the baseline. From `hybrid-1.0.0` (L-13) it is proposed to hold the embedding similarity; `model_version` tells the two apart.
 - **Scoring runs in the worker,** not during a request.
 
 ## Open

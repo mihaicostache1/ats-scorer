@@ -1,0 +1,22 @@
+{
+  "job_id": "J16",
+  "synthetic": true,
+  "title": "Mobile Developer",
+  "department": "Engineering",
+  "location": "Austin, TX (on-site)",
+  "employment_type": "full_time",
+  "description": "About the role\nWe are hiring a Mobile Developer for our Engineering team (Austin, TX (on-site)).\n\nWhat you will do\n- Work with designers and backend developers\n- Build and ship features for our mobile apps\n- Publish releases to the app stores\n\nWhat you bring\n- At least 2 years of relevant experience\n- Solid working knowledge of React Native, Git, Swift and Mobile UI Design\n\nNice to have\n- REST APIs and iOS",
+  "required_skills": [
+    "React Native",
+    "Git",
+    "Swift",
+    "Mobile UI Design"
+  ],
+  "preferred_skills": [
+    "REST APIs",
+    "iOS"
+  ],
+  "min_experience_years": 2,
+  "role_family": "mobile",
+  "seniority": "mid"
+}

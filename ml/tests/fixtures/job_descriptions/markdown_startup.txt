@@ -1,0 +1,21 @@
+# Senior Backend Engineer (Python) — Payments
+
+**About us**
+We're a 40-person fintech, founded 12 years ago, moving money for 3 million users.
+
+**What you'll do**
+* Own our payment APIs end to end
+* Work with Kafka-based event pipelines
+* Mentor 2-3 engineers
+
+**Requirements**
+* 5+ yrs of professional backend experience
+* Python/Go in production
+* Strong knowledge of PostgreSQL and Redis
+* Experience with AWS (Lambda, S3) or GCP
+
+**Bonus points**
+* Kubernetes, Terraform
+* You've worked in payments before
+
+**Perks**: annual bonus, 30 days PTO, remote-first

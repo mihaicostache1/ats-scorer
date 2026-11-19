@@ -1,0 +1,24 @@
+{
+  "job_id": "J20",
+  "synthetic": true,
+  "title": "Senior Marketing Manager",
+  "department": "Marketing",
+  "location": "Remote (US/EU)",
+  "employment_type": "full_time",
+  "description": "Senior Marketing Manager - Remote (US/EU)\nMust have: Marketing Automation, Social Media, Content Marketing, Market Research, SEO\nExperience: At least 6 years of relevant experience\nGood to have: Paid Search, A/B Testing, Copywriting\nTasks: Create and edit content for web, email and social media; Manage budgets and agencies; Work with sales and product on launches; Plan and run multi-channel campaigns",
+  "required_skills": [
+    "Marketing Automation",
+    "Social Media",
+    "Content Marketing",
+    "Market Research",
+    "SEO"
+  ],
+  "preferred_skills": [
+    "Paid Search",
+    "A/B Testing",
+    "Copywriting"
+  ],
+  "min_experience_years": 6,
+  "role_family": "marketing",
+  "seniority": "senior"
+}

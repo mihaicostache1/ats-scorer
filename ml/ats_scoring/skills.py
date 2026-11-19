@@ -4,8 +4,9 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-# A nice-to-have skill counts half as much as a required one.
-PREFERRED_WEIGHT = 0.5
+# Defaults for match_skills. The scorer passes the values from weights.yaml.
+REQUIRED_WEIGHT = 1.0
+PREFERRED_WEIGHT = 0.5  # a nice-to-have skill counts half as much as a required one
 
 # Abbreviations that plain string comparison cannot resolve. Keys and values are in
 # cleaned form. Background: docs/ml/embedding-model-and-skill-matching.md
@@ -75,12 +76,19 @@ def _unique(skills: object) -> dict[str, str]:
     return unique
 
 
-def match_skills(candidate_skills: object, required: object, preferred: object) -> SkillMatch:
+def match_skills(
+    candidate_skills: object,
+    required: object,
+    preferred: object,
+    *,
+    required_weight: float = REQUIRED_WEIGHT,
+    preferred_weight: float = PREFERRED_WEIGHT,
+) -> SkillMatch:
     """Compare skill lists after normalization.
 
-    The overlap is the share of the job's skills the candidate has, with preferred
-    skills weighted by PREFERRED_WEIGHT. A skill listed as both required and preferred
-    counts as required.
+    The overlap is the weighted share of the job's skills the candidate has: each required
+    skill weighs `required_weight` and each preferred one `preferred_weight`. A skill listed
+    as both required and preferred counts as required.
     """
     have = _unique(candidate_skills).keys()
     wanted = _unique(required)
@@ -88,8 +96,8 @@ def match_skills(candidate_skills: object, required: object, preferred: object) 
 
     matched_required = [name for key, name in wanted.items() if key in have]
     matched_optional = [name for key, name in optional.items() if key in have]
-    possible = len(wanted) + PREFERRED_WEIGHT * len(optional)
-    earned = len(matched_required) + PREFERRED_WEIGHT * len(matched_optional)
+    possible = required_weight * len(wanted) + preferred_weight * len(optional)
+    earned = required_weight * len(matched_required) + preferred_weight * len(matched_optional)
     return SkillMatch(
         matched_required=matched_required,
         missing_required=[name for key, name in wanted.items() if key not in have],

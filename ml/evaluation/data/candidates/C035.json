@@ -1,0 +1,75 @@
+{
+  "schema_version": "0.1",
+  "headline": "QA Engineer",
+  "summary": "My most recent role is QA Engineer; most of my work involves JIRA, Cypress and Python. Known for reliable delivery and pragmatic solutions.",
+  "skills": [
+    "Cypress",
+    "JIRA",
+    "JMeter",
+    "API Testing",
+    "Test Automation",
+    "KPI Definition",
+    "Python",
+    "Appium",
+    "Stakeholder Communication",
+    "Agile"
+  ],
+  "experience_years": 5.4,
+  "work_history": [
+    {
+      "title": "QA Engineer",
+      "company": "Vantaro Group",
+      "years": 2.0,
+      "summary": "Reported, reproduced and tracked defects together with developers",
+      "start": "2024-09",
+      "end": null,
+      "bullets": [
+        "Reported, reproduced and tracked defects together with developers",
+        "Coached 5 testers on writing maintainable automated tests"
+      ]
+    },
+    {
+      "title": "Junior QA Tester",
+      "company": "Glasswing Bio",
+      "years": 1.8,
+      "summary": "Reduced manual regression effort by 15% through automation (JIRA, Python)",
+      "start": "2022-09",
+      "end": "2024-06",
+      "bullets": [
+        "Reduced manual regression effort by 15% through automation (JIRA, Python)",
+        "Coached 8 testers on writing maintainable automated tests (Appium, Test Automation)",
+        "Reported, reproduced and tracked defects together with developers"
+      ]
+    },
+    {
+      "title": "Junior QA Tester",
+      "company": "Quartzline Software",
+      "years": 1.7,
+      "summary": "Reported, reproduced and tracked defects together with developers",
+      "start": "2020-11",
+      "end": "2022-07",
+      "bullets": [
+        "Reported, reproduced and tracked defects together with developers",
+        "Coached 8 testers on writing maintainable automated tests (Cypress, Test Automation)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Sc. Information Systems",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2019
+    },
+    {
+      "degree": "B.Sc. Information Systems",
+      "institution": "Lakeshore University",
+      "grad_year": 2017
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Spanish (fluent)",
+    "Dutch (intermediate)"
+  ],
+  "certifications": []
+}

@@ -1,0 +1,24 @@
+{
+  "job_id": "J02",
+  "synthetic": true,
+  "title": "Frontend Developer",
+  "department": "Engineering",
+  "location": "Remote (EU)",
+  "employment_type": "contract",
+  "description": "About the role\nWe are hiring a Frontend Developer for our Engineering team (Remote (EU)).\n\nWhat you will do\n- Work closely with designers and backend developers\n- Build accessible, responsive user interfaces\n- Turn designs into reusable components\n- Write automated tests for critical user journeys\n\nWhat you bring\n- At least 2 years of relevant experience\n- Solid working knowledge of HTML, React, Web Accessibility, Tailwind CSS, Vue.js and CSS\n\nNice to have\n- Cypress and Responsive Design",
+  "required_skills": [
+    "HTML",
+    "React",
+    "Web Accessibility",
+    "Tailwind CSS",
+    "Vue.js",
+    "CSS"
+  ],
+  "preferred_skills": [
+    "Cypress",
+    "Responsive Design"
+  ],
+  "min_experience_years": 2,
+  "role_family": "frontend",
+  "seniority": "mid"
+}

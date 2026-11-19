@@ -1,0 +1,93 @@
+{
+  "schema_version": "0.1",
+  "headline": "Senior DevOps Engineer",
+  "summary": "Senior DevOps Engineer with 8 years of experience in Linux, Prometheus and Kubernetes. Looking for a role with ownership and room to grow.",
+  "skills": [
+    "Bash",
+    "Prometheus",
+    "Linux",
+    "Kubernetes",
+    "AWS",
+    "CI/CD",
+    "Monitoring",
+    "Agile",
+    "Dashboards",
+    "ArgoCD",
+    "Data Cleaning",
+    "Azure",
+    "Networking",
+    "Terraform",
+    "Presentation Skills"
+  ],
+  "experience_years": 8.2,
+  "work_history": [
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Tidewater Robotics",
+      "years": 2.5,
+      "summary": "Introduced alerting and dashboards that shortened incident response by 45% (AWS, Prometheus)",
+      "start": "2024-03",
+      "end": null,
+      "bullets": [
+        "Introduced alerting and dashboards that shortened incident response by 45% (AWS, Prometheus)",
+        "Wrote infrastructure as code and reviewed changes from other teams",
+        "Automated deployments, reducing release time by 35%",
+        "Ran and monitored production clusters serving 3 services"
+      ]
+    },
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Driftwood Media",
+      "years": 1.7,
+      "summary": "Hardened build pipelines and moved secrets into a managed store (Linux, CI/CD)",
+      "start": "2022-05",
+      "end": "2024-01",
+      "bullets": [
+        "Hardened build pipelines and moved secrets into a managed store (Linux, CI/CD)",
+        "Automated deployments, reducing release time by 40%",
+        "Wrote infrastructure as code and reviewed changes from other teams (Azure, Prometheus)",
+        "Cut the monthly cloud bill by 15% by right-sizing workloads"
+      ]
+    },
+    {
+      "title": "Senior DevOps Engineer",
+      "company": "Pinecrest Mobility",
+      "years": 1.2,
+      "summary": "Cut the monthly cloud bill by 15% by right-sizing workloads (Terraform, ArgoCD)",
+      "start": "2020-11",
+      "end": "2022-02",
+      "bullets": [
+        "Cut the monthly cloud bill by 15% by right-sizing workloads (Terraform, ArgoCD)",
+        "Introduced alerting and dashboards that shortened incident response by 30%",
+        "Hardened build pipelines and moved secrets into a managed store"
+      ]
+    },
+    {
+      "title": "DevOps Engineer",
+      "company": "Emberline Games",
+      "years": 2.8,
+      "summary": "Introduced alerting and dashboards that shortened incident response by 35%",
+      "start": "2018-01",
+      "end": "2020-10",
+      "bullets": [
+        "Introduced alerting and dashboards that shortened incident response by 35%",
+        "Wrote infrastructure as code and reviewed changes from other teams (ArgoCD, Bash)",
+        "Ran and monitored production clusters serving 6 services (Terraform, AWS)",
+        "Cut the monthly cloud bill by 30% by right-sizing workloads"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.Sc. Software Engineering",
+      "institution": "Northfield Technical University",
+      "grad_year": 2018
+    }
+  ],
+  "languages": [
+    "English (C1)"
+  ],
+  "certifications": [
+    "Certified Kubernetes Administrator (CKA)"
+  ]
+}

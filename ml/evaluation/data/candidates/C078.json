@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "headline": "Associate Product Manager",
+  "summary": "1 year of hands-on work with Product Strategy and User Stories, most recently as Associate Product Manager. Comfortable working in cross-functional agile teams.",
+  "skills": [
+    "Technical Writing",
+    "User Stories",
+    "Problem Solving",
+    "Customer Interviews",
+    "Scrum",
+    "Product Strategy",
+    "Roadmapping",
+    "Content Marketing",
+    "Marketing Automation"
+  ],
+  "experience_years": 1.1,
+  "work_history": [
+    {
+      "title": "Associate Product Manager",
+      "company": "Oakhaven Analytics",
+      "years": 1.1,
+      "summary": "Launched a feature that raised activation by 35%",
+      "start": "2025-08",
+      "end": null,
+      "bullets": [
+        "Launched a feature that raised activation by 35%",
+        "Ran user interviews and turned the findings into prioritised user stories (User Stories, Scrum)",
+        "Owned the roadmap and backlog for a product used by 6 customer teams"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "B.A. Business Administration",
+      "institution": "Solvang Polytechnic",
+      "grad_year": 2025
+    }
+  ],
+  "languages": [
+    "English (native)",
+    "Portuguese (C1)"
+  ],
+  "certifications": [
+    "Product Management Certificate"
+  ]
+}
