@@ -1,14 +1,15 @@
 """Parser behavior and the shared L-10/L-11 boundaries, without a database."""
 
 from datetime import date
+from unittest.mock import Mock
 
 import jsonschema
 import pytest
 import spacy
 from ats_scoring.esco import load_esco
-from ats_scoring.parsed_cv import Contact, Experience, ParsedCV, Skill
+from ats_scoring.parsed_cv import SCHEMA_VERSION, Contact, Experience, ParsedCV, Skill
 from ats_scoring.schema import load_parsed_cv_schema
-from ats_scoring.skill_normalizer import SkillNormalizer
+from ats_scoring.skill_normalizer import NormalizedSkill, SkillNormalizer
 
 from app.services.cv_parser import (
     CvParser,
@@ -70,6 +71,7 @@ def test_structured_extraction(
         as_of=date(2026, 1, 1),
     )
     jsonschema.validate(parsed.model_dump(mode="json"), load_parsed_cv_schema())
+    assert parsed.schema_version == SCHEMA_VERSION
     assert parsed.contact.name == "Jane Smith"
     assert parsed.contact.email == "jane.smith+cv@example.org"
     assert parsed.contact.phone == "+40 (721) 123-456"
@@ -198,8 +200,42 @@ def test_l11_esco_exact_and_fuzzy_suggestions(parser: CvParser) -> None:
     parser.normalizer = SkillNormalizer(load_esco(fixture))
     parsed = parser.parse("Skills: Python, project managment, Underwater basket weaving")
     assert parsed.skills[0].normalized == "Python"
+    assert parsed.skills[0].suggestion is None
     assert parsed.skills[1].normalized is None
+    assert parsed.skills[1].suggestion == "project management"
     assert parsed.skills[2].raw == "Underwater basket weaving"
+    assert parsed.skills[2].suggestion is None
+    assert parsed.confidence["/skills/1/normalized"] == 0.6
+    data = parsed.model_dump(mode="json")
+    jsonschema.validate(data, load_parsed_cv_schema())
+    assert ParsedCV.model_validate(data).skills[1].suggestion == "project management"
+
+
+def test_l11_embedding_suggestion_survives_parser_serialization(parser: CvParser) -> None:
+    normalizer = Mock(spec=SkillNormalizer)
+    normalizer.normalize_skills.return_value = [
+        NormalizedSkill(
+            raw="Unit Testing",
+            normalized=None,
+            method="embedding",
+            score=0.95,
+            suggestion="perform software unit testing",
+        )
+    ]
+    parser.normalizer = normalizer
+    parsed = parser.parse("Skills: Unit Testing")
+    data = parsed.model_dump(mode="json")
+    jsonschema.validate(data, load_parsed_cv_schema())
+
+    assert data["schema_version"] == "1.1"
+    assert data["skills"] == [
+        {
+            "raw": "Unit Testing",
+            "normalized": None,
+            "suggestion": "perform software unit testing",
+        }
+    ]
+    assert parsed.confidence["/skills/0/normalized"] == 0.6
 
 
 def test_review_policy_missing_fields_and_configured_threshold() -> None:

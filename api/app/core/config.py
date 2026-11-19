@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import AnyHttpUrl, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -50,6 +50,17 @@ class Settings(BaseSettings):
 
     # Rate limiting – login endpoint
     LOGIN_RATE_LIMIT: str = "10/minute"
+
+    # B-15: the frontend form reads the token from the URL fragment and POSTs it to the API.
+    USER_INVITE_EXPIRE_HOURS: int = Field(default=48, ge=1, le=720)
+    INVITE_ACCEPT_URL: AnyHttpUrl = AnyHttpUrl("http://localhost:3000/accept-invite")
+
+    @field_validator("INVITE_ACCEPT_URL")
+    @classmethod
+    def _invite_url_has_no_fragment(cls, value: AnyHttpUrl) -> AnyHttpUrl:
+        if value.fragment is not None:
+            raise ValueError("INVITE_ACCEPT_URL must not contain a fragment")
+        return value
 
     # File storage (local disk in development). Must not be a publicly served directory.
     STORAGE_LOCAL_DIR: str = Field(default="storage", alias="STORAGE_LOCAL_DIR")

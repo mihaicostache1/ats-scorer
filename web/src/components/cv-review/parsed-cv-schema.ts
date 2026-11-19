@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { components } from "@/api/generated/schema";
 
 /**
- * Parsed-CV schema 1.0 (L-10) on the client, plus the mapping between a profile and the review form.
+ * Parsed-CV schema 1.1 (also reads 1.0) on the client, plus the profile/review-form mapping.
  *
  * `parsedCvSchema` mirrors `ml/ats_scoring/schemas/parsed_cv.schema.json` and is checked against its
  * valid and invalid fixtures in `parsed-cv-schema.test.ts`. A save only goes out when the profile it
@@ -25,7 +25,7 @@ const yearMonth = z.string().regex(YEAR_MONTH);
 const nullableText = z.string().nullable().optional();
 
 export const parsedCvSchema = z.strictObject({
-  schema_version: z.literal("1.0"),
+  schema_version: z.enum(["1.0", "1.1"]),
   source: z.enum(["parser", "recruiter"]),
   contact: z
     .strictObject({
@@ -43,6 +43,8 @@ export const parsedCvSchema = z.strictObject({
       raw: z.string().min(1),
       // The key must be present; `null` means "not recognized".
       normalized: z.string().min(1).nullable(),
+      // An unconfirmed suggestion is preserved for review, never copied into normalized.
+      suggestion: z.string().min(1).nullable().optional(),
     })
   ),
   experience_years: z.number().min(0).nullable().optional(),

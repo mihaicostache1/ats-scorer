@@ -42,15 +42,17 @@ Build one normalizer when the worker starts and reuse it. Loading and indexing E
 
 ```python
 from ats_scoring.esco import load_esco
+from ats_scoring.parsed_cv import SCHEMA_VERSION
 from ats_scoring.skill_normalizer import SkillNormalizer
 
 normalizer = SkillNormalizer(load_esco("/data/esco/skills_en.csv"))
 
 skills = normalizer.normalize_skills(["JS", "Docker", "project managment"])
+parsed_data["schema_version"] = SCHEMA_VERSION  # 1.1
 parsed_data["skills"] = [skill.to_parsed_cv() for skill in skills]
 # [{"raw": "JS", "normalized": "JavaScript"},
 #  {"raw": "Docker", "normalized": "Docker"},
-#  {"raw": "project managment", "normalized": None}]   # suggestion: "project management"
+#  {"raw": "project managment", "normalized": None, "suggestion": "project management"}]
 
 found = normalizer.extract_skills(parsed_data["summary"] or "")
 ```
@@ -85,7 +87,7 @@ There are also module-level `normalize_skills(skills)` and `extract_skills(text)
 | `esco_uri`, `esco_label` | The ESCO concept that was matched or suggested, and its preferred label. `None` when there is none, for example for Docker |
 | `suggestion` | The name to offer the recruiter, for `fuzzy` and `embedding` |
 | `accepted` | `normalized is not None` |
-| `to_parsed_cv()` | `{"raw", "normalized"}`, the `skills[]` entry of the [parsed-CV schema](parsed-cv-schema.md) |
+| `to_parsed_cv()` | `{"raw", "normalized"}` plus `suggestion` when present, the `skills[]` entry of [parsed-CV schema 1.1](parsed-cv-schema.md) |
 
 **Names:** an exact match shows the label that matched, as ESCO spells it, without the bracketed qualifier. An alternative label is kept, because ESCO lists narrower terms there: "Scrum" stays "Scrum", with `esco_label` "ICT project management methodologies". A hidden label (misspellings, old names) and a label from another language show the concept's preferred name instead.
 
@@ -136,7 +138,7 @@ Fuzzy matching compares each string with about 100,000 ESCO labels, in parallel 
 ## Limits
 
 - **Coverage is the alias table's.** About 45% of our synthetic skills have no acceptable ESCO match (L-6), so the alias table does most of the work for tech skills. Add entries as real CVs show gaps, with a test for each.
-- **Suggestions have no place in the parsed-CV schema 1.0.** `skills[]` holds only `raw` and `normalized`. To show suggestions on the review screen, B-13 can keep them elsewhere, or the schema gets an optional `suggestion` field in a minor version (1.1). The backend and frontend developers decide; see the schema's change rules.
+- **Suggestion storage is resolved in schema 1.1.** B-13 preserves fuzzy and embedding labels in optional `skills[].suggestion`, with `normalized: null`, for recruiter review. Existing 1.0 records remain valid. See the [L-11 review decision](parsed-cv-schema.md#skill-suggestions-l-11-review-decision).
 - **The fuzzy and embedding thresholds are L-6's starting points,** not tuned. L-6 also found that no cosine cut-off separates right from wrong embedding matches. Tune both on recruiter-confirmed matches once F-11 records them.
 - **The scorer does not use this yet.** It keeps its own smaller alias table in `ats_scoring/skills.py`, because changing that table changes scores and needs a new `MODEL_VERSION`. A test checks that the two tables agree where both have an entry.
 - **Extraction is literal.** It misses inflected forms ("Dockerized") and skills written as a sentence ("I lead teams").

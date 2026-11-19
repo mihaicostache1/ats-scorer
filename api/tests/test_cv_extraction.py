@@ -471,23 +471,37 @@ async def test_retry_permissions(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("with_suggestions", [False, True])
 async def test_parsed_output_and_original_are_saved_atomically(
     upload: Uploader,
     async_client: AsyncClient,
     committed_db: Session,
     cv_storage: LocalDiskStorage,
     monkeypatch: pytest.MonkeyPatch,
+    with_suggestions: bool,
 ) -> None:
     parsed = ParsedCV(
-        schema_version="1.0",
+        schema_version="1.1" if with_suggestions else "1.0",
         source="parser",
         contact=Contact(name="Jane", email="a@b.com"),
         skills=[Skill(raw="Docker", normalized="Docker")],
         confidence={"/contact/name": 0.9},
     )
+    if with_suggestions:
+        parsed.skills.extend(
+            [
+                Skill(raw="project managment", normalized=None, suggestion="project management"),
+                Skill(
+                    raw="Unit Testing",
+                    normalized=None,
+                    suggestion="perform software unit testing",
+                ),
+            ]
+        )
+        parsed.confidence.update({"/skills/1/normalized": 0.6, "/skills/2/normalized": 0.6})
     monkeypatch.setattr(cv_extraction, "parse_cv_text", lambda text: parsed)
     document = await upload()
-    assert await _run(cv_storage, document) == "parsed"
+    assert await _run(cv_storage, document) == ("needs_review" if with_suggestions else "parsed")
     row = _row(committed_db, document)
     candidate = committed_db.get(Candidate, row.candidate_id)
     assert candidate is not None
@@ -496,10 +510,9 @@ async def test_parsed_output_and_original_are_saved_atomically(
     # Parsing doesn't accept changes to the candidate's canonical identity (B-14).
     assert candidate.full_name == "Test Person"
     assert candidate.email != "a@b.com"
-    assert (
-        "parsed_data_original"
-        not in (await async_client.get(f"{CANDIDATES_URL}/{candidate.id}")).json()
-    )
+    fetched = (await async_client.get(f"{CANDIDATES_URL}/{candidate.id}")).json()
+    assert "parsed_data_original" not in fetched
+    assert fetched["parsed_data"] == parsed.model_dump(mode="json")
 
     original = candidate.parsed_data_original.copy()
     candidate.parsed_data = {**candidate.parsed_data, "source": "recruiter", "summary": "Corrected"}

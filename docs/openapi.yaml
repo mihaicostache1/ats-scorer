@@ -148,6 +148,315 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailError'
 
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List workspace users
+      description: List members, including inactive accounts. Only admins in the same workspace can read.
+      operationId: listUsers
+      parameters:
+      - name: role
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/UserRole'
+          - type: 'null'
+          title: Role
+      - name: is_active
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 255
+          - type: 'null'
+          title: Search
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Per Page
+      - name: access_token
+        in: cookie
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Token
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsersResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '403':
+          description: Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+      security:
+      - CookieAuth: []
+  /users/invitations:
+    post:
+      tags:
+      - Users
+      summary: Create a shareable user invitation
+      description: Return a single-use link for the admin to share. No email is sent.
+      operationId: inviteUser
+      parameters:
+      - name: access_token
+        in: cookie
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteUserRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInvitationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '403':
+          description: Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '409':
+          description: Existing member, last active admin or self-deactivation conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+      security:
+      - CookieAuth: []
+  /users/{id}/role:
+    patch:
+      tags:
+      - Users
+      summary: Change a workspace user's role
+      description: Change role immediately, including for existing sessions; preserve the last admin.
+      operationId: changeUserRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      - name: access_token
+        in: cookie
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRoleRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '403':
+          description: Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '404':
+          description: User not found in this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '409':
+          description: Existing member, last active admin or self-deactivation conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+      security:
+      - CookieAuth: []
+  /users/{id}/deactivate:
+    post:
+      tags:
+      - Users
+      summary: Deactivate a workspace user
+      description: Deactivate another member. Existing access and refresh tokens are rejected afterwards.
+      operationId: deactivateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      - name: access_token
+        in: cookie
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Access Token
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '403':
+          description: Admin privileges required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '404':
+          description: User not found in this organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '409':
+          description: Existing member, last active admin or self-deactivation conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+      security:
+      - CookieAuth: []
+  /auth/accept-invite:
+    post:
+      tags:
+      - Auth
+      summary: Accept a single-use workspace invitation
+      description: Create the invited account without an existing session; sign in normally afterwards.
+      operationId: acceptInvitation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '400':
+          description: Invalid, expired, superseded or already-used invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+        '409':
+          description: Existing member, last active admin or self-deactivation conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+
   /orgs/current:
     get:
       summary: Get Current Organization Workspace
@@ -539,7 +848,7 @@ paths:
       description: |
         Apply partial corrections to an existing L-10 profile. Nested contact fields
         merge; arrays replace their lists. The complete result must validate against
-        schema 1.0. Requires the admin or recruiter role.
+        schema 1.1 (also accepts 1.0 records). Requires the admin or recruiter role.
         The server sets source to recruiter, records reviewer and timestamp, and sets
         corrected fields' confidence to 1. Client source/confidence values are validated
         but cannot override server provenance. Preserves parsed_data_original.
@@ -1112,6 +1421,112 @@ components:
           type: boolean
           example: true
 
+    UserRole:
+      type: string
+      enum:
+      - admin
+      - recruiter
+      - viewer
+      title: UserRole
+      description: Workspace roles supported by B-6.
+    InviteUserRequest:
+      properties:
+        email:
+          type: string
+          maxLength: 255
+          format: email
+          title: Email
+        role:
+          $ref: '#/components/schemas/UserRole'
+          default: recruiter
+      additionalProperties: false
+      type: object
+      required:
+      - email
+      title: InviteUserRequest
+      description: An admin chooses the email and role; the invitee chooses their name and password.
+    UserInvitationResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        expires_at:
+          type: string
+          format: date-time
+          title: Expires At
+        invite_url:
+          type: string
+          title: Invite Url
+      type: object
+      required:
+      - id
+      - email
+      - role
+      - expires_at
+      - invite_url
+      title: UserInvitationResponse
+      description: The shareable link is returned only when the invitation is issued.
+    AcceptInvitationRequest:
+      properties:
+        token:
+          type: string
+          maxLength: 256
+          minLength: 1
+          format: password
+          title: Token
+          writeOnly: true
+        full_name:
+          type: string
+          maxLength: 255
+          minLength: 2
+          title: Full Name
+        password:
+          type: string
+          maxLength: 128
+          minLength: 8
+          format: password
+          title: Password
+          writeOnly: true
+      additionalProperties: false
+      type: object
+      required:
+      - token
+      - full_name
+      - password
+      title: AcceptInvitationRequest
+      description: Public redemption payload. Email, role and organization come exclusively from the token.
+    UpdateUserRoleRequest:
+      properties:
+        role:
+          $ref: '#/components/schemas/UserRole'
+      additionalProperties: false
+      type: object
+      required:
+      - role
+      title: UpdateUserRoleRequest
+      description: Role updates cannot change identity, organization or active status.
+    PaginatedUsersResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserProfileResponse'
+          type: array
+          title: Items
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+      required:
+      - items
+      - pagination
+      title: PaginatedUsersResponse
+      description: The standard pagination envelope, including inactive users unless filtered.
+
     OrganizationResponse:
       type: object
       required:
@@ -1437,6 +1852,14 @@ components:
           - string
           - 'null'
           minLength: 1
+        suggestion:
+          description: Unconfirmed fuzzy or embedding match for recruiter review. Never
+            automatically copied to normalized or used for scoring. Omitted or null
+            when there is no suggestion.
+          type:
+          - string
+          - 'null'
+          minLength: 1
     ParsedCvExperience:
       type: object
       required:
@@ -1509,7 +1932,7 @@ components:
           - 'null'
     ParsedCV:
       title: Parsed CV
-      description: 'Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data.
+      description: 'Version 1.1, also accepts 1.0 records. Structured data extracted from one CV, stored in candidates.parsed_data.
         Every object is closed: a new field needs a new schema version. Rules for changing
         it: docs/ml/parsed-cv-schema.md.'
       type: object
@@ -1525,6 +1948,7 @@ components:
             gets a new schema file.
           enum:
           - '1.0'
+          - '1.1'
         source:
           description: 'Who wrote this version of the record: the CV parser, or a recruiter
             who corrected it.'
@@ -1621,6 +2045,7 @@ components:
             gets a new schema file.
           enum:
           - '1.0'
+          - '1.1'
         source:
           description: 'Who wrote this version of the record: the CV parser, or a recruiter
             who corrected it.'

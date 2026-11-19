@@ -118,6 +118,31 @@ describe("toFormValues / toPatch", () => {
 });
 
 describe("checkPatch", () => {
+  it.each(load("valid"))("allows saving an unchanged valid/$name profile", ({ data }) => {
+    const parsed = data as ParsedCV;
+    expect(checkPatch(toFormValues(parsed), parsed)).toEqual({ ok: true, patch: {} });
+  });
+
+  it("preserves unconfirmed suggestions and clears only the skill the recruiter confirms", () => {
+    const parsed = JSON.parse(
+      readFileSync(path.join(FIXTURES, "valid", "skill_suggestions.json"), "utf8")
+    ) as ParsedCV;
+    const values = toFormValues(parsed);
+    expect(values.skills[0].normalized).toBe("");
+    values.skills[1].normalized = "perform software unit testing";
+
+    const result = checkPatch(values, parsed);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("Expected a valid correction");
+    expect(result.patch.skills?.[0]).toEqual(parsed.skills[0]);
+    expect(result.patch.skills?.[0].normalized).toBeNull();
+    expect(result.patch.skills?.[1]).toEqual({
+      raw: "Unit Testing",
+      normalized: "perform software unit testing",
+    });
+    expect(result.patch.skills?.[1]).not.toHaveProperty("suggestion");
+  });
+
   it("accepts a valid correction", () => {
     const result = checkPatch(
       edit((v) => (v.headline = "Staff Engineer")),

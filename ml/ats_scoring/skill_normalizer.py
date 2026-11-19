@@ -267,8 +267,11 @@ class NormalizedSkill:
         return self.normalized is not None
 
     def to_parsed_cv(self) -> dict[str, str | None]:
-        """The `skills[]` entry of the parsed-CV schema 1.0."""
-        return {"raw": self.raw, "normalized": self.normalized}
+        """The `skills[]` entry of parsed-CV schema 1.1, including review suggestions."""
+        skill = {"raw": self.raw, "normalized": self.normalized}
+        if self.suggestion is not None:
+            skill["suggestion"] = self.suggestion
+        return skill
 
 
 _UNMATCHED = NormalizedSkill(raw="", normalized=None, method="none", score=None)

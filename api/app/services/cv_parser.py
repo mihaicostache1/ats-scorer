@@ -11,7 +11,15 @@ from datetime import date
 from functools import lru_cache
 
 import spacy
-from ats_scoring.parsed_cv import Contact, Education, Experience, Language, ParsedCV, Skill
+from ats_scoring.parsed_cv import (
+    SCHEMA_VERSION,
+    Contact,
+    Education,
+    Experience,
+    Language,
+    ParsedCV,
+    Skill,
+)
 from ats_scoring.skill_normalizer import SkillNormalizer, default_normalizer
 from spacy.language import Language as NlpPipeline
 
@@ -160,7 +168,7 @@ class CvParser:
             for chunk in range(0, len(clean_text), 50_000)
             for ent in self.nlp(clean_text[chunk : chunk + 50_000]).ents
         ]
-        parsed = ParsedCV(schema_version="1.0", source="parser", skills=[])
+        parsed = ParsedCV(schema_version=SCHEMA_VERSION, source="parser", skills=[])
         emails = list(dict.fromkeys(match.group() for match in _EMAIL.finditer(clean_text)))
         phones = _phone_values(clean_text)
         parsed.contact = Contact(

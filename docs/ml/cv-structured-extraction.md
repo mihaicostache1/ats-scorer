@@ -17,12 +17,14 @@ years, and current-position markers. Year-only dates use January with confidence
 merges overlapping date intervals rather than counting simultaneous jobs twice.
 
 Explicit skill lists go through L-11 `normalize_skills`. Unrecognized skills keep
-their raw text with `normalized: null`; fuzzy and embedding suggestions are never
-accepted. When no skills list exists, L-11 `extract_skills` reads summary/experience
+their raw text with `normalized: null`; fuzzy and embedding labels are preserved in
+optional `suggestion` for review and are never automatically accepted. When no skills
+list exists, L-11 `extract_skills` reads summary/experience
 text. Contact text is excluded from that fallback. Duplicates are removed while
 keeping the first written form. A lock protects shared spaCy/normalizer calls.
 
-The parser returns the shared `ParsedCV` model, version 1.0, with `source: parser`.
+The parser returns the shared `ParsedCV` model, version 1.1, with `source: parser`.
+The shared schema continues to accept existing 1.0 records without migration.
 It revalidates its JSON representation before returning; persistence validates again.
 Tests validate against the L-10 JSON Schema and check that confidence pointers resolve.
 Birth date, nationality, gender and marital-status lines are excluded from parsing.

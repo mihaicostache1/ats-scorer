@@ -106,6 +106,106 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List workspace users
+     * @description List members, including inactive accounts. Only admins in the same workspace can read.
+     */
+    get: operations["listUsers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/invitations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a shareable user invitation
+     * @description Return a single-use link for the admin to share. No email is sent.
+     */
+    post: operations["inviteUser"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{id}/role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Change a workspace user's role
+     * @description Change role immediately, including for existing sessions; preserve the last admin.
+     */
+    patch: operations["changeUserRole"];
+    trace?: never;
+  };
+  "/users/{id}/deactivate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Deactivate a workspace user
+     * @description Deactivate another member. Existing access and refresh tokens are rejected afterwards.
+     */
+    post: operations["deactivateUser"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/accept-invite": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Accept a single-use workspace invitation
+     * @description Create the invited account without an existing session; sign in normally afterwards.
+     */
+    post: operations["acceptInvitation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/orgs/current": {
     parameters: {
       query?: never;
@@ -314,7 +414,7 @@ export interface paths {
      * Correct Parsed Candidate Profile
      * @description Apply partial corrections to an existing L-10 profile. Nested contact fields
      *     merge; arrays replace their lists. The complete result must validate against
-     *     schema 1.0. Requires the admin or recruiter role.
+     *     schema 1.1 (also accepts 1.0 records). Requires the admin or recruiter role.
      *     The server sets source to recruiter, records reviewer and timestamp, and sets
      *     corrected fields' confidence to 1. Client source/confidence values are validated
      *     but cannot override server provenance. Preserves parsed_data_original.
@@ -614,6 +714,80 @@ export interface components {
       /** @example true */
       is_active: boolean;
     };
+    /**
+     * UserRole
+     * @description Workspace roles supported by B-6.
+     * @enum {string}
+     */
+    UserRole: "admin" | "recruiter" | "viewer";
+    /**
+     * InviteUserRequest
+     * @description An admin chooses the email and role; the invitee chooses their name and password.
+     */
+    InviteUserRequest: {
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+      /** @default recruiter */
+      role: components["schemas"]["UserRole"];
+    };
+    /**
+     * UserInvitationResponse
+     * @description The shareable link is returned only when the invitation is issued.
+     */
+    UserInvitationResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Email */
+      email: string;
+      role: components["schemas"]["UserRole"];
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string;
+      /** Invite Url */
+      invite_url: string;
+    };
+    /**
+     * AcceptInvitationRequest
+     * @description Public redemption payload. Email, role and organization come exclusively from the token.
+     */
+    AcceptInvitationRequest: {
+      /**
+       * Token
+       * Format: password
+       */
+      token: string;
+      /** Full Name */
+      full_name: string;
+      /**
+       * Password
+       * Format: password
+       */
+      password: string;
+    };
+    /**
+     * UpdateUserRoleRequest
+     * @description Role updates cannot change identity, organization or active status.
+     */
+    UpdateUserRoleRequest: {
+      role: components["schemas"]["UserRole"];
+    };
+    /**
+     * PaginatedUsersResponse
+     * @description The standard pagination envelope, including inactive users unless filtered.
+     */
+    PaginatedUsersResponse: {
+      /** Items */
+      items: components["schemas"]["UserProfileResponse"][];
+      pagination: components["schemas"]["PaginationMeta"];
+    };
     OrganizationResponse: {
       /**
        * Format: uuid
@@ -839,6 +1013,8 @@ export interface components {
       raw: string;
       /** @description Canonical name of the skill, or null when it is not recognized. */
       normalized: string | null;
+      /** @description Unconfirmed fuzzy or embedding match for recruiter review. Never automatically copied to normalized or used for scoring. Omitted or null when there is no suggestion. */
+      suggestion?: string | null;
     };
     ParsedCvExperience: {
       title: string;
@@ -866,14 +1042,14 @@ export interface components {
     };
     /**
      * Parsed CV
-     * @description Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.
+     * @description Version 1.1, also accepts 1.0 records. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.
      */
     ParsedCV: {
       /**
        * @description Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.
        * @enum {unknown}
        */
-      schema_version: "1.0";
+      schema_version: "1.0" | "1.1";
       /**
        * @description Who wrote this version of the record: the CV parser, or a recruiter who corrected it.
        * @enum {unknown}
@@ -916,7 +1092,7 @@ export interface components {
        * @description Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.
        * @enum {unknown}
        */
-      schema_version?: "1.0";
+      schema_version?: "1.0" | "1.1";
       /**
        * @description Who wrote this version of the record: the CV parser, or a recruiter who corrected it.
        * @enum {unknown}
@@ -1477,6 +1653,316 @@ export interface operations {
       };
       /** @description Not authenticated */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
+  listUsers: {
+    parameters: {
+      query?: {
+        role?: components["schemas"]["UserRole"] | null;
+        is_active?: boolean | null;
+        search?: string | null;
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: {
+        access_token?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaginatedUsersResponse"];
+        };
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Admin privileges required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
+  inviteUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        access_token?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InviteUserRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserInvitationResponse"];
+        };
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Admin privileges required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Existing member, last active admin or self-deactivation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
+  changeUserRole: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: {
+        access_token?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserRoleRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserProfileResponse"];
+        };
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Admin privileges required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description User not found in this organization */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Existing member, last active admin or self-deactivation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
+  deactivateUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: {
+        access_token?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserProfileResponse"];
+        };
+      };
+      /** @description Not authenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Admin privileges required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description User not found in this organization */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Existing member, last active admin or self-deactivation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
+  acceptInvitation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcceptInvitationRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserProfileResponse"];
+        };
+      };
+      /** @description Invalid, expired, superseded or already-used invitation */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Existing member, last active admin or self-deactivation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
         headers: {
           [name: string]: unknown;
         };

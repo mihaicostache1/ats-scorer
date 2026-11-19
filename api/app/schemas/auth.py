@@ -14,6 +14,11 @@ class OrgRegisterRequest(BaseModel):
     admin_email: EmailStr
     admin_password: str = Field(..., min_length=8)
 
+    @field_validator("admin_email")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.lower()
+
     @field_validator("admin_password")
     @classmethod
     def password_not_trivial(cls, v: str) -> str:
@@ -27,6 +32,11 @@ class LoginRequest(BaseModel):
 
     email: EmailStr
     password: str = Field(..., min_length=1)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.lower()
 
 
 class TokenResponse(BaseModel):

@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Parsed CV",
-  "description": "Version 1.0. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.",
+  "description": "Version 1.1, also accepts 1.0 records. Structured data extracted from one CV, stored in candidates.parsed_data. Every object is closed: a new field needs a new schema version. Rules for changing it: docs/ml/parsed-cv-schema.md.",
   "type": "object",
   "required": ["schema_version", "source", "skills"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
       "description": "Version of this schema the record was written with. A change that keeps older records valid adds its version to this list; a breaking change gets a new schema file.",
-      "enum": ["1.0"]
+      "enum": ["1.0", "1.1"]
     },
     "source": {
       "description": "Who wrote this version of the record: the CV parser, or a recruiter who corrected it.",
@@ -90,6 +90,11 @@
         },
         "normalized": {
           "description": "Canonical name of the skill, or null when it is not recognized.",
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "suggestion": {
+          "description": "Unconfirmed fuzzy or embedding match for recruiter review. Never automatically copied to normalized or used for scoring. Omitted or null when there is no suggestion.",
           "type": ["string", "null"],
           "minLength": 1
         }
