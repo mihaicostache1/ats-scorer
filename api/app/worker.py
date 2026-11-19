@@ -5,11 +5,12 @@ Run it with:  arq app.worker.WorkerSettings
 
 from typing import Any
 
-from arq import func
+from arq import cron, func
 
 from app.core.config import settings
 from app.core.logging import logger
 from app.services.cv_extraction import extract_cv_text
+from app.services.embedding_pipeline import embed_pending
 from app.services.job_queue import EXTRACT_CV_TEXT_JOB, redis_settings
 
 
@@ -37,6 +38,15 @@ class WorkerSettings:
             + 30,
             # Results live in cv_documents. Keeping none also frees the job ID, so a
             # failed document can be queued again.
+            keep_result=0,
+        )
+    ]
+    cron_jobs = [
+        cron(
+            embed_pending,
+            second={0, 20, 40},
+            run_at_startup=True,
+            job_id="embed_pending",
             keep_result=0,
         )
     ]

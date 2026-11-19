@@ -63,6 +63,31 @@ event. Apply migration `007_parsed_profile_review` before using the endpoint.
 See the [parsed-profile API contract](docs/api_spec.md#patch-apiv1candidatesidparsed-profile)
 for partial-update semantics and field errors.
 
+### Embeddings (B-17)
+
+Install and download the pinned L-6 model once from the repository root:
+
+```sh
+pip install -e 'ml[embeddings]'
+python -m ats_scoring.embeddings download --to ml/models/multilingual-e5-small
+```
+
+Set `ATS_EMBEDDING_MODEL_DIR` in `.env` to the absolute path printed by the download.
+Run `alembic upgrade head` from `api/`, then start the worker. For Compose, set
+`ATS_WORKER_BUILD_TARGET=embedding-worker` and
+`ATS_WORKER_EMBEDDING_MODEL_DIR=/models/multilingual-e5-small` in `.env`, then run
+`docker compose up -d --build worker`.
+
+The worker checks for pending embeddings every 20 seconds. It embeds parsed profiles,
+profiles saved by a reviewer, and job postings. Candidate embeddings use L-14 redacted
+qualifications. Edits invalidate the stored vector in the same transaction as the edit.
+Embedding runs locally and records the model name and revision. Compare vectors that
+have the same recorded model version.
+
+Run `make backfill-embeddings` from the repository root to fill missing vectors or
+refresh existing vectors after a model revision change. It uses the same local model
+and skips rows already processed with that version.
+
 ### User administration (B-15)
 
 Admins can list workspace members, invite colleagues, change roles and deactivate accounts.

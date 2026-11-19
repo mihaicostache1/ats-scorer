@@ -63,6 +63,7 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
+      target: ${ATS_WORKER_BUILD_TARGET:-runtime}
     container_name: ats-worker
     restart: unless-stopped
     command: ["arq", "app.worker.WorkerSettings"]
@@ -72,9 +73,11 @@ services:
       - ENVIRONMENT=development
       - LOG_LEVEL=INFO
       - STORAGE_LOCAL_DIR=/data/storage
+      - ATS_EMBEDDING_MODEL_DIR=${ATS_WORKER_EMBEDDING_MODEL_DIR:-}
     volumes:
       # The same volume as the api, which writes the files the worker reads.
       - cvdata:/data/storage
+      - ./ml/models:/models:ro
     depends_on:
       postgres:
         condition: service_healthy

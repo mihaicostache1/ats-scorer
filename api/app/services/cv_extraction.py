@@ -146,6 +146,8 @@ def _mark_parsed(sessions: sessionmaker[Session], document_id: uuid.UUID, parsed
             candidate.raw_text = document.extracted_text
             candidate.parsed_profile_reviewed_by = None
             candidate.parsed_profile_reviewed_at = None
+            candidate.embedding = None
+            candidate.embedding_model_version = None
         document.status = status
         document.error_code = None
         document.error_message = None

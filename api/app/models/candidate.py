@@ -23,7 +23,15 @@ class Candidate(Base):
 
     __tablename__ = "candidates"
 
-    __table_args__ = (Index("ix_candidates_org_email", "org_id", "email"),)
+    __table_args__ = (
+        Index("ix_candidates_org_email", "org_id", "email"),
+        Index(
+            "idx_candidates_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     org_id: Mapped[uuid.UUID] = mapped_column(
@@ -50,6 +58,7 @@ class Candidate(Base):
         DateTime(timezone=True), nullable=True
     )
     embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
+    embedding_model_version: Mapped[str | None] = mapped_column(String(255), nullable=True)
     protected_attributes: Mapped[dict[str, Any]] = mapped_column(
         JSONB, server_default="{}", nullable=False
     )

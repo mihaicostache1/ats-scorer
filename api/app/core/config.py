@@ -77,6 +77,9 @@ class Settings(BaseSettings):
     OCR_LANGUAGE: str = "eng"
     OCR_PAGE_TIMEOUT_SECONDS: int = 30
 
+    # Local, pinned L-6 model. The worker enables embedding when a folder is configured.
+    ATS_EMBEDDING_MODEL_DIR: str = ""
+
     # Logging Settings
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
 

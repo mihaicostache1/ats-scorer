@@ -7,4 +7,5 @@
 **/.ruff_cache
 web
 api/storage
+ml/models
 ml/synthetic/output

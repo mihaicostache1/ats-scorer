@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     preferred_skills JSONB NOT NULL DEFAULT '[]'::jsonb,
     min_experience_years INT NOT NULL DEFAULT 0,
     embedding vector(384), -- CPU-friendly sentence-transformer embedding (384 dims)
+    embedding_model_version VARCHAR(255),
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -93,6 +94,7 @@ CREATE TABLE IF NOT EXISTS candidates (
     parsed_profile_reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
     parsed_profile_reviewed_at TIMESTAMPTZ,
     embedding vector(384), -- Candidate resume text embedding (384 dims for vector similarity search)
+    embedding_model_version VARCHAR(255),
     protected_attributes JSONB NOT NULL DEFAULT '{}'::jsonb, -- Redacted/encrypted demographic proxies for fairness audit
     is_anonymized BOOLEAN NOT NULL DEFAULT FALSE,
     consent_given_at TIMESTAMPTZ, -- When the candidate consented to data processing; NULL = not recorded

@@ -23,6 +23,7 @@ from app.schemas.job import (
 )
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.embedding_pipeline import JOB_EMBEDDING_FIELDS
 from app.services.pipeline_service import get_job_stages
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -35,9 +36,12 @@ _SORT_COLUMNS = {
 }
 
 
-def _get_job_or_404(db: Session, job_id: uuid.UUID) -> Job:
+def _get_job_or_404(db: Session, job_id: uuid.UUID, *, lock: bool = False) -> Job:
     """Load a job through the tenant-scoped session; other orgs' jobs look missing."""
-    job = db.query(Job).filter(Job.id == job_id).first()
+    query = db.query(Job).filter(Job.id == job_id)
+    if lock:
+        query = query.with_for_update()
+    job = query.first()
     if job is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -179,7 +183,8 @@ def update_job(
     current_user: User = Depends(get_current_recruiter_or_admin),
 ) -> Job:
     """Partially update a job. Admin or recruiter only."""
-    job = _get_job_or_404(db, id)
+    # Serialize the source edit and invalidation with a worker's write of the vector.
+    job = _get_job_or_404(db, id, lock=True)
 
     changes = {
         field: value
@@ -191,6 +196,9 @@ def update_job(
 
     for field, value in changes.items():
         setattr(job, field, value)
+    if any(field in changes for field in JOB_EMBEDDING_FIELDS):
+        job.embedding = None
+        job.embedding_model_version = None
     log_audit_event(
         db=db,
         org_id=job.org_id,

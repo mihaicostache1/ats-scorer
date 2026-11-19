@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS api-base
 
 WORKDIR /app/api
 
@@ -28,3 +28,8 @@ EXPOSE 8000
 ENV PYTHONUNBUFFERED=1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+FROM api-base AS embedding-worker
+RUN pip install --no-cache-dir "/app/ml[embeddings]"
+
+FROM api-base AS runtime

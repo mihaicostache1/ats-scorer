@@ -164,6 +164,9 @@ def correct_parsed_profile(
     candidate.parsed_data = parsed.model_dump(mode="json")
     candidate.parsed_profile_reviewed_by = reviewer.id
     candidate.parsed_profile_reviewed_at = reviewed_at
+    if changed:
+        candidate.embedding = None
+        candidate.embedding_model_version = None
     for column, value in contact.model_dump(exclude_unset=True).items():
         setattr(candidate, column, value)
     if document is not None:
