@@ -165,7 +165,9 @@ def _literal(value: str) -> re.Pattern[str]:
     return re.compile(r"(?<!\w)" + r"\s+".join(map(re.escape, words)) + r"(?!\w)", re.I)
 
 
-def _identity_patterns(contact: Mapping[str, Any], street: list[str]) -> list[re.Pattern[str]]:
+def _identity_patterns(
+    contact: Mapping[str, Any], street: list[str], additional_names: Iterable[str]
+) -> list[re.Pattern[str]]:
     """The candidate's own details, longest first, so the full name goes before its parts."""
     values: set[str] = set(street)
     for key in ("name", "full_name", "email", "phone", "location"):
@@ -175,9 +177,9 @@ def _identity_patterns(contact: Mapping[str, Any], street: list[str]) -> list[re
     links = contact.get("links")
     if isinstance(links, list | tuple):
         values.update(link.strip() for link in links if isinstance(link, str) and link.strip())
-    for key in ("name", "full_name"):
-        name = contact.get(key)
-        if isinstance(name, str):
+    for name in (contact.get("name"), contact.get("full_name"), *additional_names):
+        if isinstance(name, str) and name.strip():
+            values.add(name.strip())
             values.update(part for part in re.split(r"[\s,]+", name) if len(part) >= 2)
     values.discard(coarse_location(contact.get("location")) or "")
     return [_literal(value) for value in sorted(values, key=len, reverse=True)]
@@ -364,18 +366,23 @@ def _education(entry: Mapping[str, Any], scrub: _Scrubber) -> dict[str, Any] | N
     return result
 
 
-def redact(parsed_cv: Mapping[str, Any], *, as_of: date | None = None) -> dict[str, Any]:
+def redact(
+    parsed_cv: Mapping[str, Any],
+    *,
+    as_of: date | None = None,
+    additional_names: Iterable[str] = (),
+) -> dict[str, Any]:
     """A copy of the parsed CV without identity details, dates or gender-coded words.
 
     Reads schema 1.x (`experiences`) and the draft 0.1 (`work_history`, skills as strings),
     and returns the same shape: a valid 1.x record stays valid. `as_of` is the date a current
     position runs to when years of experience are computed (default: today). The input is
-    not changed.
+    not changed. Callers may supply authoritative or previously recorded names for scrubbing.
     """
     contact = parsed_cv.get("contact")
     contact = contact if isinstance(contact, Mapping) else {}
     _, street = _location_parts(contact.get("location"))
-    scrub = _Scrubber(_identity_patterns(contact, street))
+    scrub = _Scrubber(_identity_patterns(contact, street, additional_names))
 
     record: dict[str, Any] = {
         key: parsed_cv[key] for key in ("schema_version", "source") if key in parsed_cv

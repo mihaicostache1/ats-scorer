@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     preferred_skills JSONB NOT NULL DEFAULT '[]'::jsonb,
     min_experience_years INT NOT NULL DEFAULT 0,
     embedding vector(384), -- CPU-friendly sentence-transformer embedding (384 dims)
+    embedding_model_version VARCHAR(255),
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -93,6 +94,9 @@ CREATE TABLE IF NOT EXISTS candidates (
     parsed_profile_reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
     parsed_profile_reviewed_at TIMESTAMPTZ,
     embedding vector(384), -- Candidate resume text embedding (384 dims for vector similarity search)
+    embedding_model_version VARCHAR(255),
+    embedding_ready BOOLEAN NOT NULL DEFAULT FALSE,
+    embedding_name_aliases JSONB NOT NULL DEFAULT '[]',
     protected_attributes JSONB NOT NULL DEFAULT '{}'::jsonb, -- Redacted/encrypted demographic proxies for fairness audit
     is_anonymized BOOLEAN NOT NULL DEFAULT FALSE,
     consent_given_at TIMESTAMPTZ, -- When the candidate consented to data processing; NULL = not recorded
@@ -248,6 +252,10 @@ CREATE INDEX IF NOT EXISTS idx_consent_records_email_hash ON consent_records(org
 -- Full-Text & Vector Similarity Indexes (pgvector HNSW index for candidate resume matching)
 CREATE INDEX IF NOT EXISTS idx_candidates_embedding_hnsw ON candidates USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS idx_jobs_embedding_hnsw ON jobs USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS ix_candidates_embeddings_pending ON candidates(id)
+    WHERE embedding_ready AND embedding_model_version IS NULL;
+CREATE INDEX IF NOT EXISTS ix_jobs_embeddings_pending ON jobs(id)
+    WHERE embedding_model_version IS NULL;
 
 -- JSONB GIN Indexes for fast filtering on skills and candidate structured data
 CREATE INDEX IF NOT EXISTS idx_jobs_required_skills_gin ON jobs USING gin (required_skills);

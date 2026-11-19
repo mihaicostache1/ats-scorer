@@ -28,6 +28,11 @@ from app.schemas.job import SortOrder
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
 from app.services.duplicate_detection import DuplicateDetector
+from app.services.embedding_inputs import (
+    invalidate_embedding,
+    remember_candidate_names,
+    saved_candidate_input,
+)
 from app.services.parsed_profile_service import correct_parsed_profile
 from app.services.storage import Storage, get_storage
 
@@ -47,9 +52,10 @@ def _candidate_response(candidate: Candidate, detector: DuplicateDetector) -> Ca
     return response
 
 
-def _get_candidate_or_404(db: Session, candidate_id: uuid.UUID) -> Candidate:
+def _get_candidate_or_404(db: Session, candidate_id: uuid.UUID, *, lock: bool = False) -> Candidate:
     """Load a candidate through the tenant-scoped session; other orgs' candidates look missing."""
-    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    query = db.query(Candidate).filter(Candidate.id == candidate_id)
+    candidate = (query.with_for_update() if lock else query).first()
     if candidate is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -163,18 +169,24 @@ def update_candidate(
     current_user: User = Depends(get_current_recruiter_or_admin),
 ) -> CandidateResponse:
     """Partially update a candidate. Admin or recruiter only."""
-    candidate = _get_candidate_or_404(db, id)
+    fields = payload.model_dump(exclude_unset=True)
+    # Serialize name history changes with CV parsing and recruiter corrections.
+    candidate = _get_candidate_or_404(db, id, lock="full_name" in fields)
 
     changes = {
-        field: value
-        for field, value in payload.model_dump(exclude_unset=True).items()
-        if getattr(candidate, field) != value
+        field: value for field, value in fields.items() if getattr(candidate, field) != value
     }
     if not changes:
         return _candidate_response(candidate, DuplicateDetector(db, candidate.org_id))
 
+    before = None
+    if "full_name" in changes:
+        before = saved_candidate_input(candidate) if candidate.embedding_ready else None
+        remember_candidate_names(candidate)
     for field, value in changes.items():
         setattr(candidate, field, value)
+    if before is not None and before != saved_candidate_input(candidate):
+        invalidate_embedding(candidate)
     log_audit_event(
         db=db,
         org_id=candidate.org_id,

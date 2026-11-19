@@ -15,6 +15,7 @@ from typing import Any, cast
 
 from arq import Retry
 from ats_scoring.parsed_cv import ParsedCV
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
@@ -24,6 +25,11 @@ from app.models.candidate import Candidate
 from app.models.cv_document import CvDocument
 from app.schemas.cv_document import CvStatus
 from app.services.cv_parser import ParserUnavailableError, needs_review, parse_cv_text
+from app.services.embedding_inputs import (
+    invalidate_embedding,
+    profile_name,
+    remember_candidate_names,
+)
 from app.services.pdf_text import ExtractionResult, PdfExtractionError, extract_text
 from app.services.storage import Storage, StorageError, get_storage
 
@@ -133,19 +139,33 @@ def _mark_parsed(sessions: sessionmaker[Session], document_id: uuid.UUID, parsed
         )
         if candidate is None:
             return "skipped"
-        # A delayed older document must not overwrite a newer upload's output.
+        # Keep the most recent saved parse. Unfinished and failed uploads have no output.
         latest = (
             db.query(CvDocument.id)
             .filter(CvDocument.candidate_id == candidate.id, CvDocument.org_id == candidate.org_id)
+            .filter(
+                or_(
+                    CvDocument.id == document.id,
+                    CvDocument.status.in_((CvStatus.PARSED.value, CvStatus.NEEDS_REVIEW.value)),
+                )
+            )
             .order_by(CvDocument.created_at.desc(), CvDocument.id.desc())
             .first()
         )
         if latest is not None and latest[0] == document.id:
+            previous_names = (
+                profile_name(candidate.parsed_data),
+                profile_name(candidate.parsed_data_original),
+            )
+            if any(name and name != parsed.contact.name for name in previous_names):
+                remember_candidate_names(candidate)
             candidate.parsed_data = data
             candidate.parsed_data_original = parsed.model_dump(mode="json")
             candidate.raw_text = document.extracted_text
             candidate.parsed_profile_reviewed_by = None
             candidate.parsed_profile_reviewed_at = None
+            candidate.embedding_ready = status == CvStatus.PARSED.value
+            invalidate_embedding(candidate)
         document.status = status
         document.error_code = None
         document.error_message = None

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, Text, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,7 +23,20 @@ class Candidate(Base):
 
     __tablename__ = "candidates"
 
-    __table_args__ = (Index("ix_candidates_org_email", "org_id", "email"),)
+    __table_args__ = (
+        Index("ix_candidates_org_email", "org_id", "email"),
+        Index(
+            "ix_candidates_embeddings_pending",
+            "id",
+            postgresql_where=text("embedding_ready AND embedding_model_version IS NULL"),
+        ),
+        Index(
+            "idx_candidates_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     org_id: Mapped[uuid.UUID] = mapped_column(
@@ -50,6 +63,9 @@ class Candidate(Base):
         DateTime(timezone=True), nullable=True
     )
     embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
+    embedding_model_version: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    embedding_ready: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    embedding_name_aliases: Mapped[list[str]] = mapped_column(JSONB, server_default="[]")
     protected_attributes: Mapped[dict[str, Any]] = mapped_column(
         JSONB, server_default="{}", nullable=False
     )

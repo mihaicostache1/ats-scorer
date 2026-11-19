@@ -1,4 +1,6 @@
-.PHONY: seed
+PYTHON ?= python
+
+.PHONY: seed backfill-embeddings
 seed:
 	@echo "Generating synthetic data (if not already present)..."
 	cd ml/synthetic && python -m venv .venv
@@ -6,3 +8,6 @@ seed:
 	cd ml/synthetic && (.venv/Scripts/python generate.py --jobs 20 || .venv/bin/python generate.py --jobs 20)
 	@echo "Seeding database..."
 	cd api && python -m scripts.seed
+
+backfill-embeddings:
+	cd api && $(PYTHON) -m scripts.backfill_embeddings

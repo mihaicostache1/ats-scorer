@@ -23,6 +23,7 @@ from app.schemas.job import (
 )
 from app.schemas.pagination import PaginationMeta
 from app.services.audit_service import log_audit_event
+from app.services.embedding_inputs import JOB_EMBEDDING_FIELDS, invalidate_embedding
 from app.services.pipeline_service import get_job_stages
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -191,6 +192,8 @@ def update_job(
 
     for field, value in changes.items():
         setattr(job, field, value)
+    if any(field in changes for field in JOB_EMBEDDING_FIELDS):
+        invalidate_embedding(job)
     log_audit_event(
         db=db,
         org_id=job.org_id,
