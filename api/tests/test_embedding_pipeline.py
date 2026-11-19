@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Callable, Sequence
+from datetime import timedelta
 from typing import Any
 
 import pytest
@@ -12,6 +13,7 @@ from httpx import AsyncClient
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.api.v1.endpoints import jobs as job_endpoints
 from app.core.config import settings
 from app.models.candidate import Candidate
 from app.models.cv_document import CvDocument
@@ -120,6 +122,11 @@ async def test_worker_reembeds_corrected_profile_without_encoding_identity(
 
     login_as(reviewer)
     url = f"/api/v1/candidates/{candidate.id}/parsed-profile"
+    assert (
+        await async_client.patch(url, json={"contact": {"email": "corrected@example.org"}})
+    ).status_code == 200
+    assert await pipeline.embed_pending(context) == 0
+    assert len(encoder.inputs) == 1
     correction = {"summary": "Builds Rust tools"}
     response = await async_client.patch(url, json=correction)
     assert response.status_code == 200
@@ -134,6 +141,76 @@ async def test_worker_reembeds_corrected_profile_without_encoding_identity(
     assert (await async_client.patch(url, json=correction)).status_code == 200
     assert await pipeline.embed_pending(context) == 0
     assert len(encoder.inputs) == 2
+
+
+@pytest.mark.parametrize(
+    ("parsed_name", "rename"), [(None, False), (None, True), ("Julia Black", True)]
+)
+async def test_scrubs_canonical_and_prior_names_after_edits(
+    parsed_name: str | None,
+    rename: bool,
+    encoder: RecordingEmbedder,
+    db_engine: Engine,
+    committed_db: Session,
+    async_client: AsyncClient,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+) -> None:
+    reviewer = create_user("recruiter")
+    candidate, document = _candidate(committed_db, reviewer)
+    sessions = sessionmaker(bind=db_engine)
+    parsed = _parsed()
+    parsed.contact.name = parsed_name
+    names = ["Jane Smith"]
+    if rename:
+        names += ["Robin Wells", "Casey Green"]
+    if parsed_name:
+        names.append(parsed_name)
+    parsed.summary = ", ".join(names) + " Built cloud services."
+    assert _mark_parsed(sessions, document.id, parsed) in {"parsed", "needs_review"}
+    login_as(reviewer)
+    url = f"/api/v1/candidates/{candidate.id}"
+    contact = {"phone": "+40123456789"}
+    if rename:
+        first = await async_client.patch(url, json={"full_name": "Robin Wells"})
+        assert first.status_code == 200
+        contact = {"name": "Casey Green"}
+    correction = await async_client.patch(f"{url}/parsed-profile", json={"contact": contact})
+    assert correction.status_code == 200
+
+    assert await pipeline.embed_pending({"sessions": sessions}) == 1
+    (text,) = encoder.inputs
+    assert "Built cloud services" in text
+    assert all(part not in text for name in names for part in name.split())
+
+
+@pytest.mark.parametrize("newer_status", ["queued", "extracting", "failed"])
+async def test_saved_parse_can_embed_while_a_newer_upload_has_no_result(
+    newer_status: str,
+    encoder: RecordingEmbedder,
+    db_engine: Engine,
+    committed_db: Session,
+    create_user: Callable[..., User],
+) -> None:
+    candidate, old = _candidate(committed_db, create_user())
+    committed_db.add(
+        CvDocument(
+            org_id=candidate.org_id,
+            candidate_id=candidate.id,
+            storage_key=f"{uuid.uuid4()}.pdf",
+            original_filename="replacement.pdf",
+            content_type=old.content_type,
+            size_bytes=old.size_bytes,
+            sha256=old.sha256,
+            created_at=old.created_at + timedelta(seconds=1),
+            status=newer_status,
+        )
+    )
+    committed_db.commit()
+    sessions = sessionmaker(bind=db_engine)
+    assert _mark_parsed(sessions, old.id, _parsed()) == "parsed"
+    assert await pipeline.embed_pending({"sessions": sessions}) == 1
+    assert "Python services" in encoder.inputs[0]
 
 
 async def test_needs_review_waits_for_a_saved_correction(
@@ -239,6 +316,7 @@ async def test_job_edits_and_backfill_refresh_missing_or_stale_rows(
         org_id=job.org_id,
         full_name="Historical candidate",
         email="historical@example.org",
+        embedding_ready=True,
         parsed_data={
             "schema_version": "1.0",
             "source": "parser",
@@ -249,6 +327,7 @@ async def test_job_edits_and_backfill_refresh_missing_or_stale_rows(
         org_id=job.org_id,
         full_name="Candidate with no qualifications",
         email="contact-only@example.org",
+        embedding_ready=True,
         parsed_data={
             "schema_version": "1.0",
             "source": "parser",
@@ -271,3 +350,93 @@ async def test_job_edits_and_backfill_refresh_missing_or_stale_rows(
     assert backfill_embeddings.main(["--batch-size", "1"]) == 0
     assert capsys.readouterr().out.splitlines() == ["candidates: processed 0", "jobs: processed 0"]
     assert len(encoder.inputs) == 4
+
+
+@pytest.mark.parametrize("keep_editing", [False, True])
+def test_backfill_retries_stale_model_rows_after_concurrent_edit(
+    keep_editing: bool,
+    encoder: RecordingEmbedder,
+    db_engine: Engine,
+    committed_db: Session,
+    create_user: Callable[..., User],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    org_id = create_user().org_id
+    job = Job(org_id=org_id, title="Stale", description="Go", embedding_model_version="old")
+    committed_db.add(job)
+    committed_db.commit()
+    sessions = sessionmaker(bind=db_engine)
+    edits = 0
+
+    def edit_unrelated_field() -> None:
+        nonlocal edits
+        edits += 1
+        with sessions.begin() as db:
+            row = db.get(Job, job.id)
+            assert row is not None
+            row.department = f"Department {edits}"
+        if not keep_editing:
+            encoder.on_encode = None
+
+    encoder.on_encode = edit_unrelated_field
+    monkeypatch.setattr(backfill_embeddings, "SessionLocal", sessions)
+    assert backfill_embeddings.main(["--batch-size", "1"]) == int(keep_editing)
+    assert len(encoder.inputs) >= 2
+    output = capsys.readouterr()
+    committed_db.refresh(job)
+    if keep_editing:
+        assert job.embedding_model_version == "old"
+        assert "1 rows kept changing" in output.err
+    else:
+        assert job.embedding_model_version == pipeline.EMBEDDING_MODEL_VERSION
+        assert "jobs: processed 1" in output.out
+
+
+async def test_job_edit_invalidates_a_vector_filled_after_the_job_was_loaded(
+    encoder: RecordingEmbedder,
+    db_engine: Engine,
+    committed_db: Session,
+    async_client: AsyncClient,
+    create_user: Callable[..., User],
+    login_as: Callable[[User], None],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    recruiter = create_user("recruiter")
+    login_as(recruiter)
+    job = Job(org_id=recruiter.org_id, title="Engineer", description="Uses Docker")
+    committed_db.add(job)
+    committed_db.commit()
+    sessions = sessionmaker(bind=db_engine)
+    lookup = job_endpoints._get_job_or_404
+
+    def load_then_embed(db: Session, job_id: uuid.UUID) -> Job:
+        loaded = lookup(db, job_id)
+        assert loaded.embedding_model_version is None
+        assert pipeline.embed_batch(sessions, "jobs").written == 1
+        return loaded
+
+    monkeypatch.setattr(job_endpoints, "_get_job_or_404", load_then_embed)
+    assert (
+        await async_client.patch(f"/api/v1/jobs/{job.id}", json={"description": "Uses Kubernetes"})
+    ).status_code == 200
+    committed_db.refresh(job)
+    assert job.embedding is None and job.embedding_model_version is None
+    assert pipeline.embed_batch(sessions, "jobs").written == 1
+    assert encoder.inputs == ["query: Engineer\nUses Docker", "query: Engineer\nUses Kubernetes"]
+
+
+async def test_worker_drains_multiple_batches_in_one_run(
+    encoder: RecordingEmbedder,
+    db_engine: Engine,
+    committed_db: Session,
+    create_user: Callable[..., User],
+) -> None:
+    org_id = create_user().org_id
+    count = pipeline.BATCH_SIZE + 3
+    committed_db.add_all(
+        Job(org_id=org_id, title=f"Posting {i}", description="Go") for i in range(count)
+    )
+    committed_db.commit()
+    assert await pipeline.embed_pending({"sessions": sessionmaker(bind=db_engine)}) == count
+    assert len(encoder.inputs) == count

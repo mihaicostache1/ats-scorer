@@ -40,6 +40,13 @@ _DOWNLOAD_PATTERNS = [
 ]
 
 
+def candidate_embedding_text(
+    candidate: Mapping[str, Any], *, additional_names: Iterable[str] = ()
+) -> str:
+    """Build the candidate passage from redacted qualifications."""
+    return candidate_text(redact(candidate, additional_names=additional_names))
+
+
 def download_model(target: Path | str, settings: EmbeddingSettings | None = None) -> Path:
     """Download the model named in weights.yaml, at its pinned revision, into `target`.
 
@@ -151,8 +158,11 @@ class Embedder:
 
         None for a CV with nothing to embed.
         """
-        texts = [candidate_text(redact(candidate)) for candidate in candidates]
-        return self._embed(texts, PASSAGE_PREFIX)
+        return self.embed_candidate_texts([candidate_embedding_text(cv) for cv in candidates])
+
+    def embed_candidate_texts(self, redacted_texts: list[str]) -> list[list[float] | None]:
+        """Embed text prepared by `candidate_embedding_text`."""
+        return self._embed(redacted_texts, PASSAGE_PREFIX)
 
     def embed_jobs(self, jobs: Iterable[Mapping[str, Any]]) -> list[list[float] | None]:
         """One vector per job, from its title, description and skills. None if all are empty."""

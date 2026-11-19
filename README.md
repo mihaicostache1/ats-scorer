@@ -78,15 +78,17 @@ Run `alembic upgrade head` from `api/`, then start the worker. For Compose, set
 `ATS_WORKER_EMBEDDING_MODEL_DIR=/models/multilingual-e5-small` in `.env`, then run
 `docker compose up -d --build worker`.
 
-The worker checks for pending embeddings every 20 seconds. It embeds parsed profiles,
-profiles saved by a reviewer, and job postings. Candidate embeddings use L-14 redacted
-qualifications. Edits invalidate the stored vector in the same transaction as the edit.
-Embedding runs locally and records the model name and revision. Compare vectors that
-have the same recorded model version.
+The worker checks for pending embeddings every 20 seconds and processes batches for up
+to a minute per run. It embeds parsed or reviewed profiles and job postings. An unfinished
+or failed upload leaves the last saved profile available. Candidate embeddings use L-14
+redacted qualifications, with current and prior known names removed. Edits that change
+the input invalidate the stored vector in the same transaction. Embedding runs locally
+and records the model name and revision. Compare vectors with the same recorded model version.
 
 Run `make backfill-embeddings` from the repository root to fill missing vectors or
 refresh existing vectors after a model revision change. It uses the same local model
-and skips rows already processed with that version.
+and skips rows already processed with that version. It retries concurrent edits and exits
+with a nonzero status if rows keep changing and need another run.
 
 ### User administration (B-15)
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,6 +23,11 @@ class Job(Base):
     __tablename__ = "jobs"
 
     __table_args__ = (
+        Index(
+            "ix_jobs_embeddings_pending",
+            "id",
+            postgresql_where=text("embedding_model_version IS NULL"),
+        ),
         Index(
             "idx_jobs_embedding_hnsw",
             "embedding",

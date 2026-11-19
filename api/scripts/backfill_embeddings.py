@@ -1,11 +1,14 @@
 """Backfill missing or outdated embeddings using the configured offline model."""
 
 import argparse
+import sys
 import uuid
 
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.services.embedding_pipeline import BATCH_SIZE, EmbeddingKind, embed_batch
+from app.services.embedding_pipeline import BATCH_SIZE, EMBEDDING_KINDS, embed_batch
+
+MAX_CONFLICT_RETRIES = 3
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -17,10 +20,11 @@ def main(argv: list[str] | None = None) -> int:
     if not settings.ATS_EMBEDDING_MODEL_DIR:
         parser.error("Set ATS_EMBEDDING_MODEL_DIR to the downloaded local model folder.")
 
-    kinds: tuple[EmbeddingKind, ...] = ("candidates", "jobs")
-    for kind in kinds:
+    incomplete = False
+    for kind in EMBEDDING_KINDS:
         after: uuid.UUID | None = None
         written = 0
+        conflicts = 0
         while True:
             batch = embed_batch(
                 SessionLocal, kind, after=after, limit=args.batch_size, include_stale=True
@@ -29,8 +33,21 @@ def main(argv: list[str] | None = None) -> int:
                 break
             after = batch.last_id
             written += batch.written
+            pending = batch.conflicts
+            for _ in range(MAX_CONFLICT_RETRIES):
+                if not pending:
+                    break
+                retry = embed_batch(
+                    SessionLocal, kind, limit=len(pending), include_stale=True, ids=pending
+                )
+                written += retry.written
+                pending = retry.conflicts
+            conflicts += len(pending)
         print(f"{kind}: processed {written}")
-    return 0
+        if conflicts:
+            incomplete = True
+            print(f"{kind}: {conflicts} rows kept changing. Run backfill again.", file=sys.stderr)
+    return int(incomplete)
 
 
 if __name__ == "__main__":

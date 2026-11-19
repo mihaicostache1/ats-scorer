@@ -19,6 +19,11 @@ from app.schemas.cv_document import CvStatus
 from app.services.audit_service import log_audit_event
 from app.services.cv_parser import needs_review
 from app.services.duplicate_detection import DuplicateDetector
+from app.services.embedding_inputs import (
+    invalidate_embedding,
+    remember_candidate_names,
+    saved_candidate_input,
+)
 
 _CONTACT_FIELDS = {"name": "full_name", "email": "email", "phone": "phone", "location": "location"}
 
@@ -161,14 +166,19 @@ def correct_parsed_profile(
     corrected["confidence"] = confidence
     parsed = ParsedCV.model_validate(corrected)
     reviewed_at = datetime.now(UTC)
+    before = saved_candidate_input(candidate) if candidate.embedding_ready else None
+    if original["contact"]["name"] != parsed.contact.name or (
+        "full_name" in canonical and canonical["full_name"] != candidate.full_name
+    ):
+        remember_candidate_names(candidate)
     candidate.parsed_data = parsed.model_dump(mode="json")
     candidate.parsed_profile_reviewed_by = reviewer.id
     candidate.parsed_profile_reviewed_at = reviewed_at
-    if changed:
-        candidate.embedding = None
-        candidate.embedding_model_version = None
     for column, value in contact.model_dump(exclude_unset=True).items():
         setattr(candidate, column, value)
+    candidate.embedding_ready = True
+    if before != saved_candidate_input(candidate):
+        invalidate_embedding(candidate)
     if document is not None:
         document.status = (
             CvStatus.NEEDS_REVIEW.value

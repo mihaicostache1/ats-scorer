@@ -4,63 +4,39 @@ import asyncio
 import uuid
 from dataclasses import dataclass
 from functools import cache
-from typing import Any, Literal, cast
+from time import monotonic
+from typing import Any, Literal, cast, get_args
 
 from ats_scoring.config import DEFAULT_CONFIG
 from ats_scoring.embeddings import Embedder
-from ats_scoring.parsed_cv import SCHEMA_VERSION
-from sqlalchemy import ColumnElement, Table, and_, or_, select, update
+from ats_scoring.parsed_cv import ParsedCV
+from sqlalchemy import ColumnElement, Table, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.candidate import Candidate
-from app.models.cv_document import CvDocument
 from app.models.job import Job
-from app.schemas.cv_document import CvStatus
+from app.services.embedding_inputs import JOB_EMBEDDING_FIELDS, candidate_input
 
 BATCH_SIZE = 32
-JOB_EMBEDDING_FIELDS = ("title", "description", "required_skills", "preferred_skills")
+WORKER_BUDGET_SECONDS = 60
 EmbeddingKind = Literal["candidates", "jobs"]
+EMBEDDING_KINDS: tuple[EmbeddingKind, ...] = ("candidates", "jobs")
 EMBEDDING_MODEL_VERSION = f"{DEFAULT_CONFIG.embedding.model}@{DEFAULT_CONFIG.embedding.revision}"
+_PROFILE_VERSIONS = get_args(ParsedCV.model_fields["schema_version"].annotation)
 
 
 @dataclass(frozen=True)
 class EmbeddingBatch:
     last_id: uuid.UUID | None
     written: int = 0
+    conflicts: tuple[uuid.UUID, ...] = ()
 
 
 @cache
 def _embedder() -> Embedder:
     return Embedder(settings.ATS_EMBEDDING_MODEL_DIR or None)
-
-
-def _candidate_ready() -> ColumnElement[bool]:
-    candidates = Candidate.__table__
-    documents = CvDocument.__table__
-    latest_status = (
-        select(documents.c.status)
-        .where(
-            documents.c.org_id == candidates.c.org_id,
-            documents.c.candidate_id == candidates.c.id,
-        )
-        .order_by(documents.c.created_at.desc(), documents.c.id.desc())
-        .limit(1)
-        .correlate(candidates)
-        .scalar_subquery()
-    )
-    return and_(
-        candidates.c.parsed_data["schema_version"].astext.in_(("1.0", SCHEMA_VERSION)),
-        or_(
-            latest_status.is_(None),  # Historical profiles with no uploaded document.
-            latest_status == CvStatus.PARSED.value,
-            and_(
-                latest_status == CvStatus.NEEDS_REVIEW.value,
-                candidates.c.parsed_profile_reviewed_at.is_not(None),
-            ),
-        ),
-    )
 
 
 def embed_batch(
@@ -70,16 +46,25 @@ def embed_batch(
     after: uuid.UUID | None = None,
     limit: int = BATCH_SIZE,
     include_stale: bool = False,
+    ids: tuple[uuid.UUID, ...] | None = None,
 ) -> EmbeddingBatch:
     """Process a bounded page of work. Only backfill replaces vectors from older models."""
-    fields: tuple[str, ...]
+    inputs: tuple[ColumnElement[Any], ...]
     if kind == "candidates":
         table = cast(Table, Candidate.__table__)
-        fields = ("parsed_data",)
-        criteria = [_candidate_ready()]
+        inputs = (
+            table.c.parsed_data,
+            table.c.full_name,
+            table.c.parsed_data_original["contact"]["name"].astext.label("original_name"),
+            table.c.embedding_name_aliases,
+        )
+        criteria = [
+            table.c.embedding_ready,
+            table.c.parsed_data["schema_version"].astext.in_(_PROFILE_VERSIONS),
+        ]
     else:
         table = cast(Table, Job.__table__)
-        fields = JOB_EMBEDDING_FIELDS
+        inputs = tuple(table.c[field] for field in JOB_EMBEDDING_FIELDS)
         criteria = []
 
     version = table.c.embedding_model_version
@@ -88,13 +73,15 @@ def embed_batch(
     else:
         criteria.append(version.is_(None))
     query = (
-        select(table.c.id, table.c.updated_at, version, *(table.c[field] for field in fields))
+        select(table.c.id, table.c.updated_at, version, *inputs)
         .where(*criteria)
         .order_by(table.c.id)
         .limit(limit)
     )
     if after is not None:
         query = query.where(table.c.id > after)
+    if ids is not None:
+        query = query.where(table.c.id.in_(ids))
     with sessions() as db:
         rows = db.execute(query).mappings().all()
     if not rows:
@@ -103,11 +90,24 @@ def embed_batch(
     # Inference uses snapshots after closing the read transaction.
     model = _embedder()
     if kind == "candidates":
-        vectors = model.embed_candidates(row["parsed_data"] for row in rows)
+        vectors = model.embed_candidate_texts(
+            [
+                candidate_input(
+                    row["parsed_data"],
+                    row["full_name"],
+                    row["original_name"],
+                    row["embedding_name_aliases"],
+                )
+                for row in rows
+            ]
+        )
     else:
-        vectors = model.embed_jobs({field: row[field] for field in fields} for row in rows)
+        vectors = model.embed_jobs(
+            {field: row[field] for field in JOB_EMBEDDING_FIELDS} for row in rows
+        )
 
     written = 0
+    conflicts: list[uuid.UUID] = []
     with sessions() as db:
         for row, vector in zip(rows, vectors, strict=True):
             # A correction or another worker may have replaced the snapshot during inference.
@@ -129,14 +129,28 @@ def embed_batch(
             )
             if db.scalar(statement) is not None:
                 written += 1
+            else:
+                conflicts.append(row["id"])
         db.commit()
-    return EmbeddingBatch(last_id=rows[-1]["id"], written=written)
+    return EmbeddingBatch(last_id=rows[-1]["id"], written=written, conflicts=tuple(conflicts))
 
 
 def _embed_pending(sessions: sessionmaker[Session]) -> int:
-    candidates = embed_batch(sessions, "candidates")
-    jobs = embed_batch(sessions, "jobs")
-    return candidates.written + jobs.written
+    deadline = monotonic() + WORKER_BUDGET_SECONDS
+    after: dict[EmbeddingKind, uuid.UUID | None] = dict.fromkeys(EMBEDDING_KINDS)
+    written = 0
+    # Alternate kinds and advance the cursor so a repeatedly edited row can't stall the worker.
+    while after:
+        for kind in tuple(after):
+            batch = embed_batch(sessions, kind, after=after[kind])
+            written += batch.written
+            if batch.last_id is None:
+                del after[kind]
+            else:
+                after[kind] = batch.last_id
+            if monotonic() >= deadline:
+                return written
+    return written
 
 
 async def embed_pending(ctx: dict[str, Any]) -> int:
