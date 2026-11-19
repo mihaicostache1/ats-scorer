@@ -18,6 +18,7 @@ from app.schemas.candidate import ParsedProfileResponse, UpdateCandidateRequest
 from app.schemas.cv_document import CvStatus
 from app.services.audit_service import log_audit_event
 from app.services.cv_parser import needs_review
+from app.services.duplicate_detection import DuplicateDetector
 
 _CONTACT_FIELDS = {"name": "full_name", "email": "email", "phone": "phone", "location": "location"}
 
@@ -187,4 +188,5 @@ def correct_parsed_profile(
         parsed_data=parsed,
         reviewed_by=reviewer.id,
         reviewed_at=reviewed_at,
+        possible_duplicates=DuplicateDetector(db, candidate.org_id).find(candidate),
     )

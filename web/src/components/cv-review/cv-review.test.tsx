@@ -118,6 +118,32 @@ describe("the split screen", () => {
     await renderReview();
     expect(screen.queryByText(/latest CV/)).not.toBeInTheDocument();
   });
+
+  it("shows matches returned after saving a correction", async () => {
+    const match = mockCandidates[1];
+    updateCandidateParsedProfile.mockResolvedValue(
+      ok({
+        ...saved().data,
+        possible_duplicates: [
+          {
+            candidate_id: match.id,
+            full_name: match.full_name,
+            matched_on: ["phone"],
+            name_similarity: null,
+          },
+        ],
+      })
+    );
+    await renderReview();
+    await user.type(screen.getByLabelText("Name"), " Jr");
+    await user.click(screen.getByRole("button", { name: "Save corrections" }));
+    const warning = within(await screen.findByRole("region", { name: "Possible duplicates" }));
+    expect(warning.getByRole("link", { name: match.full_name })).toHaveAttribute(
+      "href",
+      `/candidates/${match.id}`
+    );
+    expect(warning.getByText("Phone")).toBeInTheDocument();
+  });
 });
 
 describe("states that cannot be reviewed", () => {

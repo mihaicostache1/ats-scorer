@@ -256,13 +256,13 @@ async def test_admin_can_review_and_each_save_records_current_reviewer(
     assert len(_events(committed_db)) == 2
 
 
-async def test_contact_email_conflict_rolls_back_all_changes(
+async def test_contact_email_match_saves_corrections_with_duplicate_warning(
     profile: Profile,
     async_client: AsyncClient,
     committed_db: Session,
 ) -> None:
     _, candidate, document = profile
-    await async_client.post(
+    other = await async_client.post(
         "/api/v1/candidates",
         json={
             "full_name": "Other Person",
@@ -272,18 +272,27 @@ async def test_contact_email_conflict_rolls_back_all_changes(
     response = await async_client.patch(
         _url(candidate),
         json={
-            "summary": "Must be rolled back",
+            "summary": "Reviewed summary",
             "contact": {"email": "OTHER@EXAMPLE.ORG"},
         },
     )
-    assert response.status_code == 409
-    assert response.json()["detail"][0]["loc"] == ["body", "contact", "email"]
+    assert response.status_code == 200
+    assert response.json()["possible_duplicates"] == [
+        {
+            "candidate_id": other.json()["id"],
+            "full_name": "Other Person",
+            "matched_on": ["email"],
+            "name_similarity": None,
+        }
+    ]
     committed_db.refresh(candidate)
     committed_db.refresh(document)
-    assert candidate.parsed_data == candidate.parsed_data_original
-    assert candidate.email == "jane@example.com"
-    assert candidate.parsed_profile_reviewed_at is None
-    assert document.status == "needs_review" and not _events(committed_db)
+    assert candidate.parsed_data["summary"] == "Reviewed summary"
+    assert candidate.parsed_data_original["summary"] == "Original summary"
+    assert candidate.email == "other@example.org"
+    assert candidate.parsed_profile_reviewed_at is not None
+    assert len(_events(committed_db)) == 1
+    assert committed_db.query(Candidate).count() == 2
 
 
 async def test_replaced_lists_reset_confidence_without_stale_indexes(

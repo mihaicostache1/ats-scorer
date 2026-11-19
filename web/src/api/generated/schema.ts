@@ -358,6 +358,8 @@ export interface paths {
      * Add Candidate
      * @description Add a candidate to the organization. `consent_given_at` stays null until
      *     consent is recorded. Requires the `admin` or `recruiter` role.
+     *     Shared emails are allowed; possible_duplicates contains review-only warnings.
+     *     Candidates are never merged automatically.
      */
     post: operations["createCandidate"];
     delete?: never;
@@ -931,6 +933,8 @@ export interface components {
       stage_type: string;
     };
     CvDocumentResponse: {
+      /** @description Current candidate suggestions, including the latest saved parsed contacts. */
+      possible_duplicates: components["schemas"]["PossibleDuplicate"][];
       /**
        * Format: uuid
        * @example 7c9e6679-7425-40de-944b-e07fc1f90ae7
@@ -1118,6 +1122,7 @@ export interface components {
       };
     };
     ParsedProfileResponse: {
+      possible_duplicates: components["schemas"]["PossibleDuplicate"][];
       /** Format: uuid */
       candidate_id: string;
       parsed_data: components["schemas"]["ParsedCV"];
@@ -1126,7 +1131,18 @@ export interface components {
       /** Format: date-time */
       reviewed_at: string;
     };
+    /** @description Review-only match within the same organization; never an automatic merge. */
+    PossibleDuplicate: {
+      /** Format: uuid */
+      candidate_id: string;
+      full_name: string;
+      matched_on: ("email" | "phone" | "name")[];
+      /** @description RapidFuzz name similarity (85 or above), or null without a name match. */
+      name_similarity: number | null;
+    };
     CandidateResponse: {
+      /** @description Current matches against canonical and latest parsed contacts within this org. */
+      possible_duplicates: components["schemas"]["PossibleDuplicate"][];
       /**
        * Format: uuid
        * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
@@ -1182,7 +1198,7 @@ export interface components {
       full_name: string;
       /**
        * Format: email
-       * @description Stored lowercase; unique per organization.
+       * @description Stored lowercase; shared emails produce possible_duplicates warnings.
        * @example alex.mercer@example.com
        */
       email: string;
@@ -2230,7 +2246,6 @@ export interface operations {
       };
       401: components["responses"]["401Unauthorized"];
       403: components["responses"]["403Forbidden"];
-      409: components["responses"]["409Conflict"];
     };
   };
   getCandidate: {
@@ -2307,7 +2322,6 @@ export interface operations {
       401: components["responses"]["401Unauthorized"];
       403: components["responses"]["403Forbidden"];
       404: components["responses"]["404NotFound"];
-      409: components["responses"]["409Conflict"];
     };
   };
   updateCandidateParsedProfile: {
@@ -2350,7 +2364,7 @@ export interface operations {
       401: components["responses"]["401Unauthorized"];
       403: components["responses"]["403Forbidden"];
       404: components["responses"]["404NotFound"];
-      /** @description Profile not ready for correction, or duplicate canonical email */
+      /** @description Profile not ready for correction */
       409: {
         headers: {
           [name: string]: unknown;

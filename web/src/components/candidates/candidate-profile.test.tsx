@@ -11,6 +11,7 @@ const {
   getJob,
   getJobStages,
   listCandidateCvDocuments,
+  getCandidateCvDocument,
   download,
   toast,
 } = vi.hoisted(() => ({
@@ -19,6 +20,7 @@ const {
   getJob: vi.fn(),
   getJobStages: vi.fn(),
   listCandidateCvDocuments: vi.fn(),
+  getCandidateCvDocument: vi.fn(),
   download: vi.fn(),
   toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn(), info: vi.fn() }),
 }));
@@ -30,7 +32,7 @@ vi.mock("@/api", () => ({
   getJobStages,
   listCandidateCvDocuments,
   downloadCandidateCV: download,
-  getCandidateCvDocument: vi.fn(),
+  getCandidateCvDocument,
   retryCandidateCvExtraction: vi.fn(),
 }));
 vi.mock("@/components/ui/toast", () => ({ toast }));
@@ -54,6 +56,37 @@ beforeEach(() => {
 });
 
 describe("CandidateProfile", () => {
+  it("shows the matches reported when a CV finishes parsing", async () => {
+    const pending = { ...alexCvs[0], status: "queued" };
+    const match = mockCandidates[1];
+    listCandidateCvDocuments.mockResolvedValue(ok([pending]));
+    getCandidateCvDocument.mockResolvedValue(
+      ok({
+        ...pending,
+        status: "parsed",
+        possible_duplicates: [
+          {
+            candidate_id: match.id,
+            full_name: match.full_name,
+            matched_on: ["email", "name"],
+            name_similarity: 91,
+          },
+        ],
+      })
+    );
+    render(<CandidateProfile id={alex.id} />);
+    await screen.findByText("Waiting to be processed…");
+    expect(screen.queryByRole("region", { name: "Possible duplicates" })).not.toBeInTheDocument();
+    const warning = within(
+      await screen.findByRole("region", { name: "Possible duplicates" }, { timeout: 3000 })
+    );
+    expect(warning.getByRole("link", { name: match.full_name })).toHaveAttribute(
+      "href",
+      `/candidates/${match.id}`
+    );
+    expect(warning.getByText("Email · Similar name")).toBeInTheDocument();
+  });
+
   it("shows contact info, applications with stages, CVs with parse status and the parsed summary", async () => {
     render(<CandidateProfile id={alex.id} />);
 

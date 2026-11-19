@@ -108,7 +108,7 @@ async def test_create_candidate_validation_and_duplicates(
     create_user: Callable[..., User],
     login_as: Callable[[User], None],
 ) -> None:
-    """Bad payloads are 422 and a repeated email in the same org is 409."""
+    """Bad payloads are 422; repeated emails create separate records with warnings."""
     login_as(create_user("recruiter"))
 
     bad_payloads: list[dict[str, Any]] = [
@@ -122,13 +122,19 @@ async def test_create_candidate_validation_and_duplicates(
     for bad in bad_payloads:
         assert (await async_client.post(CANDIDATES_URL, json=bad)).status_code == 422, bad
 
-    await _create_candidate(async_client)
+    first = await _create_candidate(async_client)
+    assert first["possible_duplicates"] == []
     for email in (CANDIDATE_PAYLOAD["email"], CANDIDATE_PAYLOAD["email"].upper()):
         response = await async_client.post(
             CANDIDATES_URL, json={**CANDIDATE_PAYLOAD, "email": email}
         )
-        assert response.status_code == 409
-    assert (await async_client.get(CANDIDATES_URL)).json()["pagination"]["total_items"] == 1
+        assert response.status_code == 201
+        assert response.json()["id"] != first["id"]
+        assert any(
+            match["candidate_id"] == first["id"] and "email" in match["matched_on"]
+            for match in response.json()["possible_duplicates"]
+        )
+    assert (await async_client.get(CANDIDATES_URL)).json()["pagination"]["total_items"] == 3
 
 
 @pytest.mark.asyncio
@@ -237,12 +243,16 @@ async def test_update_candidate(
     cleared = await async_client.patch(candidate_url, json={"consent_given_at": None})
     assert cleared.json()["consent_given_at"] is None
 
-    # Required columns cannot be nulled, and an email already in use is a conflict.
+    # Required columns cannot be nulled; a shared email produces a warning.
     assert (await async_client.patch(candidate_url, json={"full_name": None})).status_code == 422
     assert (await async_client.patch(candidate_url, json={"email": None})).status_code == 422
-    conflict = await async_client.patch(candidate_url, json={"email": other["email"].upper()})
-    assert conflict.status_code == 409
-    assert (await async_client.get(candidate_url)).json()["email"] == candidate["email"]
+    shared = await async_client.patch(candidate_url, json={"email": other["email"].upper()})
+    assert shared.status_code == 200
+    assert shared.json()["email"] == other["email"]
+    assert any(
+        match["candidate_id"] == other["id"] and "email" in match["matched_on"]
+        for match in shared.json()["possible_duplicates"]
+    )
     assert (
         await async_client.patch(f"{CANDIDATES_URL}/{uuid.uuid4()}", json={})
     ).status_code == 404

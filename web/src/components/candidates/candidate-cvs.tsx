@@ -7,7 +7,8 @@ import { Can } from "@/components/auth/can";
 import { CvDropzone } from "./cv-dropzone";
 import { CvRow } from "./cv-row";
 import { CvUploadItem } from "./cv-upload-item";
-import { describeCvStatus, type CvDocument } from "./cv-status";
+import { describeCvStatus, isReviewable, type CvDocument } from "./cv-status";
+import type { PossibleDuplicate } from "./possible-duplicates";
 import { ProfileSection, SectionBody, SectionEmpty } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
 import { useCvUploads } from "./use-cv-uploads";
@@ -27,7 +28,13 @@ function changedMeaningfully(previous: CvDocument, next: CvDocument): boolean {
  * The fetched list is the starting point; CVs uploaded in this visit and fresher copies from
  * polling are layered on top by id, so the list never flashes back to a loading state.
  */
-export function CandidateCvs({ candidateId }: { candidateId: string }) {
+export function CandidateCvs({
+  candidateId,
+  onParsedMatches,
+}: {
+  candidateId: string;
+  onParsedMatches?: (matches: PossibleDuplicate[]) => void;
+}) {
   const load = React.useCallback(
     async () => unwrap(await listCandidateCvDocuments(candidateId)),
     [candidateId]
@@ -38,12 +45,18 @@ export function CandidateCvs({ candidateId }: { candidateId: string }) {
   const [updates, setUpdates] = React.useState<Record<string, CvDocument>>({});
   const [announcement, setAnnouncement] = React.useState("");
 
-  const handleUpdate = React.useCallback((next: CvDocument, previous: CvDocument) => {
-    setUpdates((current) => ({ ...current, [next.id]: next }));
-    if (changedMeaningfully(previous, next)) {
-      setAnnouncement(`${next.original_filename}: ${describeCvStatus(next)}`);
-    }
-  }, []);
+  const handleUpdate = React.useCallback(
+    (next: CvDocument, previous: CvDocument) => {
+      setUpdates((current) => ({ ...current, [next.id]: next }));
+      const matches = isReviewable(next.status) ? next.possible_duplicates : undefined;
+      if (matches) onParsedMatches?.(matches);
+      if (changedMeaningfully(previous, next)) {
+        const warning = matches?.length ? " Possible duplicates found." : "";
+        setAnnouncement(`${next.original_filename}: ${describeCvStatus(next)}${warning}`);
+      }
+    },
+    [onParsedMatches]
+  );
 
   const uploads = useCvUploads({
     candidateId,

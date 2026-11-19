@@ -16,6 +16,7 @@ from app.models.cv_document import CvDocument
 from app.models.user import User
 from app.schemas.cv_document import CvDocumentResponse, CvStatus
 from app.services.audit_service import log_audit_event
+from app.services.duplicate_detection import DuplicateDetector
 from app.services.job_queue import JobQueue, QueueUnavailableError, get_job_queue
 from app.services.storage import Storage, StorageError, get_storage, new_cv_storage_key
 
@@ -85,6 +86,13 @@ def _get_document_or_404(db: Session, candidate_id: uuid.UUID, cv_id: uuid.UUID)
     return document
 
 
+def _document_response(db: Session, document: CvDocument) -> CvDocumentResponse:
+    candidate = _get_candidate_or_404(db, document.candidate_id)
+    response = CvDocumentResponse.model_validate(document)
+    response.possible_duplicates = DuplicateDetector(db, candidate.org_id).find(candidate)
+    return response
+
+
 @router.post(
     "",
     response_model=CvDocumentResponse,
@@ -99,7 +107,7 @@ def upload_cv(
     storage: Storage = Depends(get_storage),
     queue: JobQueue = Depends(get_job_queue),
     current_user: User = Depends(get_current_recruiter_or_admin),
-) -> CvDocument:
+) -> CvDocumentResponse:
     """Store a PDF CV and queue it for processing. Admin or recruiter only.
 
     The file is judged by its content, not its name or declared type.
@@ -154,7 +162,7 @@ def upload_cv(
     db.refresh(document)
     # Queued only after the commit, so the worker always finds the record.
     _enqueue_extraction(db, queue, document)
-    return document
+    return _document_response(db, document)
 
 
 @router.get(
@@ -166,15 +174,22 @@ def list_cv_documents(
     id: uuid.UUID,
     db: Session = Depends(get_tenant_db),
     _current_user: User = Depends(get_current_user),
-) -> list[CvDocument]:
+) -> list[CvDocumentResponse]:
     """Return the candidate's CV documents with their status, newest first."""
     candidate = _get_candidate_or_404(db, id)
-    return (
+    documents = (
         db.query(CvDocument)
         .filter(CvDocument.candidate_id == candidate.id)
         .order_by(CvDocument.created_at.desc(), CvDocument.id)
         .all()
     )
+    matches = DuplicateDetector(db, candidate.org_id).find(candidate)
+    return [
+        CvDocumentResponse.model_validate(document).model_copy(
+            update={"possible_duplicates": matches}
+        )
+        for document in documents
+    ]
 
 
 @router.get(
@@ -187,9 +202,9 @@ def get_cv_document(
     cv_id: uuid.UUID,
     db: Session = Depends(get_tenant_db),
     _current_user: User = Depends(get_current_user),
-) -> CvDocument:
+) -> CvDocumentResponse:
     """Return one CV document, including its processing status."""
-    return _get_document_or_404(db, id, cv_id)
+    return _document_response(db, _get_document_or_404(db, id, cv_id))
 
 
 @router.post(
@@ -204,7 +219,7 @@ def retry_cv_extraction(
     db: Session = Depends(get_tenant_db),
     queue: JobQueue = Depends(get_job_queue),
     current_user: User = Depends(get_current_recruiter_or_admin),
-) -> CvDocument:
+) -> CvDocumentResponse:
     """Queue a failed document again, with a fresh set of attempts. Admin or recruiter only.
 
     A document still waiting or in progress is queued again as it is, which recovers
@@ -240,7 +255,7 @@ def retry_cv_extraction(
         db.refresh(document)
 
     _enqueue_extraction(db, queue, document)
-    return document
+    return _document_response(db, document)
 
 
 @router.get(
