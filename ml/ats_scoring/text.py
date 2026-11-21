@@ -72,17 +72,30 @@ def job_text(job: Mapping[str, Any]) -> str:
     return _join(parts)
 
 
-def tfidf_similarity(first: str, second: str) -> float:
+def tfidf_similarity(
+    first: str,
+    second: str,
+    *,
+    first_tokens: list[str] | None = None,
+    second_tokens: list[str] | None = None,
+) -> float:
     """Return the cosine similarity (0-1) of two texts under TF-IDF.
 
     Uses single words and word pairs. The IDF is computed from these two texts only,
     which is weak: a word found in both counts a little less than a word found in one.
     Fitting the IDF on a larger set of CVs and jobs is the natural next step.
+
+    `first_tokens` and `second_tokens` may pass `tokenize()` of a text computed earlier, so a
+    text compared many times (the job, in a batch) is tokenized once. The result is the same.
     """
-    if not tokenize(first) or not tokenize(second):
+    tokens = {
+        first: tokenize(first) if first_tokens is None else first_tokens,
+        second: tokenize(second) if second_tokens is None else second_tokens,
+    }
+    if not tokens[first] or not tokens[second]:
         return 0.0
     vectorizer = TfidfVectorizer(
-        tokenizer=tokenize,
+        tokenizer=tokens.__getitem__,
         token_pattern=None,
         lowercase=False,
         ngram_range=(1, 2),

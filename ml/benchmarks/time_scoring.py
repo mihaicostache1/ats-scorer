@@ -8,9 +8,12 @@ there are fewer CVs than `--candidates`, they are reused in turn.
     python benchmarks/time_scoring.py --candidates 1000 --job J01 --passes 3
     python benchmarks/time_scoring.py --model-dir models/multilingual-e5-small
 
+Each ranking is timed twice: calling `score()` once per candidate, and one `score_batch()`
+call for the whole list, which is what the backend should use. They give the same scores.
 With `--model-dir`, it also embeds the CVs and the job (timed separately, as that happens
-once per CV when it is parsed) and ranks with the embeddings. Network access is blocked
-while anything is timed, to show that neither step uses it.
+once per CV when it is parsed) and ranks with the embeddings, passed to `score_batch()` as
+one NumPy float32 matrix, as read from pgvector. Network access is blocked while anything is
+timed, to show that no step uses it.
 """
 
 import argparse
@@ -24,7 +27,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from ats_scoring import MODEL_VERSION, NothingToScoreError, score
+import numpy as np
+
+from ats_scoring import MODEL_VERSION, NothingToScoreError, score, score_batch
 
 DEFAULT_DATA = Path(__file__).resolve().parents[1] / "synthetic" / "output"
 
@@ -84,6 +89,19 @@ def rank(
     return ranked
 
 
+def rank_batch(
+    batch: list[dict[str, Any]],
+    job: dict[str, Any],
+    vectors: Any,
+    job_vector: Any,
+) -> list[tuple[float, int]]:
+    """The same ranking from one score_batch() call."""
+    results = score_batch(job, batch, candidate_embeddings=vectors, job_embedding=job_vector)
+    ranked = [(result["total"], index) for index, result in enumerate(results) if result]
+    ranked.sort(key=lambda item: (-item[0], item[1]))
+    return ranked
+
+
 def timed(passes: int, run: Callable[[], object]) -> float:
     timings = []
     for _ in range(max(1, passes)):
@@ -110,12 +128,17 @@ def main() -> int:
     distinct = min(len(pool), args.candidates)
     print(f"{MODEL_VERSION}: {args.candidates} candidates ({distinct} distinct) against {args.job}")
 
+    def report(label: str, seconds: float) -> None:
+        print(f"  {label:34} {seconds:7.2f} s  ({seconds / len(batch) * 1000:.2f} ms each)")
+
     rank(batch[:1], job, None, None)  # warm-up: the first call loads scikit-learn
     with no_network():
-        seconds = timed(args.passes, lambda: rank(batch, job, None, None))
-    print(
-        f"  rank without embeddings  {seconds:7.2f} s  ({seconds / len(batch) * 1000:.2f} ms each)"
-    )
+        loop = timed(args.passes, lambda: rank(batch, job, None, None))
+        batched = timed(args.passes, lambda: rank_batch(batch, job, None, None))
+        if rank(batch, job, None, None) != rank_batch(batch, job, None, None):
+            raise SystemExit("score_batch() and score() disagree")
+    report("rank without embeddings, score()", loop)
+    report("rank without embeddings, batch", batched)
 
     if args.model_dir:
         from ats_scoring.embeddings import Embedder
@@ -129,14 +152,20 @@ def main() -> int:
             vectors = embedder.embed_candidates(batch)
             job_vector = embedder.embed_job(job)
             embed_seconds = time.perf_counter() - started
-            seconds = timed(args.passes, lambda: rank(batch, job, vectors, job_vector))
-        print(f"  load model               {load_seconds:7.2f} s  (once per worker)")
+            matrix = np.array(vectors, dtype=np.float32)  # pgvector returns float32 arrays
+            loop = timed(args.passes, lambda: rank(batch, job, list(matrix), job_vector))
+            batched = timed(args.passes, lambda: rank_batch(batch, job, matrix, job_vector))
+            if rank(batch, job, list(matrix), job_vector) != rank_batch(
+                batch, job, matrix, job_vector
+            ):
+                raise SystemExit("score_batch() and score() disagree with embeddings")
+        print(f"  {'load model':34} {load_seconds:7.2f} s  (once per worker)")
         print(
-            f"  embed CVs and the job    {embed_seconds:7.2f} s  "
+            f"  {'embed CVs and the job':34} {embed_seconds:7.2f} s  "
             f"({embed_seconds / len(batch) * 1000:.1f} ms per CV, once per CV)"
         )
-        each = seconds / len(batch) * 1000
-        print(f"  rank with embeddings     {seconds:7.2f} s  ({each:.2f} ms each)")
+        report("rank with embeddings, score()", loop)
+        report("rank with embeddings, batch", batched)
 
     print(f"  median of {max(1, args.passes)} passes for the ranking rows")
     print(f"Python {platform.python_version()}, {platform.platform()}, {platform.processor()}")

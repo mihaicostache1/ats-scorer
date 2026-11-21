@@ -64,6 +64,8 @@ score(candidate, job, candidate_embedding=cv_vector, job_embedding=job_vector)
 
 `candidate` follows the parsed-CV schema (version 1.1, also accepting 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
 
+To rank many candidates for one job, `score_batch(job, candidates, candidate_embeddings=..., job_embedding=...)` returns one result per candidate, in order, each exactly what `score()` gives. A candidate with nothing to score gets `None` instead of an exception. Embeddings can be a list of vectors (or `None`) or one 2-D array. `additional_names` (one list per candidate, also on `score()`) removes other names of the candidate before scoring, the same ones the backend removes before embedding. `EMBEDDING_MODEL_VERSION` is the string the backend stores next to each embedding: pass `None` for a vector recorded with another one. Details: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in).
+
 The embeddings come from `ats_scoring.embeddings.Embedder`, computed once per CV and per job and stored. `score()` never loads a model and makes no network call. Without embeddings it still works, and the embedding weight is shared among the other components.
 
 ```bash
@@ -146,7 +148,7 @@ python synthetic/generate.py --cvs 1000 --out /tmp/synth1000
 python benchmarks/time_scoring.py --data /tmp/synth1000 --model-dir models/multilingual-e5-small
 ```
 
-On an Apple M5: ranking 1,000 candidates takes about 0.5 s, and embedding 1,000 CVs takes about 16 s (once per CV). Full results: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#speed).
+On an Apple M5: ranking 1,000 candidates takes about 0.75 s, the same with `score()` per candidate or with `score_batch()`, and embedding 1,000 CVs takes about 17 s (once per CV). Full results: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#speed).
 
 ### Test
 
