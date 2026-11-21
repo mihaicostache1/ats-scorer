@@ -86,6 +86,7 @@ There are also module-level `normalize_skills(skills)` and `extract_skills(text)
 | `score` | 0-1: `1.0` for alias and exact, the fuzzy ratio divided by 100, or the cosine. `None` for `none` |
 | `esco_uri`, `esco_label` | The ESCO concept that was matched or suggested, and its preferred label. `None` when there is none, for example for Docker |
 | `suggestion` | The name to offer the recruiter, for `fuzzy` and `embedding` |
+| `start`, `end` | For `extract_skills`, where the first mention is: `text[start:end] == raw` (L-17). `None` from `normalize_skills`. Not part of `to_parsed_cv()` |
 | `accepted` | `normalized is not None` |
 | `to_parsed_cv()` | `{"raw", "normalized"}` plus `suggestion` when present, the `skills[]` entry of [parsed-CV schema 1.1](parsed-cv-schema.md) |
 

@@ -1,7 +1,7 @@
 # Settings of the hybrid scorer (L-13), read by ats_scoring.config when the package is imported.
 # Change model_version whenever you change anything in this file: every stored score carries
 # the version, and the same input must always get the same score under the same version.
-model_version: hybrid-1.1.0
+model_version: hybrid-1.2.0
 
 # Share of the total carried by each component. Must add up to 1. When a component cannot be
 # computed (no embedding, no minimum experience on the job, no skills on the job, ...) it is
@@ -32,3 +32,12 @@ embedding:
 title:
   # The headline and the most recent position count in full. Older positions count this much.
   older_title_factor: 0.8
+
+bands:
+  # Band shown next to the total (US-08): strong from `strong` up, moderate from `moderate` up,
+  # weak below. Picked on the 30 L-9 pairs by a rule fixed beforehand and checked on the 30 L-15
+  # pairs (L-18): strong is rare and precise, most good candidates show as moderate. The score
+  # ranks candidates within a job; the band is not a chance of passing screening.
+  # Numbers and decision: docs/ml/experiments.md#l-18-band-thresholds
+  strong: 70
+  moderate: 50

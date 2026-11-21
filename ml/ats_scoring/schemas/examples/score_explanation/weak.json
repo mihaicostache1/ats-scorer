@@ -1,0 +1,71 @@
+{
+  "explanation_version": "1.0",
+  "model_version": "hybrid-1.2.0",
+  "total": 21.37,
+  "band": "weak",
+  "summary": "Weak match. Has 0 of 6 required skills. Has 7.5 years of experience; the job asks for at least 6 years.",
+  "components": [
+    {
+      "name": "skill_overlap",
+      "label": "Skills",
+      "score": 0.0,
+      "weight": 0.3,
+      "contribution": 0.0,
+      "statement": "Has 0 of 6 required skills. Has 0 of 2 nice-to-have skills."
+    },
+    {
+      "name": "embedding_similarity",
+      "label": "Similarity of meaning",
+      "score": 31.91,
+      "weight": 0.35,
+      "contribution": 11.17,
+      "statement": "Similarity of meaning with the job: 32/100 (compared with other candidates, not an absolute grade)."
+    },
+    {
+      "name": "experience_fit",
+      "label": "Experience",
+      "score": 100.0,
+      "weight": 0.1,
+      "contribution": 10.0,
+      "statement": "Has 7.5 years of experience; the job asks for at least 6 years."
+    },
+    {
+      "name": "title_similarity",
+      "label": "Job title",
+      "score": 0.0,
+      "weight": 0.15,
+      "contribution": 0.0,
+      "statement": "Closest job title: Senior UX Designer (title fit 0/100, seniority aside)."
+    },
+    {
+      "name": "text_similarity",
+      "label": "Shared words",
+      "score": 2.03,
+      "weight": 0.1,
+      "contribution": 0.2,
+      "statement": "Shared words with the job: 2/100. It counts shared words, not meaning."
+    }
+  ],
+  "matched_skills": [],
+  "missing_skills": {
+    "required": [
+      "Microservices",
+      "Python",
+      "Docker",
+      "Java",
+      "Spring Boot",
+      "FastAPI"
+    ],
+    "preferred": [
+      "Go",
+      "SQL"
+    ]
+  },
+  "experience": {
+    "status": "meets",
+    "candidate_years": 7.5,
+    "required_years": 6.0,
+    "statement": "Has 7.5 years of experience; the job asks for at least 6 years."
+  },
+  "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+}

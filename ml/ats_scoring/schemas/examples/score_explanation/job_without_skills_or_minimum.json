@@ -1,0 +1,61 @@
+{
+  "explanation_version": "1.0",
+  "model_version": "hybrid-1.2.0",
+  "total": 21.5,
+  "band": "weak",
+  "summary": "Weak match. The job lists no skills, so skills are not part of the score. The job gives no minimum experience, so experience is not scored.",
+  "components": [
+    {
+      "name": "skill_overlap",
+      "label": "Skills",
+      "score": null,
+      "weight": 0.0,
+      "contribution": 0.0,
+      "statement": "The job lists no skills, so skills are not part of the score."
+    },
+    {
+      "name": "embedding_similarity",
+      "label": "Similarity of meaning",
+      "score": null,
+      "weight": 0.0,
+      "contribution": 0.0,
+      "statement": "No embedding is available, so similarity of meaning is not scored."
+    },
+    {
+      "name": "experience_fit",
+      "label": "Experience",
+      "score": null,
+      "weight": 0.0,
+      "contribution": 0.0,
+      "statement": "The job gives no minimum experience, so experience is not scored."
+    },
+    {
+      "name": "title_similarity",
+      "label": "Job title",
+      "score": 33.33,
+      "weight": 0.6,
+      "contribution": 20.0,
+      "statement": "Closest job title: Backend Developer (title fit 33/100, seniority aside)."
+    },
+    {
+      "name": "text_similarity",
+      "label": "Shared words",
+      "score": 3.75,
+      "weight": 0.4,
+      "contribution": 1.5,
+      "statement": "Shared words with the job: 4/100. It counts shared words, not meaning."
+    }
+  ],
+  "matched_skills": [],
+  "missing_skills": {
+    "required": [],
+    "preferred": []
+  },
+  "experience": {
+    "status": "not_required",
+    "candidate_years": 5.5,
+    "required_years": null,
+    "statement": "The job gives no minimum experience, so experience is not scored."
+  },
+  "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+}

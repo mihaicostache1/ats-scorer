@@ -1,6 +1,6 @@
 # Hybrid scorer v1 (L-13)
 
-**Status:** implemented, `model_version` `hybrid-1.1.0` (1.0.0 plus redaction, L-14). Not called by the API yet. Owner: ML/DevOps lead.
+**Status:** implemented, `model_version` `hybrid-1.2.0` (1.0.0 plus redaction, L-14, plus the explanation and band, L-17, with the same totals as 1.1.0). Not called by the API yet. Owner: ML/DevOps lead.
 
 | What | Where |
 |---|---|
@@ -9,6 +9,7 @@
 | Embeddings (offline) | [ml/ats_scoring/embeddings.py](../../ml/ats_scoring/embeddings.py) |
 | Title similarity | [ml/ats_scoring/titles.py](../../ml/ats_scoring/titles.py) |
 | Redaction (L-14) | [ml/ats_scoring/redaction.py](../../ml/ats_scoring/redaction.py), see [redaction.md](redaction.md) |
+| Explanation and band (L-17, L-18) | [ml/ats_scoring/explanation.py](../../ml/ats_scoring/explanation.py), see [score-explanation.md](score-explanation.md); thresholds in [experiments.md](experiments.md#l-18-band-thresholds) |
 | Evaluation result | [ml/evaluation/results/2026-11-10_hybrid-1.1.0.json](../../ml/evaluation/results/2026-11-10_hybrid-1.1.0.json) (same scores as [1.0.0](../../ml/evaluation/results/2026-11-07_hybrid-1.0.0.json)) |
 | Ablation | [ml/evaluation/ablation.py](../../ml/evaluation/ablation.py) |
 | Timing | [ml/benchmarks/time_scoring.py](../../ml/benchmarks/time_scoring.py) |
@@ -131,7 +132,7 @@ Proposed mapping to the `scores` table (backend to confirm):
 | `components["embedding_similarity"]`, or `text_similarity` when it is `None` | `semantic_score` (not nullable) |
 | `components["experience_fit"]` | `experience_score` |
 | `components["title_similarity"]` | `title_fit_score` |
-| `components`, `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |
+| `explanation` ([score-explanation.md](score-explanation.md)): components with their contributions, matched skills with the CV's phrase, missing skills, experience, band | `component_breakdown` |
 | `model_version` | `model_version` |
 
 ## Speed

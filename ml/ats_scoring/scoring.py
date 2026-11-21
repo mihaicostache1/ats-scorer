@@ -8,7 +8,6 @@ computed beforehand with ats_scoring.embeddings and passed in.
 ranking does: it prepares the job once and gives each candidate exactly what `score()` gives.
 """
 
-import math
 from collections.abc import Iterable, Mapping, Sequence, Sized
 from dataclasses import dataclass
 from typing import Any
@@ -16,11 +15,12 @@ from typing import Any
 import numpy as np
 
 from ats_scoring.config import COMPONENTS, DEFAULT_CONFIG, ScorerConfig
+from ats_scoring.explanation import build_explanation, skill_lines, years_or_none
 from ats_scoring.redaction import redact
 from ats_scoring.schema import ScoreComponents, ScoreResult
-from ats_scoring.skills import SkillMatch, match_skills
+from ats_scoring.skills import match_skills
 from ats_scoring.text import candidate_text, job_text, skill_texts, tfidf_similarity, tokenize
-from ats_scoring.titles import TitleMatch, match_title
+from ats_scoring.titles import match_title
 
 # Stored with every score. Set in weights.yaml: change it whenever the same input could get a
 # different result, for example when the weights or the skill alias table change.
@@ -86,14 +86,6 @@ def _scaled_cosine(
     return min(1.0, max(0.0, scaled))
 
 
-def _years(value: object) -> float | None:
-    if isinstance(value, bool) or not isinstance(value, int | float):
-        return None
-    if not math.isfinite(value) or value < 0:
-        return None
-    return float(value)
-
-
 def experience_fit(candidate_years: object, min_years: object) -> float | None:
     """1 when the candidate has at least the minimum, falling linearly to 0 at no experience.
 
@@ -102,7 +94,7 @@ def experience_fit(candidate_years: object, min_years: object) -> float | None:
     More experience than asked is not penalized: years of experience track age, so the scorer
     only checks that the minimum is met.
     """
-    have, need = _years(candidate_years), _years(min_years)
+    have, need = years_or_none(candidate_years), years_or_none(min_years)
     if have is None or need is None or need == 0:
         return None
     if have >= need:
@@ -127,75 +119,6 @@ def _combine(
         if value is not None and name in present
     )
     return total, used
-
-
-def _skill_count(found: int, total: int, kind: str) -> str:
-    return f"Has {found} of {total} {kind} skill{'' if total == 1 else 's'}."
-
-
-def _format_years(years: float) -> str:
-    return f"{years:g} year{'' if years == 1 else 's'}"
-
-
-def _explanations(
-    skills: SkillMatch,
-    embedding: float | None,
-    candidate_years: object,
-    min_years: object,
-    title: TitleMatch,
-    similarity: float,
-) -> list[str]:
-    """Plain-language reasons for the score, for the breakdown shown to recruiters."""
-    lines = []
-    if skills.overlap is None:
-        lines.append("The job lists no skills, so skills are not part of the score.")
-    else:
-        required = len(skills.matched_required) + len(skills.missing_required)
-        if required:
-            lines.append(_skill_count(len(skills.matched_required), required, "required"))
-        preferred = len(skills.matched_preferred) + len(skills.missing_preferred)
-        if preferred:
-            lines.append(_skill_count(len(skills.matched_preferred), preferred, "preferred"))
-
-    if embedding is None:
-        lines.append("No embedding is available, so similarity of meaning is not scored.")
-    else:
-        lines.append(
-            f"Similarity of meaning with the job: {_percent(embedding):.0f}/100 "
-            "(compared with other candidates, not an absolute grade)."
-        )
-
-    have, need = _years(candidate_years), _years(min_years)
-    if need is None:
-        lines.append("The job gives no minimum experience, so experience is not scored.")
-    elif need == 0:
-        lines.append("The job asks for no prior experience, so experience is not scored.")
-    elif have is None:
-        lines.append("The CV gives no total years of experience, so experience is not scored.")
-    elif have >= need:
-        lines.append(
-            f"Has {_format_years(have)} of experience; the job asks for at least "
-            f"{_format_years(need)}."
-        )
-    else:
-        lines.append(
-            f"Has {_format_years(have)} of experience, below the {_format_years(need)} "
-            "the job asks for."
-        )
-
-    if title.similarity is None:
-        lines.append("No job title to compare, so title fit is not scored.")
-    else:
-        lines.append(
-            f"Closest job title: {title.closest_title} "
-            f"(title fit {_percent(title.similarity):.0f}/100, seniority aside)."
-        )
-
-    lines.append(
-        f"Shared words with the job: {_percent(similarity):.0f}/100. "
-        "It counts shared words, not meaning."
-    )
-    return lines
 
 
 @dataclass(frozen=True)
@@ -241,8 +164,9 @@ def _score_one(
         raise NothingToScoreError("candidate has no skills or text to score")
     fields = job.fields
 
+    cv_skills = skill_texts(candidate.get("skills"))
     skills = match_skills(
-        skill_texts(candidate.get("skills")),
+        cv_skills,
         fields.get("required_skills"),
         fields.get("preferred_skills"),
         required_weight=config.required_skill_weight,
@@ -262,7 +186,7 @@ def _score_one(
         "title_similarity": title.similarity,
         "text_similarity": similarity,
     }
-    total, weights = _combine(fractions, config.weights)
+    exact_total, weights = _combine(fractions, config.weights)
     components: ScoreComponents = {
         "skill_overlap": None if skills.overlap is None else _percent(skills.overlap),
         "embedding_similarity": None if embedding is None else _percent(embedding),
@@ -270,21 +194,32 @@ def _score_one(
         "title_similarity": None if title.similarity is None else _percent(title.similarity),
         "text_similarity": _percent(similarity),
     }
+    total = _percent(exact_total)
+    explanation = build_explanation(
+        total=total,
+        components=components,
+        weights=weights,
+        skills=skills,
+        cv_skills=cv_skills,
+        candidate_years=candidate.get("experience_years"),
+        min_years=fields.get("min_experience_years"),
+        title=title,
+        bands=config.bands,
+        model_version=config.model_version,
+    )
     return {
-        "total": _percent(total),
+        "total": total,
         "components": components,
         "weights": weights,
         "matched_skills": skills.matched,
         "missing_skills": skills.missing,
-        "score_explanations": _explanations(
-            skills,
-            embedding,
-            candidate.get("experience_years"),
-            fields.get("min_experience_years"),
-            title,
-            similarity,
-        ),
+        # The same sentences as the explanation, with skills split into required and nice-to-have.
+        "score_explanations": [
+            *skill_lines(skills),
+            *(part["statement"] for part in explanation["components"][1:]),
+        ],
         "model_version": config.model_version,
+        "explanation": explanation,
     }
 
 

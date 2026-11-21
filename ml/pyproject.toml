@@ -39,6 +39,7 @@ ats_scoring = [
     "schemas/*.json",
     "schemas/fixtures/valid/*.json",
     "schemas/fixtures/invalid/*.json",
+    "schemas/examples/score_explanation/*.json",
 ]
 
 [tool.ruff]

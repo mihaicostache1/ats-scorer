@@ -35,12 +35,33 @@ class ScoreResult(TypedDict):
     missing_skills: list[str]
     score_explanations: list[str]  # plain-language reasons, for recruiters
     model_version: str
+    # Everything the detail view shows (L-17): valid under score_explanation.ScoreExplanation
+    # and schemas/score_explanation.schema.json. JSON-ready, for scores.component_breakdown.
+    explanation: dict[str, Any]
 
 
 def _load(*path: str) -> dict[str, Any]:
     text = resources.files("ats_scoring").joinpath("schemas", *path).read_text(encoding="utf-8")
     data: dict[str, Any] = json.loads(text)
     return data
+
+
+def load_score_explanation_schema() -> dict[str, Any]:
+    """Return the JSON Schema (draft 2020-12) for the explanation returned with every score."""
+    return _load("score_explanation.schema.json")
+
+
+def score_explanation_example_names() -> list[str]:
+    """Names of the example explanations in schemas/examples/score_explanation/."""
+    folder = resources.files("ats_scoring").joinpath("schemas", "examples", "score_explanation")
+    if not folder.is_dir():
+        return []
+    return sorted(item.name.removesuffix(".json") for item in folder.iterdir() if item.is_file())
+
+
+def load_score_explanation_example(name: str) -> dict[str, Any]:
+    """One example explanation, for frontend mocks and other teams' tests."""
+    return _load("examples", "score_explanation", f"{name}.json")
 
 
 def load_parsed_cv_schema() -> dict[str, Any]:

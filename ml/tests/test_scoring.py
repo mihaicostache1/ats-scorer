@@ -144,6 +144,7 @@ def test_result_has_the_agreed_shape_and_range(name: str, candidate: dict[str, A
         "missing_skills",
         "score_explanations",
         "model_version",
+        "explanation",
     }
     assert list(result["components"]) == list(COMPONENTS)
     assert list(result["weights"]) == list(COMPONENTS)
@@ -354,7 +355,7 @@ def test_older_titles_count_less() -> None:
 def test_partial_pair_is_explained() -> None:
     explanations = full_score(PARTIAL, "PARTIAL")["score_explanations"]
 
-    assert explanations[:2] == ["Has 2 of 4 required skills.", "Has 0 of 2 preferred skills."]
+    assert explanations[:2] == ["Has 2 of 4 required skills.", "Has 0 of 2 nice-to-have skills."]
     assert explanations[2].startswith("Similarity of meaning with the job: ")
     assert explanations[3].startswith("Has 1.5 years of experience")
     assert explanations[4].startswith("Closest job title: ")

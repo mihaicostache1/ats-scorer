@@ -11,7 +11,7 @@
 
 ## ats_scoring
 
-Scores how well a parsed CV fits a job. Version 1 (`hybrid-1.1.0`, L-13 and L-14) mixes skill overlap, embedding similarity, experience fit, title similarity and TF-IDF text similarity. Design, evaluation and timing: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md).
+Scores how well a parsed CV fits a job. Version 1 (`hybrid-1.2.0`, L-13, L-14 and L-17) mixes skill overlap, embedding similarity, experience fit, title similarity and TF-IDF text similarity, and explains every score. Design, evaluation and timing: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md).
 
 The CV is redacted first: `redact(parsed_cv)` removes the name, contact details, street address, photo references, birth date, graduation years and other dates, and gendered titles and pronouns, keeping city or region and country. `score()` and `Embedder` call it themselves. What it does and does not remove: [docs/ml/redaction.md](../docs/ml/redaction.md).
 
@@ -58,11 +58,15 @@ score(candidate, job, candidate_embedding=cv_vector, job_embedding=job_vector)
 #     "matched_skills": ["Python", "PostgreSQL"],
 #     "missing_skills": ["Docker", "REST APIs"],
 #     "score_explanations": ["Has 2 of 4 required skills.", ...],
-#     "model_version": "hybrid-1.1.0",
+#     "model_version": "hybrid-1.2.0",
+#     "explanation": {"band": "moderate", "summary": "Moderate match. Has 2 of 4 required skills. ...",
+#                     "matched_skills": [..., {"skill": "PostgreSQL", "cv_phrase": "Postgres", ...}], ...},
 # }
 ```
 
 `candidate` follows the parsed-CV schema (version 1.1, also accepting 1.0, with `ParsedCV` models in `ats_scoring.parsed_cv`), described in [docs/ml/parsed-cv-schema.md](../docs/ml/parsed-cv-schema.md). The scorer also still reads the older draft shape that the synthetic data uses, where skills are plain strings and positions are in `work_history`. `job` uses the job fields of the API.
+
+`explanation` is what the detail view shows (US-09): each component's contribution, the matched skills with the CV's phrase, the missing required and nice-to-have skills, an experience statement, the band (strong, moderate, weak) and an advisory note. Every text comes from a template. It has its own versioned schema (`ScoreExplanation`, `schemas/score_explanation.schema.json`) and example payloads for frontend mocks: [docs/ml/score-explanation.md](../docs/ml/score-explanation.md).
 
 To rank many candidates for one job, `score_batch(job, candidates, candidate_embeddings=..., job_embedding=...)` returns one result per candidate, in order, each exactly what `score()` gives. A candidate with nothing to score gets `None` instead of an exception. Embeddings can be a list of vectors (or `None`) or one 2-D array. `additional_names` (one list per candidate, also on `score()`) removes other names of the candidate before scoring, the same ones the backend removes before embedding. `EMBEDDING_MODEL_VERSION` is the string the backend stores next to each embedding: pass `None` for a vector recorded with another one. Details: [docs/ml/hybrid-scorer.md](../docs/ml/hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in).
 
