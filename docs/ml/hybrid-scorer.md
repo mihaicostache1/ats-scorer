@@ -4,7 +4,7 @@
 
 | What | Where |
 |---|---|
-| Scorer | [ml/ats_scoring/scoring.py](../../ml/ats_scoring/scoring.py) |
+| Scorer | [ml/ats_scoring/scoring.py](../../ml/ats_scoring/scoring.py): `score()` for one candidate, `score_batch()` for a ranking (L-16) |
 | Weights and model version | [ml/ats_scoring/weights.yaml](../../ml/ats_scoring/weights.yaml), loaded by [config.py](../../ml/ats_scoring/config.py) |
 | Embeddings (offline) | [ml/ats_scoring/embeddings.py](../../ml/ats_scoring/embeddings.py) |
 | Title similarity | [ml/ats_scoring/titles.py](../../ml/ats_scoring/titles.py) |
@@ -79,21 +79,47 @@ export ATS_EMBEDDING_MODEL_DIR=/models/multilingual-e5-small
 
 ### For the backend (when scoring is wired in)
 
+The embeddings are already filled by the B-17 pipeline (`api/app/services/embedding_pipeline.py`): an Arq task embeds every ready CV and every job, and stores `embedding_model_version` (`"<model>@<revision>"` from `weights.yaml`) next to each vector. Ranking a job then needs one call:
+
 ```python
-from ats_scoring import score
-from ats_scoring.embeddings import Embedder
+from ats_scoring import EMBEDDING_MODEL_VERSION, score_batch
 
-embedder = Embedder()                        # once per worker; about 2 s
-candidate.embedding = embedder.embed_candidate(candidate.parsed_data)   # after parsing
-job.embedding = embedder.embed_job(job_fields)                          # on create/update
 
-result = score(candidate.parsed_data, job_fields,
-               candidate_embedding=candidate.embedding, job_embedding=job.embedding)
+def usable(record):  # a vector from another model, or none yet: score without it
+    return record.embedding if record.embedding_model_version == EMBEDDING_MODEL_VERSION else None
+
+
+results = score_batch(
+    job_fields,                                        # title, description, skills, min_experience_years
+    [c.parsed_data for c in candidates],
+    candidate_embeddings=[usable(c) for c in candidates],
+    job_embedding=usable(job),
+    additional_names=[names_of(c) for c in candidates],  # the names B-17 removes before embedding
+)
+for candidate, result in zip(candidates, results):
+    if result is None:
+        ...  # nothing to score (CV failed to parse): send to manual review
+    else:
+        ...  # store result, see the mapping below
 ```
 
-- `candidates.embedding` and `jobs.embedding` are already `vector(384)`. Store the model and revision next to them, or re-embed every row when `weights.yaml` changes the model.
-- Re-embed a job when its title, description or skills change, and a CV when a recruiter corrects its parsed data (B-14).
-- `job_fields` now also uses `min_experience_years`.
+`names_of(c)` is the list `candidate_input()` in `api/app/services/embedding_inputs.py` already builds: `full_name`, `embedding_name_aliases` and the name in `parsed_data_original`. Passing it removes the same names from the scored text as from the embedded text, so an earlier name left in a summary cannot change the score (US-06).
+
+`score_batch(job, candidates)` gives each candidate exactly what `score(candidate, job)` gives (a test checks this on all 270 pairs of the evaluation set's 6 jobs and 45 CVs, with the real embeddings). The result does not depend on the other candidates in the batch, so scores can be computed in any batches and stored. Differences from `score()`:
+
+- A candidate with nothing to score gets `None` in the list, instead of an exception that would stop the ranking.
+- `candidate_embeddings` is one entry per candidate: a vector, or `None` for a CV that has no usable embedding. It can also be one 2-D array with a row per candidate. A vector can be a list of floats or a NumPy array of any float type, so what pgvector returns (float32 arrays) can be passed as it is.
+- `additional_names` is one entry per candidate too: a list of names, one name as a string, or `None`.
+- It raises `ValueError` if `candidate_embeddings` or `additional_names` has a different length from `candidates`, or if any embedding does not have 384 numbers (the message gives its position). These mean a bug or the wrong model, not a bad CV. It raises `NothingToScoreError` if the job itself has nothing to score.
+
+Use `score()` for one pair, for example to rescore one candidate after a recruiter corrects their CV. It takes the same `additional_names`.
+
+How this fits the B-17 pipeline:
+
+- **Same model for every row.** The scorer cannot tell vectors of another model apart, so compare `embedding_model_version` with `EMBEDDING_MODEL_VERSION` and pass `None` when they differ, as `usable()` does. After `weights.yaml` changes the model, `api/scripts/backfill_embeddings.py` re-embeds the stale rows.
+- **CVs and jobs embedded differently.** `Embedder` adds the e5 `passage:` prefix to CVs and `query:` to jobs, which B-17 uses as is. Embedding both the same way lowers quality without any error (L-6).
+- **Missing embeddings.** A candidate passed `None` is scored without the embedding component, its weight spread over the others. Its total is then on a slightly different footing from the candidates that have one. B-17 clears the vector when a CV or a job is edited and the worker fills it again, so this stays rare: a CV just uploaded or corrected, a job just edited, a failed embedding job. If the job has no embedding, every candidate is scored without it, which is consistent. Store the scores with the embedding state they had, and rescore once the worker has caught up.
+- `job_fields` also uses `min_experience_years`, which is not part of the job embedding, so changing it needs a rescore but no re-embedding.
 - Without embeddings, `score()` still works and spreads the embedding weight over the other components. That is the fallback while the worker cannot run the model, for example on staging, which has no worker (L-8).
 
 Proposed mapping to the `scores` table (backend to confirm):
@@ -114,12 +140,17 @@ Proposed mapping to the `scores` table (backend to confirm):
 
 | Step | Time | How often |
 |---|---|---|
-| Rank 1,000 candidates, with embeddings (score each, then sort) | 0.81-0.82 s (0.82 ms each) | Every ranking |
-| Rank 1,000 candidates, without embeddings | 0.75-0.80 s | Every ranking |
-| Load the model | 2.0-2.5 s | Once per worker |
-| Embed 1,000 CVs and the job | 16.7-17.0 s (17 ms per CV) | Once per CV |
+| Rank 1,000 candidates, with embeddings, `score_batch()` then sort | 0.74-0.77 s (0.75 ms each) | Every ranking |
+| Rank 1,000 candidates, with embeddings, `score()` for each, then sort | 0.77 s | Every ranking |
+| Rank 1,000 candidates, without embeddings, `score_batch()` | 0.71-0.74 s | Every ranking |
+| Load the model | 2.5-2.7 s | Once per worker |
+| Embed 1,000 CVs and the job | 16.9-17.2 s (17 ms per CV) | Once per CV |
 
-Most of the ranking time is TF-IDF, which fits a vectorizer for every pair (about 0.5 ms). Redaction adds about 0.25 ms per candidate (`hybrid-1.0.0` without it: 0.49-0.52 s), spread over its patterns with no single hot spot. The embedding comparison adds about 0.03 ms per candidate. L-6 measured 86 ms per CV on older hardware, so expect 3 to 5 times slower embedding on a typical laptop or a small cloud CPU.
+Measured on 2026-11-17 (L-16), embeddings passed as one float32 matrix, as read from pgvector. Both ways give the same scores (the benchmark checks this).
+
+**Time target (L-16), to agree with the backend developer:** rank 1,000 candidates with precomputed embeddings in **under 10 s** on a laptop CPU, the ticket's suggested starting point. Measured: about 0.75 s, so more than 10 times under it. _Agreed: pending._ A small cloud CPU is likely 3 to 5 times slower, which still leaves a wide margin.
+
+`score_batch()` is barely faster than calling `score()` for each candidate, because almost all the time is spent per candidate. Preparing the job once saves only its tokenization. Most of the ranking time is TF-IDF, which fits a vectorizer for every pair (about 0.5 ms). Redaction adds about 0.25 ms per candidate (`hybrid-1.0.0` without it: 0.49-0.52 s), spread over its patterns with no single hot spot. The embedding comparison adds about 0.03 ms per candidate. L-6 measured 86 ms per CV on older hardware, so expect 3 to 5 times slower embedding on a typical laptop or a small cloud CPU.
 
 ## Evaluation (L-9 set: 30 pairs, 3 jobs, 1 rater)
 
