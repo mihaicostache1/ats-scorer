@@ -1,4 +1,4 @@
-# Score explanation (L-17)
+# Score explanation and bands (L-17, L-18)
 
 **Status:** implemented, explanation version `1.0`, returned from `model_version` `hybrid-1.2.0`. Not called by the API yet. Owner: ML/DevOps lead. User stories: US-08 (band), US-09 (understand a score).
 
@@ -8,12 +8,14 @@
 | Pydantic model | [ml/ats_scoring/score_explanation.py](../../ml/ats_scoring/score_explanation.py): `ScoreExplanation` |
 | JSON Schema | [ml/ats_scoring/schemas/score_explanation.schema.json](../../ml/ats_scoring/schemas/score_explanation.schema.json) |
 | Example payloads (frontend mocks, F-15) | [ml/ats_scoring/schemas/examples/score_explanation/](../../ml/ats_scoring/schemas/examples/score_explanation/), written by [evaluation/explanation_examples.py](../../ml/evaluation/explanation_examples.py) |
-| Band thresholds | `bands` in [weights.yaml](../../ml/ats_scoring/weights.yaml) |
+| Band thresholds | `bands` in [weights.yaml](../../ml/ats_scoring/weights.yaml), picked and checked in [experiments.md](experiments.md#l-18-band-thresholds) (L-18) |
 | Tests | [ml/tests/test_explanation.py](../../ml/tests/test_explanation.py), and `test_no_redacted_value_reaches_the_explanation` in [test_redaction.py](../../ml/tests/test_redaction.py) |
 
 ## In one paragraph
 
 `score()` and `score_batch()` now return an `explanation` with every score: the total and its band (strong, moderate, weak), what each component added to the total, the matched skills with the phrase the CV used for each, the missing required and nice-to-have skills, an experience statement, and a note that the score is advisory. Every sentence comes from a fixed template in `explanation.py`, never from a language model, so the same score always gets the same words. It is built only from the redacted CV, so it never contains a name, contact detail, date or gender-coded word. It is JSON-ready and meant to be stored as is in `scores.component_breakdown`.
+
+**What the score is.** The score ranks candidates for one job, to help a recruiter decide whom to read first. It is not a probability that the candidate passes screening, and a band is not a verdict. The same total can mean a top candidate in one job and an average one in another (see [Bands](#bands)), so scores are compared only within a job.
 
 ## Use
 
@@ -53,7 +55,7 @@ Shortened from [no_embedding_cv_phrases.json](../../ml/ats_scoring/schemas/examp
   "missing_skills": { "required": ["Docker"], "preferred": ["Redis"] },
   "experience": { "status": "meets", "candidate_years": 5.5, "required_years": 3.0,
     "statement": "Has 5.5 years of experience; the job asks for at least 3 years." },
-  "advisory_note": "This score is advisory and can be wrong. It compares the CV with the job description and does not reject anyone. Read the CV before you decide."
+  "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
 }
 ```
 
@@ -78,13 +80,59 @@ The scorer matches skills on the CV's `skills` list, so `cv_phrase` is the `raw`
 
 ## Bands
 
-| Band | Total | Rated "strong fit" (3) | "Good fit" (2) | "Weak fit" (1) | "No fit" (0) |
-|---|---|---|---|---|---|
-| strong | 60 and above | 16 | 0 | 2 | 0 |
-| moderate | 40 to 59.99 | 1 | 6 | 4 | 1 |
-| weak | below 40 | 1 | 2 | 7 | 20 |
+| Band | Total | What it means, measured on 60 rated pairs |
+|---|---|---|
+| `strong` | 70 and above | Rare and precise: all 5 pairs here were rated "strong fit", but only 5 of the 18 pairs rated so are here |
+| `moderate` | 50 to 69.99 | Most good candidates (11 of the 18 rated "strong fit"), plus some weaker ones |
+| `weak` | below 50 | Mostly "weak fit" or "no fit" (31 of 36), with an occasional good candidate the scorer misses |
 
-Counts are the 60 rated evaluation pairs (one rater) under `hybrid-1.2.0`, whose totals are the same as `hybrid-1.1.0`. The thresholds were read off this table, so it is not an independent check: with 60 pairs and one rater, treat them as a starting point. The band is advisory, like the score: nothing is hidden or rejected because of it (US-08). Changing a threshold changes the output for the same input, so it needs a new `model_version`.
+The thresholds were picked on the L-9 pairs by a rule fixed beforehand and checked on the L-15 pairs (L-18): weighted kappa 0.755 on the first, 0.571 on the second. Full numbers and limits: [experiments.md](experiments.md#l-18-band-thresholds).
+
+**The band follows the score, and the score is relative.** The median total of the candidates rated "strong fit" runs from 55 in one job to 79 in another, so a job can have no strong match at all while its best candidates are good. Bands group a ranking; they do not grade candidates across jobs. Changing a threshold changes the output for the same input, so it needs a new `model_version`.
+
+## Bands in the UI
+
+For the ranked list (F-14) and the score detail (F-15). Both use exactly these names, so a recruiter sees the same word everywhere.
+
+**Names.** The API value is `strong`, `moderate` or `weak`; never rename it in code. The label is always the band plus "match", as in the explanation's `summary`:
+
+```ts
+// One shared map, used by the ranked list, its filters and the score detail.
+export const BAND_LABELS = {
+  strong: "Strong match",
+  moderate: "Moderate match",
+  weak: "Weak match",
+} as const;
+```
+
+"Match" says the band describes the CV against this job, not the person. Never "strong candidate" or "weak candidate".
+
+**Number and band together.** Show the total as a whole number with the label: `74 · Strong match`. Round **down** (`Math.floor`), so the number never shows the next band's threshold: 69.99 shows `69 · Moderate match`, not `70`. Never add `%` and never write "74% match": the score is not a percentage or a probability.
+
+**Help text.** Next to the band (tooltip or info icon), use this text, unchanged:
+
+> Bands group this job's candidates by score, to help you decide whom to read first. They are not a chance of passing screening, and they do not compare candidates across jobs. Read the CV before you decide.
+
+Per band, if the UI explains each one:
+
+| Band | Text |
+|---|---|
+| Strong match | Closest to this job's requirements. Read these first. |
+| Moderate match | Meets part of this job's requirements. Many good candidates are here, so review them too. |
+| Weak match | Few of this job's requirements found in the CV. Check the CV before deciding: it may have been parsed badly. |
+
+**Words to avoid** anywhere near a score or band: pass, fail, qualified, unqualified, recommended, not recommended, reject, approve, likely, chance, probability, `%`, "the AI decided", best candidate, top talent, unfit. The score is a ranking aid (US-08: advisory, nothing hidden or rejected automatically).
+
+**Layout.**
+
+- Sort the list by score, not by band. The order within a band matters as much as the band.
+- Show all three bands by default. Do not collapse or hide weak matches, and do not pre-filter to strong.
+- A job with no strong match is normal (it happened on 3 of the 6 evaluated jobs). Do not show "no good candidates". If a filter on strong comes back empty: "No candidate is a strong match for this job. Moderate matches may still fit."
+- Candidates without a score ("Needs manual review", US-08) have no band. Show them in their own group, never as weak.
+- Do not show a score or band average across jobs, and do not compare one candidate's scores in two jobs.
+- Do not use colour alone, and avoid a red / amber / green scheme: it reads as fail / pass. Use one neutral colour at three strengths, always with the text label.
+
+**In the score detail (F-15),** show the `summary` and the `advisory_note` near the score, as returned. Do not rephrase them: they come from reviewed templates. Show the `model_version` in small print.
 
 ## Templates only
 

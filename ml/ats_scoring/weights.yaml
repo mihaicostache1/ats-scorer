@@ -35,7 +35,9 @@ title:
 
 bands:
   # Band shown next to the total (US-08): strong from `strong` up, moderate from `moderate` up,
-  # weak below. On the 60 rated evaluation pairs, 16 of the 18 rated "strong fit" are strong and
-  # 20 of the 21 rated "no fit" are weak. Why these values: docs/ml/score-explanation.md#bands
-  strong: 60
-  moderate: 40
+  # weak below. Picked on the 30 L-9 pairs by a rule fixed beforehand and checked on the 30 L-15
+  # pairs (L-18): strong is rare and precise, most good candidates show as moderate. The score
+  # ranks candidates within a job; the band is not a chance of passing screening.
+  # Numbers and decision: docs/ml/experiments.md#l-18-band-thresholds
+  strong: 70
+  moderate: 50

@@ -82,5 +82,5 @@
     "required_years": 3.0,
     "statement": "Has 5.5 years of experience; the job asks for at least 3 years."
   },
-  "advisory_note": "This score is advisory and can be wrong. It compares the CV with the job description and does not reject anyone. Read the CV before you decide."
+  "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
 }

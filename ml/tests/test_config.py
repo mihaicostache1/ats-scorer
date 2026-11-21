@@ -62,7 +62,7 @@ def _broken(path: tuple[str, ...], value: Any) -> dict[str, Any]:
         (("embedding", "dimensions"), 0, "positive integer"),
         (("embedding", "revision"), "", "non-empty string"),
         (("title", "older_title_factor"), 1.5, "from 0 to 1"),
-        (("bands", "moderate"), 60, "bands.moderate < bands.strong"),
+        (("bands", "moderate"), 70, "bands.moderate < bands.strong"),
         (("bands", "strong"), 101, "bands.strong <= 100"),
         (("bands", "moderate"), 0, "0 < bands.moderate"),
         (("bands", "strong"), KeyError, "must be a number"),

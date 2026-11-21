@@ -290,13 +290,15 @@ def test_bands(total: float, expected: str) -> None:
 
 
 def test_the_band_follows_weights_yaml() -> None:
-    assert DEFAULT_CONFIG.bands == BandSettings(strong=60, moderate=40)
+    """L-18: picked on the L-9 pairs, checked on the L-15 pairs (docs/ml/experiments.md)."""
+    assert DEFAULT_CONFIG.bands == BandSettings(strong=70, moderate=50)
 
 
 def test_the_advisory_note_is_always_there() -> None:
     for _, result in EVALUATION:
         assert result["explanation"]["advisory_note"] == TEMPLATES["advisory"]
-    assert "advisory" in TEMPLATES["advisory"] and "wrong" in TEMPLATES["advisory"]
+    note = TEMPLATES["advisory"]
+    assert "advisory" in note and "wrong" in note and "not a chance of passing" in note
 
 
 # --------------------------------------------------------------------------- templates only

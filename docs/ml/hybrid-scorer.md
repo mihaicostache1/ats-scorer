@@ -9,7 +9,7 @@
 | Embeddings (offline) | [ml/ats_scoring/embeddings.py](../../ml/ats_scoring/embeddings.py) |
 | Title similarity | [ml/ats_scoring/titles.py](../../ml/ats_scoring/titles.py) |
 | Redaction (L-14) | [ml/ats_scoring/redaction.py](../../ml/ats_scoring/redaction.py), see [redaction.md](redaction.md) |
-| Explanation and band (L-17) | [ml/ats_scoring/explanation.py](../../ml/ats_scoring/explanation.py), see [score-explanation.md](score-explanation.md) |
+| Explanation and band (L-17, L-18) | [ml/ats_scoring/explanation.py](../../ml/ats_scoring/explanation.py), see [score-explanation.md](score-explanation.md); thresholds in [experiments.md](experiments.md#l-18-band-thresholds) |
 | Evaluation result | [ml/evaluation/results/2026-11-10_hybrid-1.1.0.json](../../ml/evaluation/results/2026-11-10_hybrid-1.1.0.json) (same scores as [1.0.0](../../ml/evaluation/results/2026-11-07_hybrid-1.0.0.json)) |
 | Ablation | [ml/evaluation/ablation.py](../../ml/evaluation/ablation.py) |
 | Timing | [ml/benchmarks/time_scoring.py](../../ml/benchmarks/time_scoring.py) |

@@ -50,8 +50,9 @@ TEMPLATES: Final[Mapping[str, str]] = {
         "Shared words with the job: {score:.0f}/100. It counts shared words, not meaning."
     ),
     "advisory": (
-        "This score is advisory and can be wrong. It compares the CV with the job description "
-        "and does not reject anyone. Read the CV before you decide."
+        "This score is advisory: it ranks candidates for this job and is not a chance of "
+        "passing screening. It can be wrong and does not reject anyone. Read the CV before "
+        "you decide."
     ),
 }
 
