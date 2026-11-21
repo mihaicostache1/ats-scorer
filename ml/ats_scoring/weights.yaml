@@ -1,7 +1,7 @@
 # Settings of the hybrid scorer (L-13), read by ats_scoring.config when the package is imported.
 # Change model_version whenever you change anything in this file: every stored score carries
 # the version, and the same input must always get the same score under the same version.
-model_version: hybrid-1.1.0
+model_version: hybrid-1.2.0
 
 # Share of the total carried by each component. Must add up to 1. When a component cannot be
 # computed (no embedding, no minimum experience on the job, no skills on the job, ...) it is
@@ -32,3 +32,10 @@ embedding:
 title:
   # The headline and the most recent position count in full. Older positions count this much.
   older_title_factor: 0.8
+
+bands:
+  # Band shown next to the total (US-08): strong from `strong` up, moderate from `moderate` up,
+  # weak below. On the 60 rated evaluation pairs, 16 of the 18 rated "strong fit" are strong and
+  # 20 of the 21 rated "no fit" are weak. Why these values: docs/ml/score-explanation.md#bands
+  strong: 60
+  moderate: 40

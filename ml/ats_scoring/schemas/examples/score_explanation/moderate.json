@@ -1,0 +1,84 @@
+{
+  "explanation_version": "1.0",
+  "model_version": "hybrid-1.2.0",
+  "total": 55.2,
+  "band": "moderate",
+  "summary": "Moderate match. Has 2 of 6 required skills. Has 4.2 years of experience, below the 6 years the job asks for.",
+  "components": [
+    {
+      "name": "skill_overlap",
+      "label": "Skills",
+      "score": 35.71,
+      "weight": 0.3,
+      "contribution": 10.71,
+      "statement": "Has 2 of 6 required skills. Has 1 of 2 nice-to-have skills."
+    },
+    {
+      "name": "embedding_similarity",
+      "label": "Similarity of meaning",
+      "score": 61.95,
+      "weight": 0.35,
+      "contribution": 21.68,
+      "statement": "Similarity of meaning with the job: 62/100 (compared with other candidates, not an absolute grade)."
+    },
+    {
+      "name": "experience_fit",
+      "label": "Experience",
+      "score": 70.0,
+      "weight": 0.1,
+      "contribution": 7.0,
+      "statement": "Has 4.2 years of experience, below the 6 years the job asks for."
+    },
+    {
+      "name": "title_similarity",
+      "label": "Job title",
+      "score": 100.0,
+      "weight": 0.15,
+      "contribution": 15.0,
+      "statement": "Closest job title: Backend Developer (title fit 100/100, seniority aside)."
+    },
+    {
+      "name": "text_similarity",
+      "label": "Shared words",
+      "score": 7.97,
+      "weight": 0.1,
+      "contribution": 0.8,
+      "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+    }
+  ],
+  "matched_skills": [
+    {
+      "skill": "Python",
+      "requirement": "required",
+      "cv_phrase": "Python"
+    },
+    {
+      "skill": "Spring Boot",
+      "requirement": "required",
+      "cv_phrase": "Spring Boot"
+    },
+    {
+      "skill": "SQL",
+      "requirement": "preferred",
+      "cv_phrase": "SQL"
+    }
+  ],
+  "missing_skills": {
+    "required": [
+      "Microservices",
+      "Docker",
+      "Java",
+      "FastAPI"
+    ],
+    "preferred": [
+      "Go"
+    ]
+  },
+  "experience": {
+    "status": "below",
+    "candidate_years": 4.2,
+    "required_years": 6.0,
+    "statement": "Has 4.2 years of experience, below the 6 years the job asks for."
+  },
+  "advisory_note": "This score is advisory and can be wrong. It compares the CV with the job description and does not reject anyone. Read the CV before you decide."
+}

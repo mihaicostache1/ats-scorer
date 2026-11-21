@@ -1,0 +1,99 @@
+{
+  "explanation_version": "1.0",
+  "model_version": "hybrid-1.2.0",
+  "total": 83.76,
+  "band": "strong",
+  "summary": "Strong match. Has 5 of 6 required skills. Has 7.8 years of experience; the job asks for at least 6 years.",
+  "components": [
+    {
+      "name": "skill_overlap",
+      "label": "Skills",
+      "score": 85.71,
+      "weight": 0.3,
+      "contribution": 25.71,
+      "statement": "Has 5 of 6 required skills. Has 2 of 2 nice-to-have skills."
+    },
+    {
+      "name": "embedding_similarity",
+      "label": "Similarity of meaning",
+      "score": 90.16,
+      "weight": 0.35,
+      "contribution": 31.56,
+      "statement": "Similarity of meaning with the job: 90/100 (compared with other candidates, not an absolute grade)."
+    },
+    {
+      "name": "experience_fit",
+      "label": "Experience",
+      "score": 100.0,
+      "weight": 0.1,
+      "contribution": 10.0,
+      "statement": "Has 7.8 years of experience; the job asks for at least 6 years."
+    },
+    {
+      "name": "title_similarity",
+      "label": "Job title",
+      "score": 100.0,
+      "weight": 0.15,
+      "contribution": 15.0,
+      "statement": "Closest job title: Senior Backend Engineer (title fit 100/100, seniority aside)."
+    },
+    {
+      "name": "text_similarity",
+      "label": "Shared words",
+      "score": 14.84,
+      "weight": 0.1,
+      "contribution": 1.48,
+      "statement": "Shared words with the job: 15/100. It counts shared words, not meaning."
+    }
+  ],
+  "matched_skills": [
+    {
+      "skill": "Microservices",
+      "requirement": "required",
+      "cv_phrase": "Microservices"
+    },
+    {
+      "skill": "Python",
+      "requirement": "required",
+      "cv_phrase": "Python"
+    },
+    {
+      "skill": "Docker",
+      "requirement": "required",
+      "cv_phrase": "Docker"
+    },
+    {
+      "skill": "Java",
+      "requirement": "required",
+      "cv_phrase": "Java"
+    },
+    {
+      "skill": "FastAPI",
+      "requirement": "required",
+      "cv_phrase": "FastAPI"
+    },
+    {
+      "skill": "Go",
+      "requirement": "preferred",
+      "cv_phrase": "Go"
+    },
+    {
+      "skill": "SQL",
+      "requirement": "preferred",
+      "cv_phrase": "SQL"
+    }
+  ],
+  "missing_skills": {
+    "required": [
+      "Spring Boot"
+    ],
+    "preferred": []
+  },
+  "experience": {
+    "status": "meets",
+    "candidate_years": 7.8,
+    "required_years": 6.0,
+    "statement": "Has 7.8 years of experience; the job asks for at least 6 years."
+  },
+  "advisory_note": "This score is advisory and can be wrong. It compares the CV with the job description and does not reject anyone. Read the CV before you decide."
+}

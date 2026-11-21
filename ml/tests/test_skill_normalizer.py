@@ -524,6 +524,25 @@ def test_extracted_raw_is_the_phrase_as_written(normalizer: SkillNormalizer) -> 
     assert skill.normalized == "Kubernetes"
 
 
+def test_extracted_skills_carry_where_they_were_found(normalizer: SkillNormalizer) -> None:
+    """L-17: the explanation shows the phrase found in the CV, so its position is kept."""
+    text = "Ran Postgres on k8s.\nMachine\nlearning, then Postgres again and PostgreSQL."
+    skills = normalizer.extract_skills(text)
+
+    assert names(skills) == ["PostgreSQL", "Kubernetes", "machine learning"]
+    for skill in skills:
+        assert skill.start is not None and skill.end is not None
+        assert text[skill.start : skill.end] == skill.raw
+    assert skills[0].start == text.index("Postgres")  # the first mention
+    assert skills[2].raw == "Machine\nlearning"
+
+
+def test_normalized_skills_have_no_position(normalizer: SkillNormalizer) -> None:
+    skill = one(normalizer, "Postgres")
+    assert (skill.start, skill.end) == (None, None)
+    assert "start" not in skill.to_parsed_cv()
+
+
 def test_extraction_spans_line_breaks(normalizer: SkillNormalizer) -> None:
     assert names(normalizer.extract_skills("Machine\nlearning")) == ["machine learning"]
 

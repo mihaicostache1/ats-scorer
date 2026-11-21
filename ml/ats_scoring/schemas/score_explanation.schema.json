@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Score explanation",
+  "description": "Version 1.0. Why a candidate got their score, returned by the scorer with every score and stored in scores.component_breakdown. Every text comes from a fixed template, and every value from the redacted CV: no name, contact detail or date. Every object is closed: a new field needs a new explanation_version. Rules for changing it: docs/ml/score-explanation.md.",
+  "type": "object",
+  "required": [
+    "explanation_version",
+    "model_version",
+    "total",
+    "band",
+    "summary",
+    "components",
+    "matched_skills",
+    "missing_skills",
+    "experience",
+    "advisory_note"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "explanation_version": {
+      "description": "Version of this schema the explanation was written with.",
+      "const": "1.0"
+    },
+    "model_version": {
+      "description": "The scorer that produced the explanation, the same as scores.model_version.",
+      "type": "string",
+      "minLength": 1
+    },
+    "total": {
+      "description": "The score, 0 to 100.",
+      "$ref": "#/$defs/points"
+    },
+    "band": {
+      "description": "strong, moderate or weak, from the thresholds in weights.yaml.",
+      "enum": ["strong", "moderate", "weak"]
+    },
+    "summary": {
+      "description": "Band, required skills and experience, in two or three sentences.",
+      "$ref": "#/$defs/text"
+    },
+    "components": {
+      "description": "The five parts of the score, always in this order: skill_overlap, embedding_similarity, experience_fit, title_similarity, text_similarity.",
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "matched_skills": {
+      "description": "Job skills the candidate has: required ones first, then nice-to-have ones, each in the job's order.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/matched_skill" }
+    },
+    "missing_skills": {
+      "description": "Job skills the candidate lacks, as the job writes them.",
+      "type": "object",
+      "required": ["required", "preferred"],
+      "additionalProperties": false,
+      "properties": {
+        "required": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+        "preferred": {
+          "description": "Nice-to-have skills.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "experience": { "$ref": "#/$defs/experience" },
+    "advisory_note": {
+      "description": "Says that the score is advisory and can be wrong (US-09). Show it with the score.",
+      "$ref": "#/$defs/text"
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "points": { "type": "number", "minimum": 0, "maximum": 100 },
+    "years": { "type": ["number", "null"], "minimum": 0 },
+    "component": {
+      "type": "object",
+      "required": ["name", "label", "score", "weight", "contribution", "statement"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "enum": [
+            "skill_overlap",
+            "embedding_similarity",
+            "experience_fit",
+            "title_similarity",
+            "text_similarity"
+          ]
+        },
+        "label": {
+          "description": "Short name to show, e.g. \"Skills\".",
+          "$ref": "#/$defs/text"
+        },
+        "score": {
+          "description": "0 to 100, or null when it could not be computed. Null never means 0.",
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "weight": {
+          "description": "Share of the total actually applied, 0 to 1. 0 when score is null: its share is spread over the other components.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "contribution": {
+          "description": "Points this component added to the total: score times weight. The contributions add up to the total, give or take rounding.",
+          "$ref": "#/$defs/points"
+        },
+        "statement": {
+          "description": "One or two sentences from the templates.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "matched_skill": {
+      "type": "object",
+      "required": ["skill", "requirement", "cv_phrase"],
+      "additionalProperties": false,
+      "properties": {
+        "skill": { "description": "As the job writes it.", "$ref": "#/$defs/text" },
+        "requirement": { "enum": ["required", "preferred"] },
+        "cv_phrase": {
+          "description": "As the CV writes it, e.g. \"Postgres\" for the job's \"PostgreSQL\".",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "experience": {
+      "type": "object",
+      "required": ["status", "candidate_years", "required_years", "statement"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "description": "meets: has at least the minimum. below: has fewer years. not_required: the job gives no minimum, or 0. unknown: the CV gives no total years. Only meets and below are scored.",
+          "enum": ["meets", "below", "not_required", "unknown"]
+        },
+        "candidate_years": {
+          "description": "Total years of experience from the CV, or null when it gives none.",
+          "$ref": "#/$defs/years"
+        },
+        "required_years": {
+          "description": "The job's minimum, or null when it gives none.",
+          "$ref": "#/$defs/years"
+        },
+        "statement": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}
