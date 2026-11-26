@@ -28,7 +28,7 @@ export function JobCard({ job }: { job: JobRecord }) {
   ].filter(Boolean);
 
   return (
-    <article aria-labelledby="labeling-job-title" className="glass space-y-4 rounded-2xl p-5">
+    <article aria-labelledby="labeling-job-title" className="surface space-y-4 rounded-2xl p-5">
       <header>
         <p className="text-muted-foreground text-footnote font-medium">Job {job.id}</p>
         <h2 id="labeling-job-title" className="text-foreground text-title-3">

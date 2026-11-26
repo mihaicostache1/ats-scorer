@@ -16,14 +16,18 @@ export function ProfileSection({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby={`${id}-heading`} className="glass space-y-4 rounded-2xl p-6">
-      <div>
-        <h2 id={`${id}-heading`} className="text-foreground text-headline">
+    <section aria-labelledby={`${id}-heading`} className="surface rounded-xl">
+      <div className="border-border border-b px-5 py-3.5 sm:px-6">
+        <h2 id={`${id}-heading`} className="text-foreground text-[14px] font-semibold">
           {title}
         </h2>
-        {description && <p className="text-muted-foreground text-footnote mt-0.5">{description}</p>}
+        {description && (
+          <p className="text-muted-foreground mt-0.5 text-[12.5px] leading-relaxed">
+            {description}
+          </p>
+        )}
       </div>
-      {children}
+      <div className="px-5 py-5 sm:px-6">{children}</div>
     </section>
   );
 }
@@ -56,7 +60,7 @@ export function SectionBody<T>({
         description="Something went wrong while fetching this section."
         error={state.error}
         onRetry={onRetry}
-        className="min-h-0 p-6"
+        className="min-h-0 border-0 bg-transparent p-4"
       />
     );
   }

@@ -7,13 +7,15 @@ import { authHandlers, sessionGuard } from "./handlers/auth";
 import { jobHandlers } from "./handlers/jobs";
 import { candidateHandlers } from "./handlers/candidates";
 import { applicationHandlers } from "./handlers/applications";
+import { userHandlers } from "./handlers/users";
 
 export const worker = setupWorker(
   sessionGuard,
   ...authHandlers,
   ...jobHandlers,
   ...candidateHandlers,
-  ...applicationHandlers
+  ...applicationHandlers,
+  ...userHandlers
 );
 
 const globalForMsw = globalThis as typeof globalThis & { __mswStarted?: Promise<unknown> };

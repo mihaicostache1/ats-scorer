@@ -17,7 +17,7 @@ const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogPrimitive.Backdrop
       className={cn(
         // Base UI marks the first frame `data-starting-style` and the last `data-ending-style`, and waits
         // for the transition between them before it unmounts; Radix-style `data-[state=…]` never matches.
-        "ease-fluid fixed inset-0 z-50 bg-black/25 backdrop-blur-md transition-opacity duration-(--motion-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        "ease-fluid fixed inset-0 z-50 bg-(--overlay-scrim) backdrop-blur-[4px] transition-opacity duration-(--motion-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
         className
       )}
       {...props}
@@ -35,9 +35,9 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Popup
       ref={ref}
       className={cn(
-        "glass-strong fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-5 rounded-3xl p-6 outline-none sm:p-7",
+        "surface-overlay fixed top-[50%] left-[50%] z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-5 overflow-y-auto rounded-xl p-6 outline-none",
         // Scales in from slightly smaller and fades; the same in reverse on the way out.
-        "ease-fluid transition-[opacity,scale] duration-(--motion-base) data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+        "ease-fluid transition-[opacity,scale] duration-(--motion-base) data-[ending-style]:scale-[0.98] data-[ending-style]:opacity-0 data-[starting-style]:scale-[0.98] data-[starting-style]:opacity-0",
         className
       )}
       {...props}
@@ -45,7 +45,7 @@ const DialogContent = React.forwardRef<
       {children}
       {!hideClose && (
         <DialogPrimitive.Close
-          className="glass-subtle text-muted-foreground hover:text-foreground focus:ring-primary/25 absolute top-4 right-4 flex size-7 items-center justify-center rounded-full focus:ring-4 focus:outline-none disabled:pointer-events-none"
+          className="text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:ring-ring absolute top-4 right-4 flex size-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none"
           aria-label="Close dialog"
         >
           <X className="size-3.5" />
@@ -58,12 +58,7 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = "DialogContent";
 
 function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn("flex flex-col space-y-2 pr-8 text-center sm:text-left", className)}
-      {...props}
-    />
-  );
+  return <div className={cn("flex flex-col space-y-1.5 pr-8 text-left", className)} {...props} />;
 }
 DialogHeader.displayName = "DialogHeader";
 
@@ -92,7 +87,7 @@ const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogPrimitive
   ({ className, ...props }, ref) => (
     <DialogPrimitive.Description
       ref={ref}
-      className={cn("text-muted-foreground text-callout", className)}
+      className={cn("text-muted-foreground text-sm leading-relaxed", className)}
       {...props}
     />
   )

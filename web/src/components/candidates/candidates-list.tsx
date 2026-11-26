@@ -7,6 +7,7 @@ import { SearchX, Users } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { Pagination } from "@/components/common/pagination";
+import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buildUrl, parsePositiveInt } from "@/lib/url-state";
@@ -20,9 +21,9 @@ const SEARCH_DEBOUNCE_MS = 300;
 export function CandidatesListSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label="Loading candidates">
-      <Skeleton className="h-9 w-56" />
-      <Skeleton className="h-9 w-full max-w-md" />
-      <Skeleton className="h-72 w-full" />
+      <Skeleton className="h-9 w-48" />
+      <Skeleton className="h-9 w-full max-w-sm" />
+      <Skeleton className="h-96 w-full rounded-xl" />
     </div>
   );
 }
@@ -106,20 +107,22 @@ export function CandidatesList() {
       icon={Users}
       title="No candidates yet"
       description="Candidates appear here once they are added to your organization."
-      className="border-2 p-12"
+      className="border-0"
     />
   );
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-foreground text-large-title">Candidates</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Search everyone in your organization and open a profile to see applications and CVs.
-        </p>
-      </div>
-
-      <CandidatesToolbar search={searchText} onSearchChange={setSearchText} />
+      <PageHeader
+        title="Candidates"
+        description="Everyone in your organization. Open a profile to see their applications, CVs and parsed details."
+      >
+        <CandidatesToolbar
+          search={searchText}
+          onSearchChange={setSearchText}
+          total={pagination?.total_items}
+        />
+      </PageHeader>
 
       {state.phase === "error" ? (
         <ErrorState
@@ -129,7 +132,7 @@ export function CandidatesList() {
           onRetry={refetch}
         />
       ) : (
-        <div className="glass overflow-hidden rounded-2xl">
+        <div className="surface overflow-hidden rounded-xl">
           <CandidatesTable
             candidates={candidates}
             isLoading={isLoading}

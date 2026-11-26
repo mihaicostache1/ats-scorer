@@ -2,12 +2,19 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
-import { getJob, getJobStages, listApplications } from "@/api";
+import { getApplicationScore, getJob, getJobStages, listApplications } from "@/api";
 import type { components } from "@/api/generated/schema";
-import { Badge, type BadgeProps } from "@/components/ui/badge";
+import {
+  ScoreBreakdown,
+  ScoreValue,
+  type ScoreResponse,
+} from "@/components/scoring/score-breakdown";
+import { Badge, StatusDot, type BadgeProps } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
 import { staggerStyle } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 import { ProfileSection, SectionBody, SectionEmpty } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
 
@@ -33,6 +40,18 @@ export interface ApplicationRow {
   status: ApplicationStatus;
   rejectionReason: string | null;
   appliedAt: string;
+  /** The job-specific score, or `null` when none has been computed (or it couldn't be loaded). */
+  score: ScoreResponse | null;
+}
+
+/** A missing score is normal (not computed yet), so any failure here just means "no score". */
+async function loadScore(applicationId: string): Promise<ScoreResponse | null> {
+  try {
+    const result = await getApplicationScore(applicationId);
+    return result.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** Applications carry only ids, so look up each distinct job's title and stage names. */
@@ -42,6 +61,8 @@ export async function loadApplicationRows(candidateId: string): Promise<Applicat
   );
 
   const jobIds = [...new Set(items.map((a) => a.job_id))];
+  const scores = new Map<string, ScoreResponse | null>();
+  const scoreLoads = Promise.all(items.map(async (a) => scores.set(a.id, await loadScore(a.id))));
   const jobs = new Map<string, { title: string | null; stages: Map<string, string> }>();
   await Promise.all(
     jobIds.map(async (id) => {
@@ -63,6 +84,7 @@ export async function loadApplicationRows(candidateId: string): Promise<Applicat
     })
   );
 
+  await scoreLoads;
   return items.map((a) => {
     const job = jobs.get(a.job_id);
     return {
@@ -73,8 +95,86 @@ export async function loadApplicationRows(candidateId: string): Promise<Applicat
       status: a.status,
       rejectionReason: a.rejection_reason,
       appliedAt: a.applied_at,
+      score: scores.get(a.id) ?? null,
     };
   });
+}
+
+function ApplicationItem({ row, index }: { row: ApplicationRow; index: number }) {
+  const [open, setOpen] = React.useState(false);
+  const panelId = React.useId();
+  const status = STATUS_BADGE[row.status];
+  return (
+    <li style={staggerStyle(index)} className="animate-row-in py-4 first:pt-0 last:pb-0">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-3">
+        <div className="min-w-0">
+          {row.jobTitle ? (
+            <Link
+              href={`/jobs/${row.jobId}`}
+              className="text-foreground focus-visible:ring-ring rounded-sm text-[14px] font-medium hover:underline hover:underline-offset-4 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {row.jobTitle}
+            </Link>
+          ) : (
+            <span className="text-muted-foreground text-[14px] font-medium">Unknown job</span>
+          )}
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <Badge variant="outline">
+              <span className="sr-only">Stage: </span>
+              {row.stageName ?? "Unknown stage"}
+            </Badge>
+            <Badge variant={status.variant}>
+              <StatusDot />
+              <span className="sr-only">Status: </span>
+              {status.label}
+            </Badge>
+            <span className="text-muted-foreground text-xs">
+              Applied {formatDate(row.appliedAt)}
+            </span>
+          </div>
+          {row.rejectionReason && (
+            <p className="text-muted-foreground mt-1.5 text-xs">Reason: {row.rejectionReason}</p>
+          )}
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span className="text-muted-foreground text-eyebrow-sm">Match</span>
+          {row.score ? (
+            <ScoreValue value={row.score.overall_score} />
+          ) : (
+            <span className="text-muted-foreground text-xs">Not scored yet</span>
+          )}
+        </div>
+      </div>
+      {row.score && (
+        <div className="mt-3">
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => setOpen((value) => !value)}
+            className="text-link focus-visible:ring-ring inline-flex items-center gap-1 rounded-sm text-[13px] font-medium hover:underline focus-visible:ring-2 focus-visible:outline-none"
+          >
+            <ChevronRight
+              aria-hidden="true"
+              className={cn(
+                "size-3.5 transition-transform duration-(--motion-fast)",
+                open && "rotate-90"
+              )}
+            />
+            {open ? "Hide score breakdown" : "Why this score"}
+          </button>
+          {open && (
+            <div
+              id={panelId}
+              className="bg-background-secondary border-border animate-pop-in mt-3 rounded-lg border p-5"
+            >
+              <ScoreBreakdown score={row.score} jobTitle={row.jobTitle} headingLevel={3} />
+            </div>
+          )}
+        </div>
+      )}
+    </li>
+  );
 }
 
 export function CandidateApplications({ candidateId }: { candidateId: string }) {
@@ -85,7 +185,7 @@ export function CandidateApplications({ candidateId }: { candidateId: string }) 
     <ProfileSection
       id="applications"
       title="Applications"
-      description="Jobs this candidate has applied to and where they are in the pipeline."
+      description="Each job this candidate applied to, their stage, and how they match that job."
     >
       <SectionBody state={state} label="applications" onRetry={refetch}>
         {(rows) =>
@@ -93,49 +193,9 @@ export function CandidateApplications({ candidateId }: { candidateId: string }) 
             <SectionEmpty>Not applied to any job yet.</SectionEmpty>
           ) : (
             <ul className="divide-border divide-y">
-              {rows.map((row, index) => {
-                const status = STATUS_BADGE[row.status];
-                return (
-                  <li
-                    key={row.id}
-                    style={staggerStyle(index)}
-                    className="animate-row-in flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
-                  >
-                    <div className="min-w-0">
-                      {row.jobTitle ? (
-                        <Link
-                          href={`/jobs/${row.jobId}`}
-                          className="text-foreground focus-visible:ring-primary/25 rounded-md text-sm font-semibold hover:underline focus-visible:ring-4 focus-visible:outline-none"
-                        >
-                          {row.jobTitle}
-                        </Link>
-                      ) : (
-                        <span className="text-muted-foreground text-sm font-semibold">
-                          Unknown job
-                        </span>
-                      )}
-                      <p className="text-muted-foreground mt-0.5 text-xs">
-                        Applied {formatDate(row.appliedAt)}
-                      </p>
-                      {row.rejectionReason && (
-                        <p className="text-muted-foreground mt-0.5 text-xs">
-                          Reason: {row.rejectionReason}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">
-                        <span className="sr-only">Stage: </span>
-                        {row.stageName ?? "Unknown stage"}
-                      </Badge>
-                      <Badge variant={status.variant}>
-                        <span className="sr-only">Status: </span>
-                        {status.label}
-                      </Badge>
-                    </div>
-                  </li>
-                );
-              })}
+              {rows.map((row, index) => (
+                <ApplicationItem key={row.id} row={row} index={index} />
+              ))}
             </ul>
           )
         }

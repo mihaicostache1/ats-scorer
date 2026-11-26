@@ -9,7 +9,7 @@ export type CvStatus = CvDocument["status"];
 export const CV_STATUS_BADGE: Record<CvStatus, { label: string; variant: BadgeProps["variant"] }> =
   {
     queued: { label: "Queued", variant: "secondary" },
-    extracting: { label: "Extracting text", variant: "secondary" },
+    extracting: { label: "Extracting text", variant: "info" },
     extracted: { label: "Text extracted", variant: "outline" },
     parsed: { label: "Parsed", variant: "success" },
     needs_review: { label: "Needs review", variant: "warning" },

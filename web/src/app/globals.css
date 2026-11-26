@@ -4,13 +4,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * ATS Scorer design tokens, colour scheme A · Ink & Cobalt. See DESIGN.md at the repository root.
+ *
+ * Three layers:
+ *   1. Brand palette (`ink-*`, `cobalt-*`, `canvas*`, `slate-text`, `mist`, `steel`): raw values,
+ *      used directly only by brand surfaces that never switch theme (marketing, logo).
+ *   2. Semantic tokens (`--background`, `--primary`, `--success`, ...): what components use. They
+ *      switch between the light workspace (Canvas) and the dark appearance (Ink navy).
+ *   3. Glass tokens (`--glass*`, `--glow`, `--ambient`): the light Liquid Glass layer, applied
+ *      centrally through the `surface`, `surface-overlay`, `glass-bar` and `interactive` utilities.
+ *
+ * Cobalt is the one brand accent: #2F55E4 on light surfaces, #7C96FF on Ink. There is no orange.
+ * Status colours (success / warning / destructive / info) are independent tokens.
+ */
+
 @theme inline {
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-system);
-  --font-mono: var(--font-system-mono);
-  --font-heading: var(--font-system);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-heading: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,9 +42,17 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -38,322 +61,372 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-pressed: var(--primary-pressed);
+  --color-link: var(--link);
+  --color-electric: var(--electric);
+  --color-electric-soft: var(--electric-soft);
+  --color-inverse: var(--inverse);
+  --color-inverse-hover: var(--inverse-hover);
+  --color-inverse-foreground: var(--inverse-foreground);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Motion curves: `ease-fluid` is a long ease-out for almost everything; `ease-pop` overshoots
-     slightly and is only for small things that pop in. */
+  /* Fixed brand colours (scheme A · Ink & Cobalt), for the marketing site and brand surfaces that
+     never switch theme. Cobalt is for light surfaces; Cobalt on dark (`cobalt-300`) for ink. */
+  --color-ink-950: #0a1022;
+  --color-ink-900: #111a33;
+  --color-ink-800: #18233f;
+  --color-ink-700: #283452;
+  --color-steel: #7c88a3;
+  --color-mist: #9aa5bf;
+  --color-canvas: #f5f6f9;
+  --color-canvas-200: #eceef3;
+  --color-canvas-300: #dfe3eb;
+  --color-slate-text: #566079;
+  --color-cobalt-600: #2f55e4;
+  --color-cobalt-700: #2444c2;
+  --color-cobalt-300: #7c96ff;
+  --color-cobalt-200: #a3b5ff;
+  --color-cobalt-soft: #e8edfd;
+
+  /* Restrained radii: 6px for small controls, 8px default, 10px for larger controls, 12px for surfaces. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+  --radius-3xl: 14px;
+  --radius-4xl: 16px;
+
+  /* Motion curves: `ease-fluid` is a long ease-out for almost everything. `ease-pop` is kept for
+     compatibility but no longer overshoots: nothing in ATS Scorer bounces. */
   --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-pop: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-pop: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/*
- * Apple HIG tokens. Light values follow the iOS/macOS system colors (systemBlue, systemGray5/6,
- * systemRed, ...); dark values are their dark-appearance counterparts.
- */
-:root {
+/* ─── Light workspace (default) ─────────────────────────────────────────────── */
+:root,
+.light {
   color-scheme: light;
-  --font-system:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui,
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-system-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Surfaces: the canvas is the grouped background, cards sit on top of it. */
+  /* Surfaces: the canvas is #F5F6F9, content surfaces are (glass over) white, controls sit on white. */
   --background: #ffffff;
-  --background-secondary: #f2f2f7;
-  --foreground: #1d1d1f;
+  --background-secondary: #f5f6f9;
+  --foreground: #0a1022;
   --card: #ffffff;
-  --card-foreground: #1d1d1f;
+  --card-foreground: #0a1022;
   --popover: #ffffff;
-  --popover-foreground: #1d1d1f;
+  --popover-foreground: #0a1022;
 
-  /* Tint: systemBlue is the only accent, used for everything interactive. */
-  --primary: #007aff;
+  /*
+   * Cobalt #2F55E4 is the one accent on light surfaces: filled buttons (white label, 5.9:1), links
+   * and Cobalt text (5.5:1 on Canvas), focus rings, selection, progress and score bars.
+   */
+  --primary: #2f55e4;
+  --primary-hover: #2444c2;
+  --primary-pressed: #1d379e;
   --primary-foreground: #ffffff;
-  --secondary: #f2f2f7;
-  --secondary-foreground: #1d1d1f;
-  --muted: #f2f2f7;
-  --muted-foreground: #6e6e73;
-  --accent: #e5e5ea;
-  --accent-foreground: #1d1d1f;
+  --link: #2f55e4;
+  --electric: #2f55e4;
+  --electric-soft: #e8edfd;
 
-  /* Semantic colors. */
-  --destructive: #d70015;
-  --success: #248a3d;
-  --warning: #b25000;
+  /* Inverse action: a crisp white button with an Ink label, for the main CTA on Ink surfaces. */
+  --inverse: #ffffff;
+  --inverse-hover: #f5f6f9;
+  --inverse-foreground: #0a1022;
 
-  --border: rgb(60 60 67 / 0.18);
-  --input: #f2f2f7;
-  --ring: #007aff;
-  --chart-1: #007aff;
-  --chart-2: #34c759;
-  --chart-3: #ff9500;
-  --chart-4: #af52de;
-  --chart-5: #ff3b30;
-  --radius: 0.75rem;
+  --secondary: #eceef3;
+  --secondary-foreground: #0a1022;
+  --muted: #eceef3;
+  --muted-foreground: #566079;
+  --accent: #eceef3;
+  --accent-foreground: #0a1022;
 
-  /* Translucent material; paired with backdrop-blur on the sidebar. */
-  --sidebar: rgb(246 246 248 / 0.8);
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-primary: #007aff;
+  /* Status colours, independent of the brand accent. All pass 4.5:1 as text on white and glass. */
+  --success: #0f7a4b;
+  --success-soft: #e6f4ed;
+  --warning: #9a5b00;
+  --warning-soft: #fdf3e1;
+  --destructive: #c8283d;
+  --destructive-soft: #fcebed;
+  --info: #2f55e4;
+  --info-soft: #e8edfd;
+  --disabled: #eceef3;
+  --disabled-foreground: #7d8aa1;
+
+  --border: #dfe3eb;
+  --border-strong: #c5cbd8;
+  --input: #ffffff;
+  --ring: #2f55e4;
+  --chart-1: #2f55e4;
+  --chart-2: #0f7a4b;
+  --chart-3: #9a5b00;
+  --chart-4: #566079;
+  --chart-5: #c8283d;
+  --radius: 0.5rem;
+
+  --sidebar: #f5f6f9;
+  --sidebar-foreground: #283452;
+  --sidebar-primary: #2f55e4;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgb(0 122 255 / 0.12);
-  --sidebar-accent-foreground: #007aff;
-  --sidebar-border: rgb(60 60 67 / 0.18);
-  --sidebar-ring: #007aff;
+  --sidebar-accent: #ffffff;
+  --sidebar-accent-foreground: #0a1022;
+  --sidebar-border: #dfe3eb;
+  --sidebar-ring: #2f55e4;
 
-  /* Liquid Glass: translucent fill, crisp light edge on top/left, shaded edge on bottom/right. */
-  --glass-bg: rgb(255 255 255 / 0.65);
-  --glass-bg-strong: rgb(255 255 255 / 0.8);
-  --glass-bg-subtle: rgb(255 255 255 / 0.5);
-  --glass-bg-subtle-hover: rgb(255 255 255 / 0.72);
-  --glass-edge: rgb(255 255 255 / 0.7);
-  --glass-edge-shade: rgb(0 0 0 / 0.07);
-  --glass-shadow:
-    0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(31 38 135 / 0.08),
-    0 24px 48px -12px rgb(31 38 135 / 0.1);
-  --glass-shadow-lg:
-    0 2px 4px rgb(0 0 0 / 0.06), 0 12px 32px rgb(31 38 135 / 0.12),
-    0 32px 64px -16px rgb(31 38 135 / 0.2);
-  --glass-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(31 38 135 / 0.06);
-  --glass-shadow-bar: 0 8px 24px -12px rgb(31 38 135 / 0.14);
+  --shadow-raised: 0 1px 2px rgb(10 16 34 / 0.04), 0 1px 1px rgb(10 16 34 / 0.03);
+  --shadow-overlay: 0 1px 2px rgb(10 16 34 / 0.06), 0 12px 32px -8px rgb(10 16 34 / 0.18);
+  --overlay-scrim: rgb(10 16 34 / 0.4);
 
-  /* Soft colour glows behind the canvas; they are what the glass blurs. */
-  --ambient-base: #f2f2f7;
-  --ambient-a: rgb(0 122 255 / 0.16);
-  --ambient-b: rgb(88 86 214 / 0.14);
-  --ambient-c: rgb(48 176 199 / 0.14);
+  /*
+   * Light Liquid Glass. Surfaces are translucent white over a faint Cobalt ambient light; the worst
+   * case (glass over the ambient peak) keeps every text pairing at AA (see DESIGN.md §2).
+   */
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(10 16 34 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.75);
+  --glass-blur: blur(20px) saturate(160%);
+  --glass-blur-strong: blur(28px) saturate(180%);
+  --glow: 0 0 0 1px rgb(47 85 228 / 0.16), 0 8px 24px -10px rgb(47 85 228 / 0.32);
+  --ambient:
+    radial-gradient(1100px 620px at 8% -12%, rgb(47 85 228 / 0.1), transparent 62%),
+    radial-gradient(900px 560px at 104% 2%, rgb(124 150 255 / 0.08), transparent 60%);
 
-  /* Motion durations: hover/press, overlays, page and list entrances. */
-  --motion-fast: 150ms;
-  --motion-base: 220ms;
+  /* PDF reading area: a calm, slightly darker field so the white page stands out. */
+  --document-well: #e4e8f0;
+
+  /* Motion durations: micro-interactions, standard transitions, page entrances. */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
   --motion-slow: 320ms;
-  /* The highlight that sweeps across a loading skeleton. */
-  --shimmer: rgb(255 255 255 / 0.6);
+  --shimmer: rgb(255 255 255 / 0.7);
 }
 
+/* ─── Dark appearance: Ink navy ─────────────────────────────────────────────── */
 .dark {
   color-scheme: dark;
-  --background: #000000;
-  --background-secondary: #1c1c1e;
-  --foreground: #f5f5f7;
-  --card: #1c1c1e;
-  --card-foreground: #f5f5f7;
-  --popover: #2c2c2e;
-  --popover-foreground: #f5f5f7;
-  --primary: #0a84ff;
-  --primary-foreground: #ffffff;
-  --secondary: #2c2c2e;
-  --secondary-foreground: #f5f5f7;
-  --muted: #2c2c2e;
-  --muted-foreground: #98989f;
-  --accent: #3a3a3c;
-  --accent-foreground: #f5f5f7;
-  --destructive: #ff453a;
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --border: rgb(84 84 88 / 0.55);
-  --input: #2c2c2e;
-  --ring: #0a84ff;
-  --chart-1: #0a84ff;
-  --chart-2: #30d158;
-  --chart-3: #ff9f0a;
-  --chart-4: #bf5af2;
-  --chart-5: #ff453a;
-  --sidebar: rgb(28 28 30 / 0.75);
-  --sidebar-foreground: #f5f5f7;
-  --sidebar-primary: #0a84ff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgb(10 132 255 / 0.2);
-  --sidebar-accent-foreground: #64b5ff;
-  --sidebar-border: rgb(84 84 88 / 0.55);
-  --sidebar-ring: #0a84ff;
+  --background: #111a33;
+  --background-secondary: #0a1022;
+  --foreground: #f5f6f9;
+  --card: #111a33;
+  --card-foreground: #f5f6f9;
+  --popover: #18233f;
+  --popover-foreground: #f5f6f9;
 
-  --glass-bg: rgb(30 30 30 / 0.65);
-  --glass-bg-strong: rgb(36 36 38 / 0.8);
-  --glass-bg-subtle: rgb(60 60 62 / 0.5);
-  --glass-bg-subtle-hover: rgb(72 72 74 / 0.62);
-  --glass-edge: rgb(255 255 255 / 0.2);
-  --glass-edge-shade: rgb(0 0 0 / 0.35);
-  --glass-shadow:
-    0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35), 0 24px 48px -12px rgb(0 0 0 / 0.45);
-  --glass-shadow-lg:
-    0 2px 4px rgb(0 0 0 / 0.5), 0 12px 32px rgb(0 0 0 / 0.45), 0 32px 64px -16px rgb(0 0 0 / 0.6);
-  --glass-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.3);
-  --glass-shadow-bar: 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  /*
+   * On Ink every accent uses Cobalt on dark #7C96FF: links and active states (6.9:1 on Ink) and
+   * filled buttons, which carry an Ink label (6.9:1) so they stay crisp rather than glowing.
+   */
+  --primary: #7c96ff;
+  --primary-hover: #a3b5ff;
+  --primary-pressed: #6982f0;
+  --primary-foreground: #0a1022;
+  --link: #7c96ff;
+  --electric: #7c96ff;
+  --electric-soft: rgb(124 150 255 / 0.16);
 
-  --ambient-base: #0a0a0c;
-  --ambient-a: rgb(10 132 255 / 0.26);
-  --ambient-b: rgb(94 92 230 / 0.22);
-  --ambient-c: rgb(50 173 230 / 0.18);
+  --inverse: #ffffff;
+  --inverse-hover: #f5f6f9;
+  --inverse-foreground: #0a1022;
 
-  --shimmer: rgb(255 255 255 / 0.08);
+  --secondary: #18233f;
+  --secondary-foreground: #f5f6f9;
+  --muted: #18233f;
+  --muted-foreground: #9aa5bf;
+  --accent: #18233f;
+  --accent-foreground: #f5f6f9;
+
+  --success: #4fd196;
+  --success-soft: rgb(79 209 150 / 0.12);
+  --warning: #f2b450;
+  --warning-soft: rgb(242 180 80 / 0.12);
+  --destructive: #ff7a8a;
+  --destructive-soft: rgb(255 122 138 / 0.12);
+  --info: #7c96ff;
+  --info-soft: rgb(124 150 255 / 0.14);
+  --disabled: #18233f;
+  --disabled-foreground: #6f7a94;
+
+  --border: #283452;
+  --border-strong: #36446a;
+  --input: #0d1429;
+  --ring: #7c96ff;
+  --chart-1: #7c96ff;
+  --chart-2: #4fd196;
+  --chart-3: #f2b450;
+  --chart-4: #9aa5bf;
+  --chart-5: #ff7a8a;
+
+  --sidebar: #0a1022;
+  --sidebar-foreground: #9aa5bf;
+  --sidebar-primary: #7c96ff;
+  --sidebar-primary-foreground: #0a1022;
+  --sidebar-accent: #18233f;
+  --sidebar-accent-foreground: #f5f6f9;
+  --sidebar-border: #1b2542;
+  --sidebar-ring: #7c96ff;
+
+  --shadow-raised: 0 1px 0 rgb(255 255 255 / 0.02) inset;
+  --shadow-overlay: 0 0 0 1px #283452, 0 16px 40px -8px rgb(0 0 0 / 0.6);
+  --overlay-scrim: rgb(4 7 16 / 0.6);
+
+  --glass: rgb(17 26 51 / 0.62);
+  --glass-strong: rgb(17 26 51 / 0.82);
+  --glass-border: rgb(124 150 255 / 0.14);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --glow: 0 0 0 1px rgb(124 150 255 / 0.22), 0 8px 28px -10px rgb(124 150 255 / 0.36);
+  --ambient:
+    radial-gradient(1100px 620px at 8% -12%, rgb(47 85 228 / 0.22), transparent 62%),
+    radial-gradient(900px 560px at 104% 2%, rgb(124 150 255 / 0.1), transparent 60%);
+
+  --document-well: #0d1429;
+  --shimmer: rgb(255 255 255 / 0.05);
+}
+
+/* ─── Surfaces ──────────────────────────────────────────────────────────────── */
+
+/*
+ * A content surface: light Liquid Glass. Translucent white (or Ink) over the ambient light, a
+ * hairline glass border, a 1px top highlight and a soft backdrop blur. Opaque where glass is not
+ * supported or not wanted (see the fallbacks below).
+ */
+@utility surface {
+  background-color: var(--glass);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  --tw-shadow: var(--glass-highlight), var(--shadow-raised);
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+/* Menus, dialogs, toasts and sticky action bars that float above the page: denser glass. */
+@utility surface-overlay {
+  background-color: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
+  --tw-shadow: var(--glass-highlight), var(--shadow-overlay);
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+/* Sticky chrome (app header, sidebar, marketing header): glass with no outer shadow or radius. */
+@utility glass-bar {
+  background-color: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
+}
+/* The same, always on Ink: the marketing header over navy sections, whatever the theme. */
+@utility glass-bar-ink {
+  background-color: rgb(10 16 34 / 0.72);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+}
+/* Form controls and outline buttons. */
+@utility control {
+  background-color: var(--input);
+  border: 1px solid var(--border-strong);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+  &:hover:not(:disabled, [aria-disabled="true"], :focus-visible) {
+    border-color: var(--steel-border, var(--muted-foreground));
+  }
+}
+@utility bg-canvas {
+  background-color: var(--background-secondary);
 }
 
 /*
- * Liquid Glass utilities. Shadows go through Tailwind's --tw-* variables so `ring-*` focus rings
- * still compose with them instead of being replaced.
+ * Fine architectural grid for the marketing site. Two 1px line sets on a 72px module, faded out at
+ * the edges with a mask so it reads as structure rather than texture.
  */
-@utility bg-ambient {
-  background-color: var(--ambient-base);
+@utility bg-blueprint {
   background-image:
-    radial-gradient(60rem 42rem at 0% 0%, var(--ambient-a), transparent 60%),
-    radial-gradient(50rem 40rem at 100% 25%, var(--ambient-b), transparent 60%),
-    radial-gradient(60rem 42rem at 30% 100%, var(--ambient-c), transparent 60%);
-  background-attachment: fixed;
+    linear-gradient(to right, rgb(124 150 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(124 150 255 / 0.07) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: -1px -1px;
 }
-@utility glass {
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid transparent;
-  border-top-color: var(--glass-edge);
-  border-left-color: var(--glass-edge);
-  border-right-color: var(--glass-edge-shade);
-  border-bottom-color: var(--glass-edge-shade);
-  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
-  --tw-shadow: var(--glass-shadow);
-  box-shadow:
-    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  transition:
-    background-color var(--motion-base) var(--ease-fluid),
-    border-color var(--motion-base) var(--ease-fluid),
-    box-shadow var(--motion-base) var(--ease-fluid),
-    transform var(--motion-base) var(--ease-fluid),
-    scale var(--motion-base) var(--ease-fluid),
-    translate var(--motion-base) var(--ease-fluid);
-}
-@utility glass-strong {
-  background: var(--glass-bg-strong);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid transparent;
-  border-top-color: var(--glass-edge);
-  border-left-color: var(--glass-edge);
-  border-right-color: var(--glass-edge-shade);
-  border-bottom-color: var(--glass-edge-shade);
-  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
-  --tw-shadow: var(--glass-shadow-lg);
-  box-shadow:
-    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-/* Controls: lighter blur, uniform edge so border/ring utilities can override it cleanly. */
-@utility glass-subtle {
-  background: var(--glass-bg-subtle);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  backdrop-filter: blur(12px) saturate(160%);
-  border: 1px solid var(--glass-edge-shade);
-  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
-  --tw-shadow: var(--glass-shadow-sm);
-  box-shadow:
-    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  transition:
-    background-color var(--motion-base) var(--ease-fluid),
-    border-color var(--motion-base) var(--ease-fluid),
-    box-shadow var(--motion-base) var(--ease-fluid),
-    transform var(--motion-base) var(--ease-fluid),
-    scale var(--motion-base) var(--ease-fluid),
-    translate var(--motion-base) var(--ease-fluid);
-  &:hover:not(:disabled) {
-    background: var(--glass-bg-subtle-hover);
-  }
-}
-/* Full-width bars: only the edge facing the content is drawn. */
-@utility glass-header {
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--glass-edge-shade);
-  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
-  --tw-shadow: var(--glass-shadow-bar);
-  box-shadow:
-    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-@utility glass-side {
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-right: 1px solid var(--glass-edge-shade);
-  --tw-inset-shadow: inset 0 1px 0 var(--glass-edge);
-  --tw-shadow: var(--glass-shadow-bar);
-  box-shadow:
-    var(--tw-inset-shadow), var(--tw-inset-ring-shadow, 0 0 #0000),
-    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-/* No blur support, or the user asked for less transparency: fall back to solid surfaces. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass,
-  .glass-header,
-  .glass-side {
-    background: var(--card);
-  }
-  .glass-strong {
-    background: var(--popover);
-  }
-  .glass-subtle {
-    background: var(--input);
-  }
-}
-@media (prefers-reduced-transparency: reduce) {
-  .glass,
-  .glass-header,
-  .glass-side {
-    background: var(--card);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-  .glass-strong {
-    background: var(--popover);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-  .glass-subtle {
-    background: var(--input);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+@utility bg-blueprint-light {
+  background-image:
+    linear-gradient(to right, rgb(10 16 34 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(10 16 34 / 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: -1px -1px;
 }
 /*
- * Motion. Short, ease-out and compositor-only (opacity and transform). Entrances use
- * `animation-fill-mode: backwards`, so nothing is left behind when they finish: no lingering
- * transform and no stacking context. The reduced-motion rule below switches all of it off.
+ * Ambient light for Ink sections (marketing hero, final CTA, auth panel, 404): two faint Cobalt
+ * radials. Fixed to Ink, so it does not follow the workspace theme.
  */
-@keyframes fluid-page-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+@utility ambient-ink {
+  background-image:
+    radial-gradient(900px 520px at 88% -12%, rgb(47 85 228 / 0.26), transparent 62%),
+    radial-gradient(760px 480px at -6% 112%, rgb(124 150 255 / 0.12), transparent 60%);
+}
+/*
+ * A soft Cobalt halo on hover for the white CTAs on Ink. Colour only, no movement. It sets no
+ * transition of its own, so it never overrides the element's (pair it with one that covers
+ * box-shadow).
+ */
+@utility glow-on-ink {
+  &:hover {
+    box-shadow:
+      0 0 0 1px rgb(124 150 255 / 0.35),
+      0 10px 32px -10px rgb(124 150 255 / 0.55);
   }
 }
-@keyframes fluid-row-in {
+@utility mask-fade-y {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 18%, black 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 70%, transparent);
+}
+
+/* Numbers that line up in columns. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The standard focus ring: 2px Cobalt (Cobalt on dark on Ink), offset from the control. */
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ─── Motion ────────────────────────────────────────────────────────────────── */
+@keyframes fluid-page-in {
   from {
     opacity: 0;
     transform: translateY(6px);
   }
 }
+@keyframes fluid-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
 @keyframes fluid-pop-in {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.98);
   }
 }
 @keyframes fluid-toast-out {
   to {
     opacity: 0;
-    transform: translateX(12px) scale(0.98);
+    transform: translateX(12px);
   }
 }
 @keyframes fluid-shimmer {
@@ -364,24 +437,52 @@
     background-position: -50% 0;
   }
 }
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes fade-in-only {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
 
-/* A whole page, when you navigate to it (see the `template.tsx` files). */
 @utility animate-page-in {
   animation: fluid-page-in var(--motion-slow) var(--ease-fluid) backwards;
 }
-/* A row or list item. Set `--i` (its index) to stagger them, up to ten steps. */
 @utility animate-row-in {
   animation: fluid-row-in var(--motion-slow) var(--ease-fluid) backwards;
-  animation-delay: calc(min(var(--i, 0), 10) * 28ms);
+  animation-delay: calc(min(var(--i, 0), 10) * 24ms);
 }
-/* Small things that appear: empty states, tag chips. */
 @utility animate-pop-in {
-  animation: fluid-pop-in var(--motion-base) var(--ease-pop) backwards;
+  animation: fluid-pop-in var(--motion-base) var(--ease-fluid) backwards;
 }
 @utility animate-toast-out {
   animation: fluid-toast-out var(--motion-base) var(--ease-fluid) forwards;
 }
-/* Loading placeholders: a soft highlight sweeps across (still, when motion is reduced). */
+/* Marketing headline and showcase entrances: 480–600ms, staggered with `--d` (ms). */
+@utility animate-rise {
+  animation: rise-in 560ms var(--ease-fluid) backwards;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+@utility animate-fade {
+  animation: fade-in-only 600ms var(--ease-fluid) backwards;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+/* An indeterminate bar: used where the backend reports a state but no percentage. */
+@utility animate-indeterminate {
+  animation: indeterminate 1.4s var(--ease-standard) infinite;
+}
 @utility skeleton-shimmer {
   background-image: linear-gradient(90deg, transparent 35%, var(--shimmer) 50%, transparent 65%);
   background-size: 200% 100%;
@@ -389,22 +490,100 @@
   background-position: 150% 0;
   animation: fluid-shimmer 1.6s var(--ease-fluid) infinite;
 }
-/* A surface you can click: lifts on hover, presses on click. Pair it with `glass`. */
+/* A clickable surface: on hover the border firms up and a soft Cobalt glow appears. No lift. */
 @utility interactive {
   transition:
-    transform var(--motion-base) var(--ease-fluid),
-    box-shadow var(--motion-base) var(--ease-fluid),
-    background-color var(--motion-base) var(--ease-fluid),
-    border-color var(--motion-base) var(--ease-fluid);
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    &:hover:not(:disabled, [aria-disabled="true"]) {
-      transform: translateY(-2px);
-      --tw-shadow: var(--glass-shadow-lg);
-    }
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-fluid);
+  &:hover:not(:disabled, [aria-disabled="true"]) {
+    border-color: color-mix(in srgb, var(--electric) 35%, var(--border-strong));
+    --tw-shadow: var(--glass-highlight), var(--glow);
   }
+}
+
+/*
+ * Glass fallbacks. Without backdrop-filter, or when the person asks for less transparency or more
+ * contrast, every glass surface becomes opaque again and the ambient light is switched off.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .surface {
+    background-color: var(--card);
+  }
+  .surface-overlay,
+  .glass-bar {
+    background-color: var(--popover);
+  }
+  .glass-bar-ink {
+    background-color: var(--color-ink-950);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  /* Every backdrop blur, including dialog and drawer scrims. */
+  *,
+  *::before,
+  *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .surface,
+  .surface-overlay,
+  .glass-bar,
+  .glass-bar-ink {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .surface {
+    background-color: var(--card);
+  }
+  .surface-overlay,
+  .glass-bar {
+    background-color: var(--popover);
+  }
+  .glass-bar-ink {
+    background-color: var(--color-ink-950);
+  }
+  body {
+    background-image: none;
+  }
+}
+@media (prefers-contrast: more) {
+  /* Every backdrop blur, including dialog and drawer scrims. */
+  *,
+  *::before,
+  *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .surface,
+  .surface-overlay,
+  .glass-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: var(--border-strong);
+  }
+  .surface {
+    background-color: var(--card);
+  }
+  .surface-overlay,
+  .glass-bar {
+    background-color: var(--popover);
+  }
+  body {
+    background-image: none;
+  }
+}
+
+/*
+ * Scroll reveal for marketing sections, with no JavaScript. Only browsers with scroll-driven
+ * animations run it; everywhere else the content is simply there, never hidden.
+ */
+@supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    &:active:not(:disabled, [aria-disabled="true"]) {
-      transform: scale(0.99);
+    .reveal {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
     }
   }
 }
@@ -428,68 +607,148 @@
     animation-duration: 1s !important;
     animation-iteration-count: infinite !important;
   }
+  .animate-indeterminate {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
-/* HIG text styles (web sizes). Use these instead of ad-hoc text-xs / text-[11px]. */
-@utility text-large-title {
-  font-size: 2.125rem;
-  line-height: 1.2;
+/* ─── Type scale ────────────────────────────────────────────────────────────── */
+
+/* Marketing display sizes, fluid between mobile and large desktop. */
+@utility text-display {
+  font-size: clamp(2.75rem, 1rem + 5vw, 5.75rem);
+  line-height: 0.98;
   font-weight: 600;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.045em;
+}
+@utility text-section {
+  font-size: clamp(2.25rem, 1.5rem + 2.6vw, 4rem);
+  line-height: 1.02;
+  font-weight: 600;
+  letter-spacing: -0.038em;
+}
+@utility text-subsection {
+  font-size: clamp(1.625rem, 1.3rem + 1vw, 2.5rem);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.028em;
+}
+@utility text-lede {
+  font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+}
+/* Small editorial labels: Geist Mono, uppercase, open tracking. */
+@utility text-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@utility text-eyebrow-sm {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* Application sizes. */
+@utility text-large-title {
+  font-size: clamp(1.75rem, 1.5rem + 0.6vw, 2.125rem);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.028em;
 }
 @utility text-title-1 {
   font-size: 1.75rem;
   line-height: 1.2;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.026em;
 }
 @utility text-title-2 {
   font-size: 1.375rem;
   line-height: 1.25;
   font-weight: 600;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.02em;
 }
 @utility text-title-3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   line-height: 1.3;
   font-weight: 600;
   letter-spacing: -0.016em;
 }
 @utility text-headline {
-  font-size: 1.0625rem;
-  line-height: 1.35;
-  font-weight: 600;
-  letter-spacing: -0.014em;
-}
-@utility text-callout {
   font-size: 1rem;
   line-height: 1.4;
+  font-weight: 600;
   letter-spacing: -0.012em;
+}
+@utility text-callout {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  letter-spacing: -0.008em;
 }
 @utility text-footnote {
   font-size: 0.8125rem;
-  line-height: 1.4;
-  letter-spacing: -0.006em;
+  line-height: 1.45;
+  letter-spacing: -0.003em;
 }
 @utility text-caption {
   font-size: 0.75rem;
-  line-height: 1.35;
+  line-height: 1.4;
+}
+/* Important metrics: 32–44px, tabular, tight. */
+@utility text-metric {
+  font-size: clamp(2rem, 1.7rem + 0.9vw, 2.75rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background-secondary text-foreground;
-    font-size: 0.9375rem;
-    line-height: 1.47;
-    letter-spacing: -0.01em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    @apply border-border outline-ring/60;
   }
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background-secondary text-foreground;
+    /* The ambient light behind the glass: faint Cobalt radials, fixed so they never scroll. */
+    background-image: var(--ambient);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01" 0;
+  }
+  ::selection {
+    background-color: rgb(47 85 228 / 0.22);
+  }
+  .dark ::selection {
+    background-color: rgb(124 150 255 / 0.3);
+  }
+  :focus-visible {
+    outline-color: var(--ring);
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
   }
 }

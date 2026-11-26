@@ -55,7 +55,7 @@ export default function LoginPage() {
       footer={
         <>
           New to ATS Scorer?{" "}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link href="/register" className="text-link font-medium hover:underline">
             Create an organization
           </Link>
         </>

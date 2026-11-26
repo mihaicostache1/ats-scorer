@@ -23,7 +23,7 @@ export function RatingBar({
   return (
     <section
       aria-labelledby="labeling-rating-heading"
-      className="glass min-w-0 space-y-3 rounded-2xl p-5"
+      className="surface min-w-0 space-y-3 rounded-2xl p-5"
     >
       <h2 id="labeling-rating-heading" className="text-foreground text-headline">
         How well does this CV fit?

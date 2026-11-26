@@ -37,7 +37,7 @@ export function CvDropzone({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="mb-5 space-y-2">
       <div
         role="group"
         aria-label="Upload a CV"
@@ -53,22 +53,22 @@ export function CvDropzone({
           if (!disabled) void accept(Array.from(event.dataTransfer.files));
         }}
         className={cn(
-          "border-border ease-fluid flex flex-col items-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-[border-color,background-color,scale] duration-(--motion-base)",
+          "border-border-strong bg-background-secondary/50 ease-fluid flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-7 text-center transition-[border-color,background-color] duration-(--motion-base)",
           // Dragging a file over: the zone eases up a touch and the icon lifts.
-          dragging && "border-primary bg-primary/5 motion-safe:scale-[1.01]",
+          dragging && "border-electric bg-electric-soft",
           disabled && "opacity-60"
         )}
       >
         <FileUp
           className={cn(
             "text-muted-foreground ease-fluid size-6 transition-[color,translate] duration-(--motion-base)",
-            dragging && "text-primary motion-safe:-translate-y-1"
+            dragging && "text-link motion-safe:-translate-y-1"
           )}
           aria-hidden="true"
         />
-        <p className="text-sm">
+        <p className="text-foreground text-[13.5px]">
           Drag and drop a PDF here, or
-          <label className="focus-within:ring-primary/25 bg-primary/10 text-primary hover:bg-primary/15 ease-fluid ml-2 inline-flex h-9 cursor-pointer items-center rounded-[10px] px-3.5 text-sm font-medium transition-[background-color,scale] duration-(--motion-fast) focus-within:ring-4 motion-safe:active:scale-[0.97]">
+          <label className="control text-foreground hover:bg-secondary focus-within:ring-ring ml-2 inline-flex h-8 cursor-pointer items-center rounded-md px-3 text-[13px] font-medium focus-within:ring-2">
             Choose PDF
             <input
               type="file"

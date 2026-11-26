@@ -2,81 +2,160 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LogOut, Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronRight, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuHeader,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getInitials } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { useSession } from "@/providers/session-provider";
+import { SEGMENT_LABELS } from "./nav-config";
 import { ThemeToggle } from "./theme-toggle";
 
-/** Top toolbar: brand and global actions only. Navigation lives in the sidebar. */
-export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
-  const { user, signOut } = useSession();
-  const initials = (user?.full_name ?? "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+interface Crumb {
+  label: string;
+  href: string | null;
+}
+
+/**
+ * Breadcrumbs from the path. Ids become "Job" or "Candidate"; segments that have no page of their
+ * own (`/cvs`, a CV id) are folded into the next crumb rather than linking nowhere.
+ */
+export function buildCrumbs(pathname: string): Crumb[] {
+  const parts = pathname.split("/").filter(Boolean);
+  const crumbs: Crumb[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    const href = `/${parts.slice(0, i + 1).join("/")}`;
+    if (part === "cvs" || (parts[i - 1] === "cvs" && UUID.test(part))) continue;
+    if (UUID.test(part) || /^\d+$/.test(part)) {
+      const parent = parts[i - 1];
+      crumbs.push({
+        label: parent === "jobs" ? "Job" : parent === "candidates" ? "Candidate" : "Details",
+        href,
+      });
+      continue;
+    }
+    // "dev" has no page of its own.
+    crumbs.push({ label: SEGMENT_LABELS[part] ?? part, href: part === "dev" ? null : href });
+  }
+  return crumbs;
+}
+
+function Breadcrumbs() {
+  const pathname = usePathname();
+  const crumbs = buildCrumbs(pathname);
+  if (crumbs.length === 0) return null;
   return (
-    <header className="glass-header sticky top-0 z-40 w-full">
-      <div className="flex h-14 items-center justify-between px-4 sm:px-6">
-        {/* Brand / Logo */}
-        <div className="flex items-center gap-3">
+    <nav aria-label="Breadcrumb" className="min-w-0">
+      <ol className="flex min-w-0 items-center gap-1 text-[13px]">
+        {crumbs.map((crumb, i) => {
+          const last = i === crumbs.length - 1;
+          return (
+            <li
+              key={`${crumb.label}-${i}`}
+              className={cn("flex min-w-0 items-center gap-1", !last && "hidden sm:flex")}
+            >
+              {i > 0 && (
+                <ChevronRight
+                  aria-hidden="true"
+                  className="text-muted-foreground/70 hidden size-3.5 shrink-0 sm:block"
+                />
+              )}
+              {last || !crumb.href ? (
+                <span
+                  aria-current={last ? "page" : undefined}
+                  className={cn(
+                    "truncate",
+                    last ? "text-foreground font-medium" : "text-muted-foreground"
+                  )}
+                >
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  className="text-muted-foreground hover:text-foreground focus-visible:ring-ring truncate rounded-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {crumb.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+function AccountMenu() {
+  const { user, signOut } = useSession();
+  if (!user) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={`Account: ${user.full_name}`}
+        className="hover:bg-secondary focus-visible:ring-ring aria-expanded:bg-secondary flex h-8 items-center gap-2 rounded-md pr-2 pl-1 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+      >
+        <span
+          aria-hidden="true"
+          className="bg-ink-950 text-canvas dark:bg-ink-700 flex size-6 items-center justify-center rounded-[5px] text-[10.5px] font-semibold"
+        >
+          {getInitials(user.full_name)}
+        </span>
+        <span className="text-foreground hidden max-w-36 truncate text-[13px] font-medium md:block">
+          {user.full_name}
+        </span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-64">
+        <DropdownMenuHeader>
+          <p className="text-foreground truncate text-sm font-medium">{user.full_name}</p>
+          <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+          <p className="text-muted-foreground mt-2 font-mono text-[11px] tracking-wide uppercase">
+            Role · {user.role}
+          </p>
+        </DropdownMenuHeader>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => void signOut()}>
+          <LogOut aria-hidden="true" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** Compact contextual bar: where you are on the left, theme and account on the right. */
+export function AppHeader({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
+  return (
+    <header className="glass-bar sticky top-0 z-30 border-b border-(--glass-border)">
+      <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-2">
           {onToggleSidebar && (
             <Button
               variant="ghost"
               size="icon-sm"
               onClick={onToggleSidebar}
-              className="text-primary lg:hidden"
-              aria-label="Toggle navigation menu"
+              className="-ml-1.5 lg:hidden"
+              aria-label="Open navigation"
             >
-              <Menu className="size-5" />
+              <Menu className="size-[18px]" />
             </Button>
           )}
-
-          <Link
-            href="/"
-            className="text-foreground focus-visible:ring-primary/25 flex items-center gap-2.5 rounded-lg px-1 font-semibold tracking-tight hover:opacity-80 focus-visible:ring-4 focus-visible:outline-none"
-          >
-            <div className="text-primary-foreground flex size-8 items-center justify-center rounded-[22%] bg-gradient-to-b from-[#3395ff] to-[#007aff] text-xs font-bold shadow-[inset_0_1px_0_rgb(255_255_255/0.4),0_4px_12px_-2px_rgb(0_122_255/0.5)]">
-              ATS
-            </div>
-            <span className="text-headline hidden sm:inline-block">ATS Scorer</span>
-          </Link>
+          <Breadcrumbs />
         </div>
-
-        {/* Right header actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <ThemeToggle />
-
-          <div className="border-border hidden items-center gap-3 border-l pl-3 sm:flex">
-            <div
-              className="glass-subtle text-primary flex size-8 items-center justify-center rounded-full text-xs font-semibold"
-              aria-hidden="true"
-            >
-              {initials || "?"}
-            </div>
-            <div className="hidden text-left lg:block">
-              <div className="flex items-center gap-2 text-sm leading-tight font-semibold">
-                {user?.full_name}
-                <Badge variant="secondary" className="px-2 py-0 text-xs capitalize">
-                  {user?.role}
-                </Badge>
-              </div>
-              <div className="text-muted-foreground text-xs">{user?.email}</div>
-            </div>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => void signOut()}
-            className="text-muted-foreground hover:text-foreground gap-1.5"
-          >
-            <LogOut className="size-4" />
-            <span className="hidden sm:inline">Sign out</span>
-          </Button>
+          <AccountMenu />
         </div>
       </div>
     </header>

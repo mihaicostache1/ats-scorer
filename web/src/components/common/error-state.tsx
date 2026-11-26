@@ -30,13 +30,13 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "border-destructive/20 bg-destructive/5 animate-pop-in flex min-h-[280px] flex-col items-center justify-center rounded-2xl border p-8 text-center",
+        "border-destructive/25 bg-destructive-soft/50 animate-pop-in flex min-h-[260px] flex-col items-center justify-center rounded-xl border p-8 text-center",
         className
       )}
       {...props}
     >
-      <div className="bg-destructive/15 text-destructive mb-4 flex size-14 items-center justify-center rounded-full">
-        <AlertTriangle className="size-7" aria-hidden="true" />
+      <div className="bg-destructive-soft text-destructive mb-4 flex size-11 items-center justify-center rounded-lg">
+        <AlertTriangle className="size-5" aria-hidden="true" />
       </div>
       <h3 className="text-foreground text-base font-semibold tracking-tight">{title}</h3>
       <p className="text-muted-foreground mt-1 max-w-md text-sm">{description}</p>
@@ -46,12 +46,12 @@ export function ErrorState({
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
-            className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 rounded text-xs underline underline-offset-4 focus-visible:ring-4 focus-visible:outline-none"
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded text-xs underline underline-offset-4 focus-visible:ring-2 focus-visible:outline-none"
           >
             {showDetails ? "Hide technical details" : "Show technical details"}
           </button>
           {showDetails && (
-            <pre className="bg-muted/70 text-destructive mt-2 max-w-lg overflow-x-auto rounded-md p-3 text-left font-mono text-xs">
+            <pre className="bg-secondary text-foreground mt-2 max-w-lg overflow-x-auto rounded-md p-3 text-left font-mono text-xs">
               {errorMessage}
             </pre>
           )}

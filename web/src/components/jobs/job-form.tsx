@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Lock } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 import { createJob, updateJob } from "@/api";
 import { EmptyState } from "@/components/common/empty-state";
+import { PageHeader } from "@/components/layout/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
@@ -43,6 +44,35 @@ import type { JobResponse } from "./use-jobs";
  * Create (no `job`) or edit (`job`) form. Validation problems show next to their field; anything
  * the server rejects is reported as a toast, and field-level server errors are also marked inline.
  */
+/** One block of the form: a title and a sentence of guidance on the left, the fields on the right. */
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  const id = React.useId();
+  return (
+    <section
+      aria-labelledby={id}
+      className="border-border grid gap-6 border-t py-8 first:border-t-0 first:pt-0 lg:grid-cols-12 lg:gap-8"
+    >
+      <div className="lg:col-span-4">
+        <h2 id={id} className="text-foreground text-[15px] font-semibold">
+          {title}
+        </h2>
+        <p className="text-muted-foreground mt-1 max-w-xs text-[13px] leading-relaxed">
+          {description}
+        </p>
+      </div>
+      <div className="space-y-5 lg:col-span-8">{children}</div>
+    </section>
+  );
+}
+
 export function JobForm({ job }: { job?: JobResponse }) {
   const router = useRouter();
   const { can } = useSession();
@@ -110,105 +140,35 @@ export function JobForm({ job }: { job?: JobResponse }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <Link
-          href={backHref}
-          className="text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none"
-        >
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          {job ? "Back to job" : "Back to jobs"}
-        </Link>
-        <h1 className="text-foreground text-large-title mt-3">{job ? "Edit job" : "New job"}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {job
+    <div className="mx-auto max-w-5xl space-y-8">
+      <PageHeader
+        back={
+          job
+            ? { href: backHref, label: "Back to job", text: job.title }
+            : { href: backHref, label: "Back to jobs", text: "Jobs" }
+        }
+        title={job ? "Edit job" : "New job"}
+        description={
+          job
             ? "Changing the requirements refreshes candidate scores."
-            : "New jobs start as drafts."}
-        </p>
-      </div>
+            : "New jobs start as drafts. Publish when the requirements are right."
+        }
+      />
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="glass space-y-5 rounded-2xl p-6"
-          noValidate
-        >
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Senior Backend Engineer"
-                    autoComplete="off"
-                    error={!!errors.title}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid gap-5 sm:grid-cols-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-0" noValidate>
+          <FormSection title="Basics" description="How the role appears in lists and to your team.">
             <FormField
               control={form.control}
-              name="department"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Department</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Engineering" error={!!errors.department} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Remote, Bucharest…" error={!!errors.location} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="employment_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Employment type</FormLabel>
-                  <FormControl>
-                    <Select error={!!errors.employment_type} {...field}>
-                      {employmentTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {formatEmploymentType(type)}
-                        </option>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="min_experience_years"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Minimum experience (years)</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
                     <Input
-                      inputMode="numeric"
-                      placeholder="0"
-                      error={!!errors.min_experience_years}
+                      placeholder="Senior Backend Engineer"
+                      autoComplete="off"
+                      error={!!errors.title}
                       {...field}
                     />
                   </FormControl>
@@ -216,74 +176,159 @@ export function JobForm({ job }: { job?: JobResponse }) {
                 </FormItem>
               )}
             />
-          </div>
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    rows={8}
-                    placeholder="What will this person do? What does the team look like?"
-                    error={!!errors.description}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Engineering" error={!!errors.department} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Remote, Bucharest…"
+                        error={!!errors.location}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employment_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Employment type</FormLabel>
+                    <FormControl>
+                      <Select error={!!errors.employment_type} {...field}>
+                        {employmentTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {formatEmploymentType(type)}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="min_experience_years"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minimum experience (years)</FormLabel>
+                    <FormControl>
+                      <Input
+                        inputMode="numeric"
+                        placeholder="0"
+                        error={!!errors.min_experience_years}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormSection>
 
-          <FormField
-            control={form.control}
-            name="required_skills"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Required skills</FormLabel>
-                <FormControl>
-                  <TagsInput
-                    placeholder="Type a skill and press Enter"
-                    error={!!errors.required_skills}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Press Enter or comma to add a skill. Backspace removes the last one.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormSection
+            title="About the role"
+            description="Responsibilities and context. Used for semantic matching against CVs."
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={8}
+                      placeholder="What will this person do? What does the team look like?"
+                      error={!!errors.description}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormSection>
 
-          <FormField
-            control={form.control}
-            name="preferred_skills"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nice-to-have skills</FormLabel>
-                <FormControl>
-                  <TagsInput
-                    placeholder="Type a skill and press Enter"
-                    error={!!errors.preferred_skills}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <FormSection
+            title="Qualifications"
+            description="Candidates are scored against these. Required skills weigh more than nice-to-have ones."
+          >
+            <FormField
+              control={form.control}
+              name="required_skills"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Required skills</FormLabel>
+                  <FormControl>
+                    <TagsInput
+                      placeholder="Type a skill and press Enter"
+                      error={!!errors.required_skills}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Press Enter or comma to add a skill. Backspace removes the last one.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
-            <Link href={backHref} className={cn(buttonVariants({ variant: "outline" }))}>
-              Cancel
-            </Link>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-              {isSubmitting ? "Saving…" : job ? "Save changes" : "Create job"}
-            </Button>
+            <FormField
+              control={form.control}
+              name="preferred_skills"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nice-to-have skills</FormLabel>
+                  <FormControl>
+                    <TagsInput
+                      placeholder="Type a skill and press Enter"
+                      error={!!errors.preferred_skills}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormSection>
+
+          <div className="surface-overlay sticky bottom-4 z-10 mt-8 flex flex-col-reverse gap-3 rounded-xl p-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-muted-foreground hidden px-2 text-[13px] sm:block">
+              {job ? "Changes apply as soon as you save." : "The job is saved as a draft."}
+            </p>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <Link href={backHref} className={cn(buttonVariants({ variant: "outline" }))}>
+                Cancel
+              </Link>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+                {isSubmitting ? "Saving…" : job ? "Save changes" : "Create job"}
+              </Button>
+            </div>
           </div>
         </form>
       </Form>

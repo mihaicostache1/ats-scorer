@@ -107,7 +107,7 @@ test("a viewer has no Candidates link and is blocked from the pages", async ({ p
   await page.getByLabel("Password").fill(ADMIN.password);
   await page.getByRole("button", { name: "Sign in" }).click();
 
-  await expect(page.getByRole("heading", { name: "Jobs Postings" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Jobs", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Candidates" })).toHaveCount(0);
 
   // Typing the address doesn't get in either.

@@ -130,6 +130,15 @@ export const applicationHandlers = [
   }),
 
   /**
+   * GET /applications/:id/score — the job-specific score record, if one has been computed.
+   * Applications without a score answer 404, as the contract describes.
+   */
+  http.get(`${BASE}/applications/:id/score`, ({ params }) => {
+    const score = scoresStore[params.id as string];
+    return score ? HttpResponse.json(score) : notFound("Score", params.id);
+  }),
+
+  /**
    * PATCH /applications/:id/stage — move pipeline stage (drag-and-drop).
    * Moving to the current stage changes nothing; an unknown stage returns 404.
    */

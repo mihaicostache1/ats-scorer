@@ -11,7 +11,7 @@ export function EscoCredit() {
         href="https://esco.ec.europa.eu"
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:ring-primary/25 rounded underline underline-offset-2 focus-visible:ring-4 focus-visible:outline-none"
+        className="focus-visible:ring-ring rounded underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
       >
         ESCO (European Skills, Competences, Qualifications and Occupations)
         <span className="sr-only"> (opens in a new tab)</span>
@@ -21,7 +21,7 @@ export function EscoCredit() {
         href="https://creativecommons.org/licenses/by/4.0/"
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:ring-primary/25 rounded underline underline-offset-2 focus-visible:ring-4 focus-visible:outline-none"
+        className="focus-visible:ring-ring rounded underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
       >
         CC BY 4.0<span className="sr-only"> (opens in a new tab)</span>
       </a>

@@ -15,11 +15,13 @@ import { authHandlers, sessionGuard } from "./handlers/auth";
 import { jobHandlers } from "./handlers/jobs";
 import { candidateHandlers } from "./handlers/candidates";
 import { applicationHandlers } from "./handlers/applications";
+import { userHandlers } from "./handlers/users";
 
 export const server = setupServer(
   sessionGuard,
   ...authHandlers,
   ...jobHandlers,
   ...candidateHandlers,
-  ...applicationHandlers
+  ...applicationHandlers,
+  ...userHandlers
 );

@@ -18,11 +18,11 @@ export function Progress({ value, label, className, ...props }: ProgressProps) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={clamped}
-      className={cn("bg-muted h-2 w-full overflow-hidden rounded-full", className)}
+      className={cn("bg-secondary h-1.5 w-full overflow-hidden rounded-full", className)}
       {...props}
     >
       <div
-        className="bg-primary h-full rounded-full transition-[width] duration-200"
+        className="bg-electric h-full rounded-full transition-[width] duration-(--motion-base)"
         style={{ width: `${clamped}%` }}
       />
     </div>

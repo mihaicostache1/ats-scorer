@@ -2,41 +2,49 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Mail, MapPin, Phone, UserX } from "lucide-react";
+import { Mail, MapPin, Phone, UserX } from "lucide-react";
 
 import { getCandidate } from "@/api";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
+import { BackLink, PageHeader } from "@/components/layout/page-header";
+import { Badge, StatusDot } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, getInitials } from "@/lib/format";
 import { CandidateApplications } from "./candidate-applications";
 import { CandidateCvs } from "./candidate-cvs";
+import { profileStatus } from "./candidates-table";
+import { readParsedSummary } from "./parsed-cv";
 import { ParsedSummary } from "./parsed-summary";
 import { PossibleDuplicates, type PossibleDuplicate } from "./possible-duplicates";
 import { ProfileSection } from "./profile-section";
 import { unwrap, useResource } from "./use-resource";
 import type { CandidateResponse } from "./use-candidates";
 
-const backLink =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none";
-
 export function CandidateProfileSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6" role="status" aria-label="Loading candidate">
-      <Skeleton className="h-5 w-32" />
-      <Skeleton className="h-14 w-80" />
-      <Skeleton className="h-40 w-full" />
-      <Skeleton className="h-32 w-full" />
+    <div className="space-y-8" role="status" aria-label="Loading candidate">
+      <div className="flex items-center gap-4">
+        <Skeleton className="size-14 rounded-lg" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+      </div>
+      <div className="grid gap-8 lg:grid-cols-12">
+        <Skeleton className="h-72 w-full rounded-xl lg:col-span-8" />
+        <Skeleton className="h-56 w-full rounded-xl lg:col-span-4" />
+      </div>
     </div>
   );
 }
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <dt className="text-muted-foreground text-footnote font-medium">{label}</dt>
-      <dd className="text-foreground mt-1 text-sm">{children}</dd>
+    <div className="py-2.5 first:pt-0 last:pb-0">
+      <dt className="text-muted-foreground text-[12px]">{label}</dt>
+      <dd className="text-foreground mt-0.5 text-[13.5px] break-words">{children}</dd>
     </div>
   );
 }
@@ -45,10 +53,10 @@ const none = <span className="text-muted-foreground">—</span>;
 
 function ContactCard({ candidate }: { candidate: CandidateResponse }) {
   const link =
-    "focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md hover:underline focus-visible:ring-4 focus-visible:outline-none";
+    "focus-visible:ring-ring inline-flex items-center gap-1.5 rounded-md hover:underline focus-visible:ring-2 focus-visible:outline-none";
   return (
     <ProfileSection id="contact" title="Contact">
-      <dl className="grid gap-5 sm:grid-cols-2">
+      <dl className="divide-border divide-y">
         <Fact label="Email">
           <a href={`mailto:${candidate.email}`} className={`${link} break-all`}>
             <Mail className="text-muted-foreground size-3.5 shrink-0" aria-hidden="true" />
@@ -124,34 +132,50 @@ export function CandidateProfile({ id }: { id: string }) {
   }
 
   const candidate = state.data;
+  const parsed = readParsedSummary(candidate.parsed_data);
+  const status = profileStatus(candidate);
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <Link href="/candidates" className={backLink}>
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          Back to candidates
-        </Link>
-        <div className="mt-3 flex items-center gap-4">
-          <div
-            aria-hidden="true"
-            className="bg-primary/10 text-primary border-border flex size-14 shrink-0 items-center justify-center rounded-full border text-lg font-semibold"
-          >
-            {getInitials(candidate.full_name)}
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-foreground text-large-title break-words">{candidate.full_name}</h1>
-            <p className="text-muted-foreground mt-0.5 text-sm break-all">{candidate.email}</p>
-          </div>
+    <div className="space-y-8">
+      <BackLink href="/candidates" label="Back to candidates" text="Candidates" className="-mb-3" />
+      <div className="flex items-start gap-4">
+        <div
+          aria-hidden="true"
+          className="bg-ink-950 text-canvas dark:bg-ink-700 flex size-14 shrink-0 items-center justify-center rounded-lg text-lg font-semibold tracking-tight"
+        >
+          {getInitials(candidate.full_name)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <PageHeader
+            title={candidate.full_name}
+            description={parsed?.headline ?? undefined}
+            meta={
+              <>
+                <Badge variant={status.variant}>
+                  <StatusDot />
+                  {status.label}
+                </Badge>
+                <span className="text-muted-foreground text-[13px] break-all">
+                  {[candidate.email, candidate.location].filter(Boolean).join(" · ")}
+                </span>
+              </>
+            }
+          />
         </div>
       </div>
 
       <PossibleDuplicates
         matches={latest?.id === id ? latest.matches : candidate.possible_duplicates}
       />
-      <ContactCard candidate={candidate} />
-      <CandidateApplications candidateId={candidate.id} />
-      <CandidateCvs candidateId={candidate.id} onParsedMatches={onParsedMatches} />
-      <ParsedSummary data={candidate.parsed_data} />
+      <div className="grid gap-8 lg:grid-cols-12">
+        <div className="min-w-0 space-y-8 lg:col-span-8">
+          <CandidateApplications candidateId={candidate.id} />
+          <ParsedSummary data={candidate.parsed_data} />
+        </div>
+        <div className="min-w-0 space-y-8 lg:col-span-4">
+          <ContactCard candidate={candidate} />
+          <CandidateCvs candidateId={candidate.id} onParsedMatches={onParsedMatches} />
+        </div>
+      </div>
     </div>
   );
 }
