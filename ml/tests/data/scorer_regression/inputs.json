@@ -1,0 +1,839 @@
+{
+  "candidates": {
+    "C021": {
+      "schema_version": "0.1",
+      "headline": "Senior Backend Engineer",
+      "summary": "7 years of hands-on work with FastAPI and Python, most recently as Senior Backend Engineer. Comfortable working in cross-functional agile teams.",
+      "skills": [
+        "Microservices",
+        "REST APIs",
+        "Java",
+        "Docker",
+        "Kafka",
+        "Python",
+        "Kubernetes",
+        "FastAPI",
+        "PostgreSQL",
+        "Next.js",
+        "SQL",
+        "Go",
+        "Scrum",
+        "CI/CD"
+      ],
+      "experience_years": 7.8,
+      "work_history": [
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Quartzline Software",
+          "years": 1.5,
+          "summary": "Migrated a legacy module to a new stack together with QA and product (Java, FastAPI)",
+          "start": "2025-03",
+          "end": null,
+          "bullets": [
+            "Migrated a legacy module to a new stack together with QA and product (Java, FastAPI)",
+            "Built and maintained backend services used by 5 internal teams",
+            "Reviewed pull requests and supported 5 newer developers (REST APIs, PostgreSQL)",
+            "Wrote unit and integration tests, raising coverage by 35 percentage points"
+          ]
+        },
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Brightloom Studio",
+          "years": 1.2,
+          "summary": "Designed REST endpoints and data models for new product features (Python, SQL)",
+          "start": "2023-09",
+          "end": "2024-12",
+          "bullets": [
+            "Designed REST endpoints and data models for new product features (Python, SQL)",
+            "Reviewed pull requests and supported 6 newer developers (PostgreSQL, FastAPI)",
+            "Cut average response time by 20% by profiling queries and adding caching"
+          ]
+        },
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Oakhaven Analytics",
+          "years": 3.2,
+          "summary": "Wrote unit and integration tests, raising coverage by 45 percentage points",
+          "start": "2020-05",
+          "end": "2023-08",
+          "bullets": [
+            "Wrote unit and integration tests, raising coverage by 45 percentage points",
+            "Cut average response time by 40% by profiling queries and adding caching"
+          ]
+        },
+        {
+          "title": "Senior Backend Engineer",
+          "company": "Northgate Devices",
+          "years": 1.8,
+          "summary": "Migrated a legacy module to a new stack together with QA and product (Docker, Java)",
+          "start": "2018-05",
+          "end": "2020-03",
+          "bullets": [
+            "Migrated a legacy module to a new stack together with QA and product (Docker, Java)",
+            "Reviewed pull requests and supported 2 newer developers (SQL, Kafka)"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Software Engineering",
+          "institution": "Eastbridge Institute of Technology",
+          "grad_year": 2017
+        },
+        {
+          "degree": "B.Sc. Computer Science",
+          "institution": "Dunmore Institute of Design",
+          "grad_year": 2015
+        }
+      ],
+      "languages": [
+        "English (fluent)",
+        "Spanish (fluent)"
+      ],
+      "certifications": []
+    },
+    "C031": {
+      "schema_version": "0.1",
+      "headline": "Backend Developer",
+      "summary": "My most recent role is Backend Developer; most of my work involves PostgreSQL, Python and REST APIs. Known for reliable delivery and pragmatic solutions.",
+      "skills": [
+        "AWS",
+        "Spring Boot",
+        "Test Planning",
+        "RabbitMQ",
+        "SQL",
+        "Django",
+        "Python",
+        "REST APIs",
+        "Scrum",
+        "PostgreSQL",
+        "Cypress"
+      ],
+      "experience_years": 4.2,
+      "work_history": [
+        {
+          "title": "Backend Developer",
+          "company": "Copperfield Insurance",
+          "years": 2.8,
+          "summary": "Migrated a legacy module to a new stack together with QA and product (PostgreSQL, Python)",
+          "start": "2023-12",
+          "end": null,
+          "bullets": [
+            "Migrated a legacy module to a new stack together with QA and product (PostgreSQL, Python)",
+            "Wrote unit and integration tests, raising coverage by 40 percentage points"
+          ]
+        },
+        {
+          "title": "Junior Backend Developer",
+          "company": "Halcyon Freight",
+          "years": 1.4,
+          "summary": "Designed REST endpoints and data models for new product features",
+          "start": "2022-07",
+          "end": "2023-12",
+          "bullets": [
+            "Designed REST endpoints and data models for new product features",
+            "Reviewed pull requests and supported 4 newer developers (SQL, AWS)",
+            "Cut average response time by 40% by profiling queries and adding caching (Django, SQL)",
+            "Wrote unit and integration tests, raising coverage by 30 percentage points"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Computer Science",
+          "institution": "Northfield Technical University",
+          "grad_year": 2021
+        },
+        {
+          "degree": "B.Sc. Computer Engineering",
+          "institution": "Solvang Polytechnic",
+          "grad_year": 2019
+        }
+      ],
+      "languages": [
+        "English (native)"
+      ],
+      "certifications": [
+        "AWS Certified Developer - Associate"
+      ]
+    },
+    "C009": {
+      "schema_version": "0.1",
+      "headline": "Senior UX Designer",
+      "summary": "7 years of hands-on work with User Research and User Flows, most recently as Senior UX Designer. Comfortable working in cross-functional agile teams.",
+      "skills": [
+        "User Research",
+        "CSS",
+        "Interaction Design",
+        "Accessibility",
+        "Figma",
+        "Information Architecture",
+        "Networking",
+        "Communication",
+        "Journey Mapping",
+        "Design Thinking",
+        "User Flows",
+        "Wireframing"
+      ],
+      "experience_years": 7.5,
+      "work_history": [
+        {
+          "title": "Senior UX Designer",
+          "company": "Kestrelworks",
+          "years": 2.4,
+          "summary": "Contributed components and guidelines to the design system (Wireframing, Accessibility)",
+          "start": "2024-04",
+          "end": null,
+          "bullets": [
+            "Contributed components and guidelines to the design system (Wireframing, Accessibility)",
+            "Redesigned a key journey, lifting task completion by 30% (User Flows, Design Thinking)",
+            "Worked with developers to ship accessible interfaces",
+            "Designed user flows, wireframes and interactive prototypes (Design Thinking, Information Architecture)"
+          ]
+        },
+        {
+          "title": "UX Designer",
+          "company": "Wavecrest Telecom",
+          "years": 2.1,
+          "summary": "Redesigned a key journey, lifting task completion by 45% (Information Architecture, Journey Mapping)",
+          "start": "2022-03",
+          "end": "2024-04",
+          "bullets": [
+            "Redesigned a key journey, lifting task completion by 45% (Information Architecture, Journey Mapping)",
+            "Facilitated 7 discovery workshops with stakeholders (Design Thinking, Figma)",
+            "Ran usability tests with 4 participants and iterated on the results (Accessibility, User Flows)",
+            "Worked with developers to ship accessible interfaces"
+          ]
+        },
+        {
+          "title": "Junior UX Designer",
+          "company": "Hollowell Foods",
+          "years": 3.0,
+          "summary": "Designed user flows, wireframes and interactive prototypes (Interaction Design, Accessibility)",
+          "start": "2018-12",
+          "end": "2021-12",
+          "bullets": [
+            "Designed user flows, wireframes and interactive prototypes (Interaction Design, Accessibility)",
+            "Facilitated 6 discovery workshops with stakeholders (Design Thinking, Figma)",
+            "Redesigned a key journey, lifting task completion by 30%",
+            "Worked with developers to ship accessible interfaces"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.A. Psychology",
+          "institution": "Valmont University",
+          "grad_year": 2018
+        }
+      ],
+      "languages": [
+        "English (native)",
+        "Spanish (B2)"
+      ],
+      "certifications": [
+        "Certified Usability Analyst"
+      ]
+    },
+    "C008": {
+      "schema_version": "0.1",
+      "headline": "Product Manager",
+      "summary": "Product Manager with 4 years of experience in A/B Testing, Data Analysis and Roadmapping. Comfortable working in cross-functional agile teams.",
+      "skills": [
+        "KPI Definition",
+        "Data Analysis",
+        "Agile",
+        "Figma",
+        "Roadmapping",
+        "Go-to-Market",
+        "A/B Testing",
+        "Product Analytics",
+        "User Research",
+        "JIRA",
+        "Backlog Prioritization"
+      ],
+      "experience_years": 4.5,
+      "work_history": [
+        {
+          "title": "Product Manager",
+          "company": "Stonebridge Health",
+          "years": 1.3,
+          "summary": "Launched a feature that raised activation by 25%",
+          "start": "2025-05",
+          "end": null,
+          "bullets": [
+            "Launched a feature that raised activation by 25%",
+            "Owned the roadmap and backlog for a product used by 7 customer teams (Agile, Data Analysis)",
+            "Defined success metrics and reviewed them with stakeholders every month (A/B Testing, Go-to-Market)"
+          ]
+        },
+        {
+          "title": "Associate Product Manager",
+          "company": "Marlowe Retail",
+          "years": 1.9,
+          "summary": "Ran user interviews and turned the findings into prioritised user stories (KPI Definition, Product Analytics)",
+          "start": "2023-03",
+          "end": "2025-02",
+          "bullets": [
+            "Ran user interviews and turned the findings into prioritised user stories (KPI Definition, Product Analytics)",
+            "Owned the roadmap and backlog for a product used by 4 customer teams (Product Analytics, Backlog Prioritization)",
+            "Defined success metrics and reviewed them with stakeholders every month",
+            "Coordinated 5 releases across engineering, sales and support (JIRA, Data Analysis)"
+          ]
+        },
+        {
+          "title": "Associate Product Manager",
+          "company": "Pinecrest Mobility",
+          "years": 1.2,
+          "summary": "Owned the roadmap and backlog for a product used by 8 customer teams (Backlog Prioritization, Roadmapping)",
+          "start": "2021-11",
+          "end": "2023-02",
+          "bullets": [
+            "Owned the roadmap and backlog for a product used by 8 customer teams (Backlog Prioritization, Roadmapping)",
+            "Ran user interviews and turned the findings into prioritised user stories (Product Analytics, Backlog Prioritization)",
+            "Defined success metrics and reviewed them with stakeholders every month (Agile, Backlog Prioritization)"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Economics",
+          "institution": "Lakeshore University",
+          "grad_year": 2021
+        },
+        {
+          "degree": "B.A. Information Systems",
+          "institution": "Valmont University",
+          "grad_year": 2019
+        }
+      ],
+      "languages": [
+        "English (C1)",
+        "French (basic)",
+        "Italian (intermediate)"
+      ],
+      "certifications": [
+        "Product Management Certificate"
+      ]
+    },
+    "C006": {
+      "schema_version": "0.1",
+      "headline": "Junior Mobile Developer",
+      "summary": "Junior Mobile Developer with under a year of experience in REST APIs, Android and Firebase. Looking for a role with ownership and room to grow.",
+      "skills": [
+        "Git",
+        "Problem Solving",
+        "Kotlin",
+        "Firebase",
+        "Android",
+        "Objective-C",
+        "Scrum",
+        "REST APIs"
+      ],
+      "experience_years": 0.7,
+      "work_history": [
+        {
+          "title": "Junior Mobile Developer",
+          "company": "Glasswing Bio",
+          "years": 0.7,
+          "summary": "Integrated REST back ends, offline storage and push notifications (Objective-C, Android)",
+          "start": "2025-11",
+          "end": "2026-07",
+          "bullets": [
+            "Integrated REST back ends, offline storage and push notifications (Objective-C, Android)",
+            "Refactored legacy screens, improving start-up time by 20%",
+            "Reduced crash rate by 15% through better error handling and monitoring"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.Sc. Computer Engineering",
+          "institution": "Valmont University",
+          "grad_year": 2024
+        }
+      ],
+      "languages": [
+        "English (fluent)",
+        "Spanish (basic)",
+        "German (professional)"
+      ],
+      "certifications": [
+        "Associate Android Developer",
+        "iOS App Development Certificate"
+      ]
+    },
+    "C010": {
+      "schema_version": "0.1",
+      "headline": "Marketing Specialist",
+      "summary": "My most recent role is Marketing Specialist; most of my work involves Paid Search, Market Research and Marketing Automation. Looking for a role with ownership and room to grow.",
+      "skills": [
+        "Google Analytics",
+        "Public Relations",
+        "Market Research",
+        "Android",
+        "Brand Strategy",
+        "SEO",
+        "Marketing Automation",
+        "Paid Search"
+      ],
+      "experience_years": 4.2,
+      "work_history": [
+        {
+          "title": "Marketing Specialist",
+          "company": "Tidewater Robotics",
+          "years": 1.2,
+          "summary": "Grew organic traffic by 25% through content and technical improvements (Brand Strategy, SEO)",
+          "start": "2025-07",
+          "end": null,
+          "bullets": [
+            "Grew organic traffic by 25% through content and technical improvements (Brand Strategy, SEO)",
+            "Coordinated 8 product launches with sales and product teams (Market Research, SEO)",
+            "Wrote and edited copy for web pages, newsletters and social posts (SEO, Paid Search)",
+            "Planned and ran campaigns across search, social and email"
+          ]
+        },
+        {
+          "title": "Marketing Assistant",
+          "company": "Lumenfold Digital",
+          "years": 1.1,
+          "summary": "Wrote and edited copy for web pages, newsletters and social posts",
+          "start": "2024-06",
+          "end": "2025-07",
+          "bullets": [
+            "Wrote and edited copy for web pages, newsletters and social posts",
+            "Managed a monthly budget and reported results to leadership (Public Relations, SEO)",
+            "Coordinated 4 product launches with sales and product teams (Marketing Automation, Market Research)"
+          ]
+        },
+        {
+          "title": "Marketing Assistant",
+          "company": "Vantaro Group",
+          "years": 2.0,
+          "summary": "Managed a monthly budget and reported results to leadership (Brand Strategy, Public Relations)",
+          "start": "2022-06",
+          "end": "2024-06",
+          "bullets": [
+            "Managed a monthly budget and reported results to leadership (Brand Strategy, Public Relations)",
+            "Wrote and edited copy for web pages, newsletters and social posts",
+            "Planned and ran campaigns across search, social and email"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.A. Communication",
+          "institution": "Westmark University of Applied Sciences",
+          "grad_year": 2021
+        }
+      ],
+      "languages": [
+        "English (fluent)",
+        "Portuguese (fluent)",
+        "Polish (intermediate)"
+      ],
+      "certifications": [
+        "HubSpot Content Marketing Certification"
+      ]
+    },
+    "C034": {
+      "schema_version": "0.1",
+      "headline": "Senior DevOps Engineer",
+      "summary": "Senior DevOps Engineer with 9 years of experience in Linux, GitHub Actions and Kubernetes. Looking for a role with ownership and room to grow.",
+      "skills": [
+        "Grafana",
+        "Jenkins",
+        "Problem Solving",
+        "Monitoring",
+        "Prototyping",
+        "Vault",
+        "Linux",
+        "Prometheus",
+        "Kubernetes",
+        "GitHub Actions",
+        "Ansible",
+        "Visual Design",
+        "Networking"
+      ],
+      "experience_years": 9.5,
+      "work_history": [
+        {
+          "title": "Senior DevOps Engineer",
+          "company": "Oakhaven Analytics",
+          "years": 1.7,
+          "summary": "Ran and monitored production clusters serving 6 services (Prometheus, GitHub Actions)",
+          "start": "2025-01",
+          "end": null,
+          "bullets": [
+            "Ran and monitored production clusters serving 6 services (Prometheus, GitHub Actions)",
+            "Hardened build pipelines and moved secrets into a managed store (GitHub Actions, Monitoring)",
+            "Cut the monthly cloud bill by 30% by right-sizing workloads"
+          ]
+        },
+        {
+          "title": "DevOps Engineer",
+          "company": "Corvid Logic",
+          "years": 2.9,
+          "summary": "Wrote infrastructure as code and reviewed changes from other teams",
+          "start": "2022-02",
+          "end": "2025-01",
+          "bullets": [
+            "Wrote infrastructure as code and reviewed changes from other teams",
+            "Introduced alerting and dashboards that shortened incident response by 15% (Grafana, Monitoring)",
+            "Ran and monitored production clusters serving 8 services"
+          ]
+        },
+        {
+          "title": "Junior DevOps Engineer",
+          "company": "Brightloom Studio",
+          "years": 1.8,
+          "summary": "Cut the monthly cloud bill by 20% by right-sizing workloads (Monitoring, GitHub Actions)",
+          "start": "2020-01",
+          "end": "2021-11",
+          "bullets": [
+            "Cut the monthly cloud bill by 20% by right-sizing workloads (Monitoring, GitHub Actions)",
+            "Automated deployments, reducing release time by 20%"
+          ]
+        },
+        {
+          "title": "Junior DevOps Engineer",
+          "company": "Driftwood Media",
+          "years": 3.1,
+          "summary": "Automated deployments, reducing release time by 40%",
+          "start": "2016-10",
+          "end": "2019-11",
+          "bullets": [
+            "Automated deployments, reducing release time by 40%",
+            "Wrote infrastructure as code and reviewed changes from other teams (Prometheus, Grafana)",
+            "Ran and monitored production clusters serving 4 services"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.Sc. Software Engineering",
+          "institution": "Kestrel State University",
+          "grad_year": 2015
+        },
+        {
+          "degree": "B.Sc. Computer Engineering",
+          "institution": "Lakeshore University",
+          "grad_year": 2013
+        }
+      ],
+      "languages": [
+        "English (native)",
+        "Portuguese (intermediate)"
+      ],
+      "certifications": [
+        "Certified Kubernetes Administrator (CKA)"
+      ]
+    },
+    "C039": {
+      "schema_version": "0.1",
+      "headline": "Senior UX Designer",
+      "summary": "7 years of hands-on work with Accessibility and Design Systems, most recently as Senior UX Designer. Enjoys mentoring and clear documentation.",
+      "skills": [
+        "Design Systems",
+        "User Research",
+        "Interaction Design",
+        "Mentoring",
+        "Prototyping",
+        "Accessibility",
+        "Stakeholder Communication",
+        "Figma",
+        "Sketch",
+        "Adobe XD"
+      ],
+      "experience_years": 7.2,
+      "work_history": [
+        {
+          "title": "Senior UX Designer",
+          "company": "Vantaro Group",
+          "years": 1.4,
+          "summary": "Worked with developers to ship accessible interfaces",
+          "start": "2025-04",
+          "end": null,
+          "bullets": [
+            "Worked with developers to ship accessible interfaces",
+            "Facilitated 5 discovery workshops with stakeholders (Figma, Interaction Design)"
+          ]
+        },
+        {
+          "title": "UX Designer",
+          "company": "Copperfield Insurance",
+          "years": 3.2,
+          "summary": "Designed user flows, wireframes and interactive prototypes (Sketch, Figma)",
+          "start": "2021-11",
+          "end": "2025-01",
+          "bullets": [
+            "Designed user flows, wireframes and interactive prototypes (Sketch, Figma)",
+            "Worked with developers to ship accessible interfaces (Figma, Prototyping)",
+            "Contributed components and guidelines to the design system (Adobe XD, Prototyping)"
+          ]
+        },
+        {
+          "title": "Junior UX Designer",
+          "company": "Bluepeak Systems",
+          "years": 2.7,
+          "summary": "Ran usability tests with 8 participants and iterated on the results (Accessibility, Sketch)",
+          "start": "2018-12",
+          "end": "2021-08",
+          "bullets": [
+            "Ran usability tests with 8 participants and iterated on the results (Accessibility, Sketch)",
+            "Contributed components and guidelines to the design system (Prototyping, Figma)",
+            "Facilitated 8 discovery workshops with stakeholders",
+            "Redesigned a key journey, lifting task completion by 20% (Adobe XD, Sketch)"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "M.A. Psychology",
+          "institution": "Solvang Polytechnic",
+          "grad_year": 2017
+        },
+        {
+          "degree": "B.A. Psychology",
+          "institution": "Riverton College",
+          "grad_year": 2015
+        }
+      ],
+      "languages": [
+        "English (fluent)",
+        "Dutch (fluent)",
+        "German (B2)"
+      ],
+      "certifications": [
+        "Google UX Design Certificate"
+      ]
+    },
+    "C077": {
+      "schema_version": "0.1",
+      "headline": "Analytics Lead",
+      "summary": "Analytics Lead with 10 years of experience in Dashboards, Power BI and pandas. Comfortable working in cross-functional agile teams.",
+      "skills": [
+        "Power BI",
+        "Stakeholder Communication",
+        "Data Visualization",
+        "Snowflake",
+        "scikit-learn",
+        "Dashboards",
+        "BigQuery",
+        "Statistics",
+        "Python",
+        "Reporting",
+        "Data Cleaning",
+        "pandas",
+        "Presentation Skills",
+        "SQL"
+      ],
+      "experience_years": 10.8,
+      "work_history": [
+        {
+          "title": "Analytics Lead",
+          "company": "Stonebridge Health",
+          "years": 2.9,
+          "summary": "Built dashboards and recurring reports for sales and operations (Snowflake, Dashboards)",
+          "start": "2023-10",
+          "end": null,
+          "bullets": [
+            "Built dashboards and recurring reports for sales and operations (Snowflake, Dashboards)",
+            "Automated a manual report, saving about 20 hours per month (Power BI, BigQuery)",
+            "Cleaned and combined data from 6 sources for monthly reporting (Dashboards, Snowflake)"
+          ]
+        },
+        {
+          "title": "Analytics Lead",
+          "company": "Tidewater Robotics",
+          "years": 1.6,
+          "summary": "Trained 7 colleagues to build their own reports",
+          "start": "2021-12",
+          "end": "2023-07",
+          "bullets": [
+            "Trained 7 colleagues to build their own reports",
+            "Defined metrics with stakeholders and documented how they are calculated (SQL, pandas)",
+            "Cleaned and combined data from 6 sources for monthly reporting"
+          ]
+        },
+        {
+          "title": "Analytics Lead",
+          "company": "Quartzline Software",
+          "years": 2.8,
+          "summary": "Built dashboards and recurring reports for sales and operations (Data Cleaning, pandas)",
+          "start": "2018-12",
+          "end": "2021-10",
+          "bullets": [
+            "Built dashboards and recurring reports for sales and operations (Data Cleaning, pandas)",
+            "Cleaned and combined data from 5 sources for monthly reporting",
+            "Automated a manual report, saving about 20 hours per month (BigQuery, SQL)",
+            "Trained 3 colleagues to build their own reports"
+          ]
+        },
+        {
+          "title": "Senior Data Analyst",
+          "company": "Ferrowind Technologies",
+          "years": 2.2,
+          "summary": "Cleaned and combined data from 5 sources for monthly reporting (Statistics, Stakeholder Communication)",
+          "start": "2016-10",
+          "end": "2018-12",
+          "bullets": [
+            "Cleaned and combined data from 5 sources for monthly reporting (Statistics, Stakeholder Communication)",
+            "Trained 7 colleagues to build their own reports (SQL, BigQuery)",
+            "Defined metrics with stakeholders and documented how they are calculated (SQL, Data Visualization)",
+            "Analysed campaign and product data and presented recommendations (pandas, Statistics)"
+          ]
+        },
+        {
+          "title": "Data Analyst",
+          "company": "Halcyon Freight",
+          "years": 1.2,
+          "summary": "Trained 3 colleagues to build their own reports",
+          "start": "2015-04",
+          "end": "2016-07",
+          "bullets": [
+            "Trained 3 colleagues to build their own reports",
+            "Automated a manual report, saving about 40 hours per month (Python, Data Visualization)"
+          ]
+        }
+      ],
+      "education": [
+        {
+          "degree": "B.Sc. Mathematics",
+          "institution": "Riverton College",
+          "grad_year": 2015
+        }
+      ],
+      "languages": [
+        "English (C1)",
+        "German (B2)",
+        "Polish (professional)"
+      ],
+      "certifications": [
+        "Microsoft Power BI Data Analyst Associate"
+      ]
+    }
+  },
+  "jobs": {
+    "J01": {
+      "title": "Senior Backend Engineer",
+      "department": "Engineering",
+      "location": "Bucharest, Romania",
+      "employment_type": "part_time",
+      "description": "Our Engineering team is growing and we are looking for a Senior Backend Engineer. You will monitor production and fix issues quickly, write automated tests and take part in code reviews, model data and write efficient queries and work with product, frontend and QA to ship features end to end. At least 6 years of relevant experience. You should be confident with Microservices, Python, Docker, Java, Spring Boot and FastAPI. Experience with Go and SQL is a plus. Location: Bucharest, Romania.",
+      "required_skills": [
+        "Microservices",
+        "Python",
+        "Docker",
+        "Java",
+        "Spring Boot",
+        "FastAPI"
+      ],
+      "preferred_skills": [
+        "Go",
+        "SQL"
+      ],
+      "min_experience_years": 6
+    },
+    "J07": {
+      "title": "Data Analyst",
+      "department": "Data",
+      "location": "Berlin, Germany (hybrid)",
+      "employment_type": "contract",
+      "description": "About the role\nWe are hiring a Data Analyst for our Data team (Berlin, Germany (hybrid)).\n\nWhat you will do\n- Build dashboards and reports for business teams\n- Define and document metrics with stakeholders\n- Answer business questions with clear analysis\n\nWhat you bring\n- At least 2 years of relevant experience\n- Solid working knowledge of Data Visualization, pandas, Power BI, Python and Excel\n\nNice to have\n- Data Cleaning, Stakeholder Communication, Looker and Dashboards",
+      "required_skills": [
+        "Data Visualization",
+        "pandas",
+        "Power BI",
+        "Python",
+        "Excel"
+      ],
+      "preferred_skills": [
+        "Data Cleaning",
+        "Stakeholder Communication",
+        "Looker",
+        "Dashboards"
+      ],
+      "min_experience_years": 2
+    },
+    "J10": {
+      "title": "Marketing Assistant",
+      "department": "Marketing",
+      "location": "Remote (EU)",
+      "employment_type": "full_time",
+      "description": "Our Marketing team is growing and we are looking for a Marketing Assistant. You will manage budgets and agencies, create and edit content for web, email and social media, work with sales and product on launches and plan and run multi-channel campaigns. No professional experience needed; internships and personal projects count. You should be confident with SEO, Brand Strategy, Market Research, Marketing Automation and Google Analytics. Experience with Social Media, Campaign Management and Public Relations is a plus. Location: Remote (EU).",
+      "required_skills": [
+        "SEO",
+        "Brand Strategy",
+        "Market Research",
+        "Marketing Automation",
+        "Google Analytics"
+      ],
+      "preferred_skills": [
+        "Social Media",
+        "Campaign Management",
+        "Public Relations"
+      ],
+      "min_experience_years": 0
+    },
+    "J04": {
+      "title": "Lead Platform Engineer",
+      "department": "Platform",
+      "location": "Austin, TX (on-site)",
+      "employment_type": "full_time",
+      "description": "About the role\nWe are hiring a Lead Platform Engineer for our Platform team (Austin, TX (on-site)).\n\nWhat you will do\n- Manage infrastructure as code\n- Automate builds, tests and deployments\n- Run and improve our cloud infrastructure\n- Set up monitoring, alerting and incident response\n\nWhat you bring\n- At least 9 years of relevant experience\n- Solid working knowledge of Networking, Bash, Docker and Ansible\n\nNice to have\n- Jenkins, Terraform, Helm and Python",
+      "required_skills": [
+        "Networking",
+        "Bash",
+        "Docker",
+        "Ansible"
+      ],
+      "preferred_skills": [
+        "Jenkins",
+        "Terraform",
+        "Helm",
+        "Python"
+      ],
+      "min_experience_years": 9
+    },
+    "J09": {
+      "title": "UX Designer",
+      "department": "Design",
+      "location": "Berlin, Germany (hybrid)",
+      "employment_type": "full_time",
+      "description": "UX Designer - Berlin, Germany (hybrid)\nMust have: Interaction Design, Prototyping, User Flows, Accessibility\nExperience: At least 3 years of relevant experience\nGood to have: Motion Design, Illustration\nTasks: Work with developers to ship accessible interfaces; Design user flows, wireframes and prototypes; Plan and run user research and usability tests; Maintain and extend the design system",
+      "required_skills": [
+        "Interaction Design",
+        "Prototyping",
+        "User Flows",
+        "Accessibility"
+      ],
+      "preferred_skills": [
+        "Motion Design",
+        "Illustration"
+      ],
+      "min_experience_years": 3
+    },
+    "J13": {
+      "title": "Senior Data Scientist",
+      "department": "Data",
+      "location": "London, UK (hybrid)",
+      "employment_type": "full_time",
+      "description": "Senior Data Scientist - London, UK (hybrid)\nMust have: PyTorch, Statistics, NLP, Feature Engineering, Machine Learning\nExperience: At least 5 years of relevant experience\nGood to have: SQL, Airflow, Hugging Face Transformers, MLflow\nTasks: Monitor model quality and investigate errors; Build reproducible training and evaluation pipelines; Explore data and communicate findings clearly; Develop, evaluate and improve machine-learning models",
+      "required_skills": [
+        "PyTorch",
+        "Statistics",
+        "NLP",
+        "Feature Engineering",
+        "Machine Learning"
+      ],
+      "preferred_skills": [
+        "SQL",
+        "Airflow",
+        "Hugging Face Transformers",
+        "MLflow"
+      ],
+      "min_experience_years": 5
+    }
+  }
+}

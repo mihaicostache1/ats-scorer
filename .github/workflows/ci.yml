@@ -167,6 +167,11 @@ jobs:
           ruff check .
           ruff format --check .
 
+      # Frozen candidate/job pairs (L-19). A failure here means scores moved, or weights, the
+      # embedding model or the skill taxonomy changed: see tests/test_scorer_regression.py.
+      - name: Scorer regression
+        run: pytest -q tests/test_scorer_regression.py
+
       - name: Pytest
-        run: pytest -q
+        run: pytest -q --ignore=tests/test_scorer_regression.py
 

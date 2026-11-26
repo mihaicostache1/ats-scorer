@@ -64,7 +64,9 @@ _LABEL_CACHE_FORMAT = 1
 # wrong exact matches ("ML" is also a programming language in ESCO) and names the tech
 # terms ESCO lacks (Docker, Kubernetes, FastAPI). A canonical name is looked up in ESCO
 # for its concept, so keep the spelling ESCO uses where ESCO has the skill. Changing the
-# table changes what the parser writes, so add tests for new entries.
+# table changes what the parser writes, so add tests for new entries. It also fails
+# tests/test_scorer_regression.py until the frozen pairs are updated with a note
+# (docs/ml/scorer-regression.md).
 ALIASES: dict[str, str] = {
     # Abbreviations and nicknames
     "js": "JavaScript",
