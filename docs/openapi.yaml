@@ -700,7 +700,8 @@ paths:
         group. A replacement CV being processed, changed scoring inputs, or an older model
         makes an existing numeric score a rescoring result. Legacy-only scores are pending here
         until the scoring worker publishes a new outcome.
-        Each group uses the requested page and page size with its own item count.
+        Each group has its own page and item count. The group-specific page overrides `page`,
+        with `per_page` setting the size of every group.
         The stage filter applies to every group. Score, skill, and experience filters require
         a score from the current model.
       operationId: getRankedCandidates
@@ -733,7 +734,20 @@ paths:
           schema: { type: string, enum: [asc, desc], default: desc }
         - name: page
           in: query
+          description: Fallback page for groups without a group-specific page.
           schema: { type: integer, minimum: 1, default: 1 }
+        - name: ranked_page
+          in: query
+          description: Page for the ranked group.
+          schema: { type: integer, minimum: 1 }
+        - name: review_page
+          in: query
+          description: Page for the needs_manual_review group.
+          schema: { type: integer, minimum: 1 }
+        - name: unranked_page
+          in: query
+          description: Page for the unranked group.
+          schema: { type: integer, minimum: 1 }
         - name: per_page
           in: query
           schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
@@ -749,7 +763,11 @@ paths:
         '403':
           $ref: '#/components/responses/403Forbidden'
         '404':
-          $ref: '#/components/responses/404NotFound'
+          description: The job was not found in the current organization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
         '422':
           description: Invalid path or query parameter.
           content:

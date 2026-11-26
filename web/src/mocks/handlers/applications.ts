@@ -1,5 +1,10 @@
 import { http, HttpResponse } from "msw";
-import { mockApplications, mockScores, mockStageHistory } from "../fixtures/applications";
+import {
+  mockApplications,
+  mockScoreAdvisory,
+  mockScores,
+  mockStageHistory,
+} from "../fixtures/applications";
 import { MOCK_ORG_ID, MOCK_USER_ID } from "../fixtures/auth";
 import { mockCandidates } from "../fixtures/candidates";
 import { mockJobs, mockPipelineStages } from "../fixtures/jobs";
@@ -81,10 +86,55 @@ function normalizeSkill(name: string) {
   return skillAliases[cleaned] ?? cleaned;
 }
 
-function rankedPage(items: RankedCandidate[], url: URL) {
-  const result = paginate(items, url);
+function rankedPage(items: RankedCandidate[], url: URL, pageParam: string) {
+  const groupUrl = new URL(url);
+  const groupPage = url.searchParams.get(pageParam);
+  if (groupPage !== null) groupUrl.searchParams.set("page", groupPage);
+  const result = paginate(items, groupUrl);
   if (!items.length) result.pagination.total_pages = 0;
   return result;
+}
+
+function validateRankingQuery(query: URLSearchParams): Response | undefined {
+  const rules: Record<string, (value: string) => boolean> = {
+    ...Object.fromEntries(
+      ["page", "ranked_page", "review_page", "unranked_page"].map((name) => [
+        name,
+        (value: string) =>
+          /^\+?\d+(?:\.0+)?$/.test(value) && Number.isFinite(Number(value)) && Number(value) >= 1,
+      ])
+    ),
+    per_page: (value) =>
+      /^\+?\d+(?:\.0+)?$/.test(value) && Number(value) >= 1 && Number(value) <= 100,
+    min_score: (value) => isNonnegativeNumber(value) && Number(value) <= 100,
+    min_experience_years: isNonnegativeNumber,
+    required_skill: (value) => value.length >= 1 && value.length <= 255,
+    stage_id: (value) => /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i.test(value),
+    sort_by: (value) => value === "score" || value === "applied_at",
+    sort_order: (value) => value === "asc" || value === "desc",
+  };
+  const detail = Object.entries(rules).flatMap(([name, valid]) => {
+    const value = query.get(name);
+    return value === null || valid(value)
+      ? []
+      : [
+          {
+            loc: ["query", name],
+            msg: "Invalid query parameter",
+            type: "value_error",
+            input: value,
+          },
+        ];
+  });
+  return detail.length ? HttpResponse.json({ detail }, { status: 422 }) : undefined;
+}
+
+function isNonnegativeNumber(value: string) {
+  return (
+    /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value.trim()) &&
+    Number.isFinite(Number(value)) &&
+    Number(value) >= 0
+  );
 }
 
 /** In-memory stores — mutations persist for the browser session. */
@@ -105,8 +155,10 @@ export const applicationHandlers = [
       return detailResponse(403, "Not enough privileges");
     }
     const job = getMockJob(params.id);
-    if (!job) return notFound("Job", params.id);
     const url = new URL(request.url);
+    const invalidQuery = validateRankingQuery(url.searchParams);
+    if (invalidQuery) return invalidQuery;
+    if (!job) return detailResponse(404, `Job with ID '${params.id}' was not found.`);
     const stage = url.searchParams.get("stage_id");
     const minScore = url.searchParams.get("min_score");
     const minExperience = url.searchParams.get("min_experience_years");
@@ -169,10 +221,10 @@ export const applicationHandlers = [
       });
     }
     const response: components["schemas"]["RankedCandidatesResponse"] = {
-      ranked: rankedPage(groups.ranked, url),
-      needs_manual_review: rankedPage(groups.needs_manual_review, url),
-      unranked: rankedPage(groups.unranked, url),
-      advisory_note: "Scores are advisory. Review the application before making a decision.",
+      ranked: rankedPage(groups.ranked, url, "ranked_page"),
+      needs_manual_review: rankedPage(groups.needs_manual_review, url, "review_page"),
+      unranked: rankedPage(groups.unranked, url, "unranked_page"),
+      advisory_note: mockScoreAdvisory,
     };
     return HttpResponse.json(response);
   }),

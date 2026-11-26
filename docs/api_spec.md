@@ -272,7 +272,8 @@ Returns the job's pipeline stages in order. Any role can read. Every organizatio
 
 Admins and recruiters can list a job's applicants using stored B-18 scores. The response contains
 `ranked`, `needs_manual_review`, and `unranked` groups, each with `items` and `pagination`.
-`page` and `per_page` apply to each group. A row includes the candidate name, stage, latest CV
+Each group can be paged independently. `page` supplies the default for groups without an explicit
+page, and `per_page` supplies the size of every page. A row includes the candidate name, stage, latest CV
 status, stored score and band, and years of experience from the score explanation.
 
 | Query parameter | Behavior | Default |
@@ -283,7 +284,10 @@ status, stored score and band, and years of experience from the score explanatio
 | `min_experience_years` | Minimum experience in the current explanation, inclusive | Any experience |
 | `sort_by` | `score` or `applied_at` | `score` |
 | `sort_order` | `asc` or `desc` | `desc` |
-| `page` | Page number starting at 1 | `1` |
+| `page` | Fallback page number starting at 1 | `1` |
+| `ranked_page` | Page for `ranked` | `page` |
+| `review_page` | Page for `needs_manual_review` | `page` |
+| `unranked_page` | Page for `unranked` | `page` |
 | `per_page` | Page size from 1 to 100 | `20` |
 
 `ranked` contains scores from the current model and the current inputs. `unranked` contains

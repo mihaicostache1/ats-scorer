@@ -164,7 +164,7 @@ def list_ranked_candidates(
     min_experience_years: float | None,
     sort_by: RankingSort,
     sort_order: SortOrder,
-    page: int,
+    group_pages: dict[str, int],
     per_page: int,
 ) -> RankedCandidatesResponse:
     query = _outcomes(
@@ -229,9 +229,10 @@ def list_ranked_candidates(
             }
         )
 
-    start = (page - 1) * per_page
     pages = {}
     for name, rows in groups.items():
+        page = group_pages[name]
+        start = (page - 1) * per_page
         rows.sort(key=itemgetter("application_id"))
         if name == "ranked" and sort_by == RankingSort.SCORE:
             rows.sort(key=itemgetter("applied_at"), reverse=True)

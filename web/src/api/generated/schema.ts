@@ -356,7 +356,8 @@ export interface paths {
      *     group. A replacement CV being processed, changed scoring inputs, or an older model
      *     makes an existing numeric score a rescoring result. Legacy-only scores are pending here
      *     until the scoring worker publishes a new outcome.
-     *     Each group uses the requested page and page size with its own item count.
+     *     Each group has its own page and item count. The group-specific page overrides `page`,
+     *     with `per_page` setting the size of every group.
      *     The stage filter applies to every group. Score, skill, and experience filters require
      *     a score from the current model.
      */
@@ -2278,7 +2279,14 @@ export interface operations {
         sort_by?: "score" | "applied_at";
         /** @description Sort direction. Under score sorting, the review and unranked groups use newest applications first. */
         sort_order?: "asc" | "desc";
+        /** @description Fallback page for groups without a group-specific page. */
         page?: number;
+        /** @description Page for the ranked group. */
+        ranked_page?: number;
+        /** @description Page for the needs_manual_review group. */
+        review_page?: number;
+        /** @description Page for the unranked group. */
+        unranked_page?: number;
         per_page?: number;
       };
       header?: never;
@@ -2300,7 +2308,15 @@ export interface operations {
       };
       401: components["responses"]["401Unauthorized"];
       403: components["responses"]["403Forbidden"];
-      404: components["responses"]["404NotFound"];
+      /** @description The job was not found in the current organization. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
       /** @description Invalid path or query parameter. */
       422: {
         headers: {

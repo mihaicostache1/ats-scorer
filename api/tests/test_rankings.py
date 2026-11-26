@@ -195,6 +195,17 @@ async def test_ranked_candidates_group_paginate_and_filter_existing_scores(
     assert _ids(page_two) == [str(second)]
     assert page_two["ranked"]["pagination"]["total_items"] == 3
     assert page_two["needs_manual_review"]["pagination"]["total_items"] == 2
+    independent = await get(page=2, ranked_page=1, review_page=2, unranked_page=1, per_page=1)
+    assert _ids(independent) == [str(top)]
+    assert independent["ranked"]["pagination"]["page"] == 1
+    assert independent["needs_manual_review"] == page_two["needs_manual_review"]
+    assert independent["unranked"]["pagination"]["page"] == 1
+    fallback = await get(page=2, review_page=1, per_page=1)
+    assert fallback["ranked"] == page_two["ranked"]
+    assert fallback["unranked"] == page_two["unranked"]
+    assert fallback["needs_manual_review"]["pagination"]["page"] == 1
+    for page_param in ("ranked_page", "review_page", "unranked_page"):
+        assert (await async_client.get(url, params={page_param: 0})).status_code == 422
     empty_page = await get(page=4, per_page=1)
     assert _ids(empty_page) == []
     assert empty_page["ranked"]["pagination"]["total_items"] == 3

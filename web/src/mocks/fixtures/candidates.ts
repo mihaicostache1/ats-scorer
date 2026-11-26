@@ -48,7 +48,7 @@ function parsedV1(i: ParsedInput): Record<string, unknown> {
   };
 }
 
-/** Twenty more synthetic candidates so the list has several pages to search and page through. */
+/** Synthetic candidates for multi-page candidate lists and job rankings. */
 function generatedCandidates(): CandidateResponse[] {
   const first = ["Maya", "Liam", "Noor", "Mateo", "Aiko", "Omar", "Sofia", "Kofi", "Elena", "Raj"];
   const last = ["Hughes", "Petrov", "Haddad", "Silva", "Tanaka"];
@@ -59,7 +59,7 @@ function generatedCandidates(): CandidateResponse[] {
     ["React", "TypeScript", "GraphQL"],
     ["Python", "Pandas", "SQL"],
   ];
-  return Array.from({ length: 20 }, (_, n) => {
+  return Array.from({ length: 23 }, (_, n) => {
     const name = `${first[n % first.length]} ${last[(n * 3) % last.length]}`;
     const email = `${name.toLowerCase().replace(" ", ".")}${n}@example.com`;
     const location = places[n % places.length];
@@ -77,30 +77,26 @@ function generatedCandidates(): CandidateResponse[] {
       consent_given_at: n % 5 === 4 ? null : created,
       created_at: created,
       updated_at: created,
-      // Every third candidate has not been parsed yet.
-      parsed_data:
-        n % 3 === 2
-          ? {}
-          : parsedV1({
-              name,
-              email,
-              phone,
-              location,
-              headline: "Software Engineer",
-              summary: "Engineer with a track record of shipping reliable services.",
-              skills: skillSets[n % skillSets.length],
-              years: 2 + (n % 7),
-              experiences: [
-                { title: "Software Engineer", company: "Example Co.", start: "2021-06", end: null },
-              ],
-              education: [
-                {
-                  degree: "B.Sc. Computer Science",
-                  institution: "State University",
-                  grad_year: 2020,
-                },
-              ],
-            }),
+      parsed_data: parsedV1({
+        name,
+        email,
+        phone,
+        location,
+        headline: "Software Engineer",
+        summary: "Engineer with a track record of shipping reliable services.",
+        skills: skillSets[n % skillSets.length],
+        years: 2 + (n % 7),
+        experiences: [
+          { title: "Software Engineer", company: "Example Co.", start: "2021-06", end: null },
+        ],
+        education: [
+          {
+            degree: "B.Sc. Computer Science",
+            institution: "State University",
+            grad_year: 2020,
+          },
+        ],
+      }),
     };
   });
 }

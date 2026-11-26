@@ -240,6 +240,9 @@ def get_ranked_candidates(
     sort_by: RankingSort = Query(RankingSort.SCORE),
     sort_order: SortOrder = Query(SortOrder.DESC),
     page: int = Query(1, ge=1),
+    ranked_page: int | None = Query(None, ge=1),
+    review_page: int | None = Query(None, ge=1),
+    unranked_page: int | None = Query(None, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_tenant_db),
     _current_user: User = Depends(get_current_recruiter_or_admin),
@@ -253,7 +256,11 @@ def get_ranked_candidates(
         min_experience_years=min_experience_years,
         sort_by=sort_by,
         sort_order=sort_order,
-        page=page,
+        group_pages={
+            "ranked": ranked_page if ranked_page is not None else page,
+            "needs_manual_review": review_page if review_page is not None else page,
+            "unranked": unranked_page if unranked_page is not None else page,
+        },
         per_page=per_page,
     )
 
