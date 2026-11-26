@@ -57,7 +57,7 @@ A score depends only on its own candidate, job and embeddings, never on the othe
 
 Edits that don't change scoring inputs (job status, location, salary, stage moves, notes) don't trigger a rescore.
 
-**Waiting for embeddings.** Scoring without an embedding spreads its weight over the other components. A score produced this way carries a null `embedding_similarity` component in its explanation ([hybrid-scorer.md](hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in)). The proposed scheduling policy allows this fallback after a delay and schedules another score when the embedding arrives.
+**Waiting for embeddings.** Explicit scoring runs use the vectors available when they start. Scoring without an embedding spreads its weight over the other components and stores a null `embedding_similarity` component in the explanation ([hybrid-scorer.md](hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in)). Automatic scheduling should wait for a bounded period before using the fallback and enqueue a new score when an embedding arrives.
 
 ### Publishing a rescore
 
@@ -65,13 +65,13 @@ Rescore jobs run concurrently and can finish out of order: a worker that read th
 
 1. **Score without a lock.** Read the inputs, compute `inputs_hash` from them, and score. The hash covers everything `score()` reads: the job's scoring fields, `parsed_data`, the names passed as `additional_names`, and, for the CV and the job, whether there's an embedding and its `embedding_model_version`.
 2. **Publish in one short transaction.** Lock the application row (`SELECT … FOR UPDATE`, as the stage move already does), then:
-   - Re-read the inputs and recompute `inputs_hash`, and read the active model version. If either differs from what was scored, **discard the result**. The edit or deploy that changed it enqueued its own rescore.
+   - Re-read the inputs and recompute `inputs_hash`. If it differs from what was scored, **discard the result**. A deployment-wide active model version check at publication is planned for the rollout integration.
    - Read the application's latest score. If it has the same `model_version` and `inputs_hash`, **discard the result** (a repeated trigger).
    - Otherwise **insert** the row, with `computed_at` taken now, after the lock.
 
 Inserts for one application are serialized by the lock. The worker checks the scoring inputs before publishing a result. Deduplication compares with the current row, so a reverted edit (requirements A → B → A) appends a new A row after B.
 
-**Active model version.** During a rolling deploy, a worker still running the old code produces scores with the old `MODEL_VERSION`. The backend keeps the active version in one place (for example a single-row `scoring_state` table that the post-deploy backfill sets). A worker whose `MODEL_VERSION` isn't the active one discards its result in step 2 and doesn't retry.
+**Proposed active model version.** During a rolling deploy, the backend could keep the active version in one place, such as a single-row `scoring_state` table set by the post-deploy backfill. This would let the worker discard results from inactive models in step 2, including results from a task pinned to a formerly active model.
 
 ## Old scores are kept
 
@@ -90,12 +90,13 @@ The B-18 job worker stores history in `application_scores`. Queue it from the ba
 `await queue.enqueue_job("score_job", str(org_id), str(job_id), MODEL_VERSION)`. Each application
 has at most one current outcome. A `needs_review` outcome carries no numeric score, band or
 explanation. Scored outcomes store the validated L-17 explanation, including a null embedding
-component when a usable vector is unavailable.
+component when a usable vector is unavailable. Applications with a CV still queued, extracting, or
+extracted are skipped until parsing finishes. Any existing outcome remains current in the meantime.
 
 `inputs_hash` is compared with the current outcome under the publication lock. The database sets
-`computed_at` with `clock_timestamp()` at insertion. The worker accepts the scorer version in the
-queue payload and checks it against its installed scorer. Automatic triggers, rollout coordination
-and exposing the current result through the ranking API are follow-up integration work.
+`computed_at` with `clock_timestamp()` at insertion. The queue payload must include the scorer
+version. A worker with a different version defers the task by 30 seconds, with up to five attempts.
+Invalid explanations fail the job and log its job and application IDs.
 
 ## To agree
 
@@ -106,6 +107,7 @@ To settle with the backend developer before this page leaves "proposed":
 - [ ] Recording a reason with automatically triggered scores
 - [ ] Where the active model version lives, and who sets it on deploy
 - [ ] Model-version backfill: open jobs only, closed jobs on demand
+- [ ] Measure publication lock duration on large jobs before enabling automatic backfills
 - [ ] The delay before automatic fallback scoring and the rescore when an embedding arrives
 - [ ] The ranking API contract and UI display for missing components and `needs_review`
 - [ ] Ownership of rollout and automatic rescoring

@@ -41,7 +41,7 @@ class WorkerSettings:
             # failed document can be queued again.
             keep_result=0,
         ),
-        func(score_job, name=SCORE_JOB, keep_result=0),
+        func(score_job, name=SCORE_JOB, max_tries=5, keep_result=0),
     ]
     cron_jobs = [
         cron(

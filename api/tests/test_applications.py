@@ -6,6 +6,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
+from ats_scoring import MODEL_VERSION
 from httpx import AsyncClient
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -386,7 +387,7 @@ async def test_stage_move_keeps_the_score_shown_at_the_time(
     parsed.parsed_data = {"skills": ["Python"], "headline": "Backend Engineer"}
     committed_db.commit()
     ctx = {"sessions": sessionmaker(bind=db_engine)}
-    assert await score_job(ctx, str(admin.org_id), job["id"]) == 1
+    assert await score_job(ctx, str(admin.org_id), job["id"], MODEL_VERSION) == 1
     [current] = committed_db.scalars(select(ApplicationScore)).all()
     assert current.score is not None
     await move("Hired")
@@ -394,7 +395,7 @@ async def test_stage_move_keeps_the_score_shown_at_the_time(
 
     parsed.parsed_data = {}
     committed_db.commit()
-    assert await score_job(ctx, str(admin.org_id), job["id"]) == 1
+    assert await score_job(ctx, str(admin.org_id), job["id"], MODEL_VERSION) == 1
     await move("Interview")
     assert (await snapshots())[-2:] == [
         (float(current.score), current.model_version),

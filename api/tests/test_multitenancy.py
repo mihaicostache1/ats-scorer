@@ -304,10 +304,10 @@ async def test_org_b_cannot_read_or_write_org_a_applications_and_stages(
     committed_db.add(bad_link)
     committed_db.commit()
     ctx = {"sessions": sessionmaker(bind=db_engine)}
-    assert await score_job(ctx, str(admin_b.org_id), str(job_a_id)) == 0
+    assert await score_job(ctx, str(admin_b.org_id), str(job_a_id), MODEL_VERSION) == 0
     assert not committed_db.scalars(select(ApplicationScore)).all()
-    assert await score_job(ctx, str(admin_a.org_id), str(job_a_id)) == 1
-    assert await score_job(ctx, str(admin_b.org_id), str(job_b_id)) == 1
+    assert await score_job(ctx, str(admin_a.org_id), str(job_a_id), MODEL_VERSION) == 1
+    assert await score_job(ctx, str(admin_b.org_id), str(job_b_id), MODEL_VERSION) == 1
     assert set(committed_db.scalars(select(ApplicationScore.application_id))) == {a_id, b_id}
     committed_db.delete(bad_link)
     committed_db.commit()

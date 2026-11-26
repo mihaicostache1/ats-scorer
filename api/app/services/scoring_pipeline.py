@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from arq import Retry
 from ats_scoring import EMBEDDING_MODEL_VERSION, MODEL_VERSION, ScoreExplanation, score_batch
 from ats_scoring.parsed_cv import ParsedCV
 from ats_scoring.schema import LEGACY_SCHEMA_VERSION, ScoreResult
@@ -16,6 +17,7 @@ from sqlalchemy import and_, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
+from app.core.logging import logger
 from app.db.session import SessionLocal
 from app.models.application import Application
 from app.models.application_score import ApplicationScore
@@ -25,6 +27,13 @@ from app.models.job import Job
 from app.schemas.cv_document import CvStatus
 from app.services.cv_parser import needs_review
 from app.services.embedding_inputs import JOB_EMBEDDING_FIELDS, candidate_names, profile_name
+
+_PROCESSING_CV_STATUSES = (
+    CvStatus.QUEUED.value,
+    CvStatus.EXTRACTING.value,
+    CvStatus.EXTRACTED.value,
+)
+_VERSION_RETRY_DELAY_SECONDS = 30
 
 
 @dataclass(frozen=True)
@@ -128,6 +137,9 @@ def _applications(
 
     inputs = []
     for id_, candidate, status, current_id, current_model, current_hash in session.execute(query):
+        # Apply this on both reads so a CV uploaded during inference also defers publication.
+        if status in _PROCESSING_CV_STATUSES:
+            continue
         profile = candidate.parsed_data
         names = candidate_names(
             candidate.full_name,
@@ -249,23 +261,33 @@ def score_job_applications(
         for item, result in zip(eligible, results, strict=True):
             if result is None:
                 continue
-            explanation = ScoreExplanation.model_validate(result["explanation"])
-            if (
-                result["model_version"] != MODEL_VERSION
-                or explanation.model_version != MODEL_VERSION
-                or explanation.total != result["total"]
-            ):
-                raise ValueError("Score explanation disagrees with the score or model version")
+            try:
+                explanation = ScoreExplanation.model_validate(result["explanation"])
+                if (
+                    result["model_version"] != MODEL_VERSION
+                    or explanation.model_version != MODEL_VERSION
+                    or explanation.total != result["total"]
+                ):
+                    raise ValueError("Score explanation disagrees with the score or model version")
+            except (KeyError, ValueError):
+                logger.error(
+                    "Invalid score explanation for job_id=%s application_id=%s", job_id, item.id
+                )
+                raise
             explanations[item.id] = explanation
     return _publish(sessions, org_id, job_id, job_hash, pending, explanations)
 
 
-async def score_job(
-    ctx: dict[str, Any], org_id: str, job_id: str, model_version: str = MODEL_VERSION
-) -> int:
-    """Arq task for a tenant's job. The enqueuer can pin the scorer version for a rollout."""
+async def score_job(ctx: dict[str, Any], org_id: str, job_id: str, model_version: str) -> int:
+    """Arq task for a tenant's job pinned to the model version selected by the enqueuer."""
     if model_version != MODEL_VERSION:
-        return 0
+        logger.warning(
+            "Deferring scoring for job_id=%s requested_model=%s worker_model=%s",
+            job_id,
+            model_version,
+            MODEL_VERSION,
+        )
+        raise Retry(defer=_VERSION_RETRY_DELAY_SECONDS)
     sessions: sessionmaker[Session] = ctx.get("sessions") or SessionLocal
     return await asyncio.to_thread(
         score_job_applications, sessions, uuid.UUID(org_id), uuid.UUID(job_id)
