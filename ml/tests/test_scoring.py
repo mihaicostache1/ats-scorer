@@ -326,9 +326,8 @@ def test_seniority_words_do_not_change_the_title_fit() -> None:
     result = score(PARTIAL, job)  # headline "Backend Developer"
 
     assert result["components"]["title_similarity"] == 100.0
-    assert "Job title fit: 100/100, from the closest title in the CV, seniority aside." in (
-        result["score_explanations"]
-    )
+    statement = "Job title fit: 100/100, from the closest title in the CV, seniority aside."
+    assert statement in result["score_explanations"]
 
 
 def test_older_titles_count_less() -> None:
