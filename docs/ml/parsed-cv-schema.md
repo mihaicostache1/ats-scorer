@@ -143,7 +143,7 @@ Proposed mapping for the hybrid scorer (`hybrid-1.0.0`, L-13), to be confirmed b
 |---|---|
 | `total` (0-100) | `overall_score` |
 | `components["skill_overlap"]` (0-100 or null) | `skill_overlap_score` |
-| `components["embedding_similarity"]`, or `text_similarity` when it is null | `semantic_score` |
+| `components["embedding_similarity"]` (0-100 or null) | `semantic_score` (nullable once the L-21 migration lands: [model-versioning.md](model-versioning.md#what-the-backend-needs-to-change)) |
 | `components["experience_fit"]` (0-100 or null) | `experience_score` |
 | `components["title_similarity"]` (0-100 or null) | `title_fit_score` |
 | `components`, `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |

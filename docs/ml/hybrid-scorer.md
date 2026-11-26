@@ -129,7 +129,7 @@ Proposed mapping to the `scores` table (backend to confirm):
 |---|---|
 | `total` | `overall_score` |
 | `components["skill_overlap"]` | `skill_overlap_score` |
-| `components["embedding_similarity"]`, or `text_similarity` when it is `None` | `semantic_score` (not nullable) |
+| `components["embedding_similarity"]` | `semantic_score`, NULL when scored without an embedding. The column is NOT NULL today; L-21 proposes making it nullable ([model-versioning.md](model-versioning.md#what-the-backend-needs-to-change)) |
 | `components["experience_fit"]` | `experience_score` |
 | `components["title_similarity"]` | `title_fit_score` |
 | `explanation` ([score-explanation.md](score-explanation.md)): components with their contributions, matched skills with the CV's phrase, missing skills, experience, band | `component_breakdown` |

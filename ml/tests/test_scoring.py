@@ -3,12 +3,22 @@
 import dataclasses
 import math
 import socket
+from collections import UserDict
+from collections.abc import Callable, Mapping
+from types import MappingProxyType
 from typing import Any
 
 import numpy as np
 import pytest
 
-from ats_scoring import MODEL_VERSION, WEIGHTS, NothingToScoreError, get_model_version, score
+from ats_scoring import (
+    MODEL_VERSION,
+    WEIGHTS,
+    NothingToScoreError,
+    get_model_version,
+    score,
+    score_batch,
+)
 from ats_scoring.config import COMPONENTS, DEFAULT_CONFIG
 from ats_scoring.scoring import embedding_similarity, experience_fit
 
@@ -237,6 +247,22 @@ def test_other_settings_can_be_passed_in() -> None:
     assert other["explanation"]["model_version"] == other["model_version"]
     assert other["total"] == other["components"]["text_similarity"]
     assert other["components"] == result["components"]
+
+
+@pytest.mark.parametrize(
+    "mapping", [MappingProxyType, UserDict], ids=["MappingProxyType", "UserDict"]
+)
+def test_weights_can_be_any_mapping(
+    mapping: Callable[[dict[str, float]], Mapping[str, float]],
+) -> None:
+    config = dataclasses.replace(DEFAULT_CONFIG, weights=mapping(dict(DEFAULT_CONFIG.weights)))
+    kwargs: dict[str, Any] = {"job_embedding": JOB_VECTOR, "config": config}
+
+    one = score(PARTIAL, JOB, candidate_embedding=EMBEDDINGS["PARTIAL"], **kwargs)
+    batch = score_batch(JOB, [PARTIAL], candidate_embeddings=[EMBEDDINGS["PARTIAL"]], **kwargs)
+
+    assert one == batch[0] == full_score(PARTIAL, "PARTIAL")
+    assert one["model_version"] == MODEL_VERSION  # same weights, same version
 
 
 # --------------------------------------------------------------------------- embedding

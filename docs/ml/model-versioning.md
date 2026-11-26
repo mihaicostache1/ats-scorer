@@ -57,9 +57,21 @@ A score depends only on its own candidate, job and embeddings, never on the othe
 
 Edits that don't change scoring inputs (job status, location, salary, stage moves, notes) don't trigger a rescore.
 
-**Waiting for embeddings.** Scoring without an embedding spreads its weight over the other components. That's valid, but on a slightly different footing from scores that use one ([hybrid-scorer.md](hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in)). If an embedding is still missing after the worker's normal delay (or there is no worker, as on staging), score without it. When the embedding arrives, rescore with the same reason.
+**Waiting for embeddings.** Scoring without an embedding spreads its weight over the other components. That's valid, but on a slightly different footing from scores that use one ([hybrid-scorer.md](hybrid-scorer.md#for-the-backend-when-scoring-is-wired-in)). If an embedding is still missing after the worker's normal delay (or there is no worker, as on staging), score without it and store `semantic_score` as NULL, not 0 and not the text similarity: NULL says "not computed" (this needs the column to become nullable, see below). When the embedding arrives, rescore with reason `embedding_ready`.
 
-**Repeated triggers.** Two edits in quick succession should give one rescore of the final state, not two: enqueue per application with a short debounce, or skip a rescore whose inputs and `model_version` match the latest stored score (see `inputs_hash` below).
+### Publishing a rescore
+
+Rescore jobs run concurrently and can finish out of order: a worker that read the old requirements can finish after one that read the new ones. Debouncing reduces the number of jobs but doesn't stop one that's already running. So a job publishes its result only if what it scored is still current:
+
+1. **Score without a lock.** Read the inputs, compute `inputs_hash` from them, and score. The hash covers everything `score()` reads: the job's scoring fields, `parsed_data`, the names passed as `additional_names`, and, for the CV and the job, whether there's an embedding and its `embedding_model_version`.
+2. **Publish in one short transaction.** Lock the application row (`SELECT … FOR UPDATE`, as the stage move already does), then:
+   - Re-read the inputs and recompute `inputs_hash`, and read the active model version. If either differs from what was scored, **discard the result**. The edit or deploy that changed it enqueued its own rescore.
+   - Read the application's latest score. If it has the same `model_version` and `inputs_hash`, **discard the result** (a repeated trigger).
+   - Otherwise **insert** the row, with `calculated_at` taken now, after the lock.
+
+Inserts for one application are serialized by the lock, and only results for the current inputs get in, so the latest row by `calculated_at` is always a score of the current state. Deduplication compares only with the latest row, so a reverted edit (requirements A → B → A) appends a new A row after B instead of being rejected because an old A row exists.
+
+**Active model version.** During a rolling deploy, a worker still running the old code produces scores with the old `MODEL_VERSION`. The backend keeps the active version in one place (for example a single-row `scoring_state` table that the post-deploy backfill sets). A worker whose `MODEL_VERSION` isn't the active one discards its result in step 2 and doesn't retry.
 
 ## Old scores are kept
 
@@ -78,9 +90,16 @@ Today `scores` has `UNIQUE (application_id, model_version)`. [parsed-cv-schema.m
 
 1. Drop `uq_scores_application_model`. Add an index on `(application_id, calculated_at DESC)` for "latest score".
 2. Add `reason VARCHAR(20) NOT NULL`: one of `initial`, `job_edited`, `profile_corrected`, `model_changed`, `embedding_ready`. It says why each row exists.
-3. Optional: add `inputs_hash VARCHAR(16)`, a hash of the scoring inputs (job fields, `parsed_data`, names, both `embedding_model_version`s), with `UNIQUE (application_id, model_version, inputs_hash)`. Then a repeated trigger is a no-op (`ON CONFLICT DO NOTHING`) instead of a duplicate row.
-4. Keep `model_version VARCHAR(50)`; the new format fits.
-5. Run rescoring in the Arq worker that already fills embeddings, with the job's applications scored by `score_batch()`.
+3. Add `inputs_hash VARCHAR(16) NOT NULL`, the hash from [Publishing a rescore](#publishing-a-rescore). It gets **no** unique constraint: a reverted edit must be able to append the same hash again. Deduplication happens under the lock, against the latest row only.
+4. Make `semantic_score` nullable (NULL = scored without an embedding). Keep its 0–100 CHECK, which NULL passes. Then:
+   - Update `docs/erd.md`, `docs/schema.sql`, and the `Score` schema in `docs/openapi.yaml` (`semantic_score: number | null`).
+   - Update the API's Pydantic schemas, then the web's generated types (`npm run gen:api`) and mocks.
+   - The UI shows a NULL component as "not computed", never as 0.
+   - The scorer-to-column mapping stops putting the text similarity into `semantic_score`. The text similarity stays in `component_breakdown`.
+5. Set `calculated_at` when the row is inserted under the lock, with `clock_timestamp()` or from Python. Postgres's `now()` is the transaction's start time, so a transaction that waited for the lock could get an earlier time than the row it follows.
+6. Store the active model version (see above) and check it when publishing.
+7. Keep `model_version VARCHAR(50)`; the new format fits.
+8. Run rescoring in the Arq worker that already fills embeddings, with the job's applications scored by `score_batch()`.
 
 ## To agree
 
@@ -88,9 +107,12 @@ To settle with the backend developer before this page leaves "proposed":
 
 - [ ] The `model_version` format and its 50-character limit
 - [ ] The four triggers and the fields that fire them
-- [ ] Append-only scores: dropping the unique constraint and adding `reason` (and `inputs_hash`?)
+- [ ] Append-only scores: dropping the unique constraint, adding `reason` and `inputs_hash`
+- [ ] Publishing under the application lock: discard stale inputs, an inactive model version, or a repeat of the latest row
+- [ ] Where the active model version lives, and who sets it on deploy
 - [ ] Model-version backfill: open jobs only, closed jobs on demand
-- [ ] Score without an embedding after a delay, then rescore when it arrives
+- [ ] Score without an embedding after a delay (`semantic_score` NULL), then rescore when it arrives
+- [ ] Nullable `semantic_score` in the database, the API contract and the UI
 - [ ] Who owns the B-task for the migration and the rescoring jobs
 
 Agreed by: _(backend developer, date)_

@@ -67,8 +67,11 @@ def _settings(config: ScorerConfig) -> dict[str, Any]:
     """Every setting of `config` except the scorer version and the embedding model's name.
 
     Taken from the dataclass, so a setting added to ScorerConfig counts without a change here.
+    `weights` may be any Mapping (MappingProxyType, UserDict, ...); asdict() only converts a
+    real dict, so it is made one first.
     """
-    settings = dataclasses.asdict(config)
+    plain = dataclasses.replace(config, weights=dict(config.weights))
+    settings = dataclasses.asdict(plain)
     del settings["scorer_version"]
     del settings["embedding"]["model"], settings["embedding"]["revision"]
     return settings
