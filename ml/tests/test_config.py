@@ -67,7 +67,11 @@ def _broken(path: tuple[str, ...], value: Any) -> dict[str, Any]:
         (("bands", "moderate"), 0, "0 < bands.moderate"),
         (("bands", "strong"), KeyError, "must be a number"),
         (("bands",), None, "must be a mapping"),
-        (("model_version",), None, "non-empty string"),
+        (("scorer_version",), None, "non-empty string"),
+        (("scorer_version",), KeyError, "non-empty string"),
+        (("scorer_version",), "hybrid+1", "only letters, digits"),
+        (("scorer_version",), "hybrid 1.3", "only letters, digits"),
+        (("scorer_version",), "-hybrid", "only letters, digits"),
         (("skills",), [], "must be a mapping"),
     ],
 )

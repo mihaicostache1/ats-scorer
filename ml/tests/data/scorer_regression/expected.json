@@ -1,8 +1,8 @@
 {
-  "model_version": "hybrid-1.2.0",
+  "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
   "tolerance": 2.0,
   "fingerprint": {
-    "weights_yaml": "bfdbcccb0c63ddb8",
+    "weights_yaml": "c5ff8ad001f0b2fe",
     "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
     "skill_taxonomy": "76d50d1e07a58f8f"
   },
@@ -189,6 +189,28 @@
       },
       "results": "05dd19b70707db0b",
       "note": "Initial freeze of 11 pairs at hybrid-1.2.0 (L-19)"
+    },
+    {
+      "date": "2026-11-26",
+      "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+      "fingerprint": {
+        "weights_yaml": "c5ff8ad001f0b2fe",
+        "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
+        "skill_taxonomy": "76d50d1e07a58f8f"
+      },
+      "results": "82d805bafb2e5631",
+      "note": "model_version now has hashes of settings, embedding model and vocabularies; scores unchanged (L-21)"
+    },
+    {
+      "date": "2026-11-26",
+      "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+      "fingerprint": {
+        "weights_yaml": "c5ff8ad001f0b2fe",
+        "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
+        "skill_taxonomy": "76d50d1e07a58f8f"
+      },
+      "results": "82d805bafb2e5631",
+      "note": "model_version now has hashes of settings, embedding model and vocabularies; scores unchanged (L-21)"
     }
   ]
 }

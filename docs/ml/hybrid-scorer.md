@@ -44,7 +44,7 @@ The total is the weighted mean of the components that are present. When a compon
 
 ## Weights
 
-The weights live in `weights.yaml`, together with `model_version`, the skill weights, the embedding model and its revision, and the cosine range. The file is checked when the package is imported: all five components must be listed, the weights must add up to 1, and the nice-to-have skill weight must be below the required one. **Change `model_version` whenever anything in the file changes.**
+The weights live in `weights.yaml`, together with `scorer_version`, the skill weights, the embedding model and its revision, and the cosine range. The file is checked when the package is imported: all five components must be listed, the weights must add up to 1, and the nice-to-have skill weight must be below the required one. The stored `model_version` includes a hash of the file's settings, so any change to them gives a new version by itself ([model-versioning.md](model-versioning.md)).
 
 How the values were chosen:
 

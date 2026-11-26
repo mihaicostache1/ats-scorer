@@ -157,7 +157,7 @@ Details of the scoring are in [ml/README.md](../../ml/README.md).
 
 - **Nullable components:** `experience_score`, `title_fit_score` and `skill_overlap_score` are null when a model does not compute them (backend PR #22).
 - **Nothing to score:** no score is stored and the candidate goes to manual review. The backend catches `NothingToScoreError`, not every `ValueError`.
-- **Re-scoring:** the backend upserts on `(application_id, model_version)`, and every stage move keeps a copy of the score and model version it was based on (PR #22). `MODEL_VERSION` changes whenever the weights or the alias table change.
+- **Re-scoring:** the backend upserts on `(application_id, model_version)`, and every stage move keeps a copy of the score and model version it was based on (PR #22). `MODEL_VERSION` changes whenever the weights or the alias table change. *L-21 proposes replacing the upsert with append-only scores, and defines the version format and rescoring triggers: [model-versioning.md](model-versioning.md).*
 - **`semantic_score` held the TF-IDF similarity** under the baseline. From `hybrid-1.0.0` (L-13) it is proposed to hold the embedding similarity; `model_version` tells the two apart.
 - **Scoring runs in the worker,** not during a request.
 

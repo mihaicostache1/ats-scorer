@@ -10,14 +10,18 @@ from ats_scoring.scoring import (
     score,
     score_batch,
 )
+from ats_scoring.versioning import ModelVersion, get_model_version, parse_model_version
 
 __all__ = [
     "EMBEDDING_MODEL_VERSION",
     "EXPLANATION_VERSION",
     "MODEL_VERSION",
     "WEIGHTS",
+    "ModelVersion",
     "NothingToScoreError",
     "ScoreExplanation",
+    "get_model_version",
+    "parse_model_version",
     "redact",
     "score",
     "score_batch",

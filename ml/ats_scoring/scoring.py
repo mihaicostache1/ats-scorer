@@ -21,10 +21,11 @@ from ats_scoring.schema import ScoreComponents, ScoreResult
 from ats_scoring.skills import match_skills
 from ats_scoring.text import candidate_text, job_text, skill_texts, tfidf_similarity, tokenize
 from ats_scoring.titles import match_title
+from ats_scoring.versioning import get_model_version
 
-# Stored with every score. Set in weights.yaml: change it whenever the same input could get a
-# different result, for example when the weights or the skill alias table change.
-MODEL_VERSION = DEFAULT_CONFIG.model_version
+# Stored with every score: the scorer version plus hashes of the settings, the embedding model
+# and the vocabularies (ats_scoring.versioning). Changes by itself when weights.yaml does.
+MODEL_VERSION = get_model_version()
 
 # Share of the total carried by each component, from weights.yaml. Adds up to 1.
 WEIGHTS = dict(DEFAULT_CONFIG.weights)
@@ -156,8 +157,12 @@ def _score_one(
     candidate_embedding: np.ndarray | None,
     additional_names: tuple[str, ...],
     config: ScorerConfig,
+    model_version: str,
 ) -> ScoreResult:
-    """Score one candidate against a prepared job. Shared by score() and score_batch()."""
+    """Score one candidate against a prepared job. Shared by score() and score_batch().
+
+    `model_version` is get_model_version(config), computed once per call by the caller.
+    """
     candidate = redact(candidate, additional_names=additional_names)
     cv_text = candidate_text(candidate)
     if not cv_text:
@@ -204,7 +209,7 @@ def _score_one(
         candidate_years=candidate.get("experience_years"),
         min_years=fields.get("min_experience_years"),
         bands=config.bands,
-        model_version=config.model_version,
+        model_version=model_version,
     )
     return {
         "total": total,
@@ -217,7 +222,7 @@ def _score_one(
             *skill_lines(skills),
             *(part["statement"] for part in explanation["components"][1:]),
         ],
-        "model_version": config.model_version,
+        "model_version": model_version,
         "explanation": explanation,
     }
 
@@ -252,7 +257,8 @@ def score(
     """
     prepared = _prepare_job(job, job_embedding, config)
     vector = _vector(candidate_embedding, "candidate_embedding", config.embedding.dimensions)
-    return _score_one(candidate, prepared, vector, _names(additional_names), config)
+    version = get_model_version(config)
+    return _score_one(candidate, prepared, vector, _names(additional_names), config, version)
 
 
 def _check_lines_up(name: str, values: Sized | None, candidates: Sized) -> None:
@@ -312,10 +318,11 @@ def score_batch(
         else [_names(entry) for entry in additional_names]
     )
 
+    version = get_model_version(config)
     results: list[ScoreResult | None] = []
     for candidate, vector, extra in zip(candidates, vectors, names, strict=True):
         try:
-            results.append(_score_one(candidate, prepared, vector, extra, config))
+            results.append(_score_one(candidate, prepared, vector, extra, config, version))
         except NothingToScoreError:
             results.append(None)
     return results

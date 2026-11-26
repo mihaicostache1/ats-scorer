@@ -35,7 +35,7 @@ from ats_scoring.evaluate import (
     load_records,
 )
 from ats_scoring.explanation import band
-from ats_scoring.scoring import score
+from ats_scoring.scoring import MODEL_VERSION, score
 
 FIT_JOBS = ("J01", "J07", "J10")  # the L-9 pairs: Senior Backend Engineer, Data Analyst, Marketing
 CHECK_JOBS = ("J04", "J09", "J13")  # the L-15 pairs: Lead Platform Engineer, UX Designer, Senior DS
@@ -261,7 +261,7 @@ def main() -> int:
     ]
     report = {
         "date": date.today().isoformat(),
-        "model_version": DEFAULT_CONFIG.model_version,
+        "model_version": MODEL_VERSION,
         "fit_jobs": list(FIT_JOBS),
         "check_jobs": list(CHECK_JOBS),
         "picked": {"strong": picked.strong, "moderate": picked.moderate},
@@ -282,7 +282,7 @@ def main() -> int:
         },
     }
 
-    print(f"{len(rows)} rated pairs, {DEFAULT_CONFIG.model_version}.")
+    print(f"{len(rows)} rated pairs, {MODEL_VERSION}.")
     print(
         f"Picked on {', '.join(FIT_JOBS)}: strong from {picked.strong:g}, moderate from "
         f"{picked.moderate:g} ({tied} threshold pairs tied for best)."

@@ -1,6 +1,10 @@
-"""Scorer settings: the weights, the model version and the embedding model, from weights.yaml."""
+"""Scorer settings: the weights, the scorer version and the embedding model, from weights.yaml.
+
+The model_version stored with a score is built from these by ats_scoring.versioning.
+"""
 
 import math
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
@@ -17,6 +21,10 @@ COMPONENTS = (
     "title_similarity",
     "text_similarity",
 )
+
+# Letters, digits, dots and dashes: "+" separates the scorer version from the hashes in the
+# model_version, and anything else would make it awkward in a URL or a file name.
+_SCORER_VERSION = re.compile(r"[A-Za-z0-9][A-Za-z0-9.-]*")
 
 
 @dataclass(frozen=True)
@@ -36,7 +44,7 @@ class BandSettings:
 
 @dataclass(frozen=True)
 class ScorerConfig:
-    model_version: str
+    scorer_version: str  # the algorithm; the full model_version is versioning.get_model_version()
     weights: Mapping[str, float]
     required_skill_weight: float
     preferred_skill_weight: float
@@ -107,8 +115,15 @@ def parse_config(data: Mapping[str, Any]) -> ScorerConfig:
     if not 0 < moderate < strong <= 100:
         raise ValueError("weights.yaml: need 0 < bands.moderate < bands.strong <= 100")
 
+    scorer_version = _text(data, "scorer_version", "")
+    if not _SCORER_VERSION.fullmatch(scorer_version):
+        raise ValueError(
+            f"weights.yaml: 'scorer_version' may hold only letters, digits, '.' and '-', "
+            f"not {scorer_version!r}"
+        )
+
     return ScorerConfig(
-        model_version=_text(data, "model_version", ""),
+        scorer_version=scorer_version,
         weights=weights,
         required_skill_weight=required,
         preferred_skill_weight=preferred,
