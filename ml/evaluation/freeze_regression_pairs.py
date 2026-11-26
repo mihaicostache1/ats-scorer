@@ -8,19 +8,22 @@ tests/data/scorer_regression/, which tests/test_scorer_regression.py checks in C
 records a fingerprint of what should move the scores: weights.yaml (weights, skill weights,
 bands, model version), the embedding model and the skill taxonomy (the scorer's aliases and the
 parser's). Changing any of them fails the test until this script is run again in the same PR,
-and the script refuses to run without a note saying why, which it adds to the file's history.
+and the script refuses to run without a note saying why, which it adds to the file's history
+together with a digest of the expected results it vouches for. Changing those results in any
+other way (by hand, or by rerunning without a new note) fails the test too.
 
 The inputs are frozen too. Candidates and jobs are copied from evaluation/data the first time a
 pair is frozen and never again, so a change to the evaluation set does not move these tests.
-Embedding vectors are copied again only when the embedding model changes: rebuild
-evaluation/data/embeddings.json with embed_eval_set.py first.
+Embedding vectors likewise: a frozen vector is kept as long as the embedding model and revision
+stay the same, and only a new pair's vectors are copied. When the model changes they are all
+copied again: rebuild evaluation/data/embeddings.json with embed_eval_set.py first.
 """
 
 import argparse
 import hashlib
 import json
 import sys
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import date
 from importlib import resources
 from pathlib import Path
@@ -39,13 +42,19 @@ EXPECTED_FILE = "expected.json"
 INPUTS_FILE = "inputs.json"
 VECTORS_FILE = "embeddings.json"
 
-# A total may move this many points either way before the test fails. Below it is rounding or a
-# refactor; a bigger move is a change in behaviour that a reviewer should see in the diff.
+# A total may move this many points either way from its frozen_total before the test fails. Below
+# it is rounding or a refactor; a bigger move is a change in behaviour that a reviewer should see
+# in the diff. The test reads it from here, not from the frozen file.
 TOLERANCE = 2.0
+
+# The parts of expected.json a history note vouches for (everything but the history itself).
+RESULT_KEYS = ("model_version", "tolerance", "fingerprint", "pairs")
+
+Pair = tuple[str, str, bool, str]
 
 # (candidate id, job id, scored with embeddings, why this pair). Ten rated pairs over the six
 # jobs of the evaluation set, every rating from 0 to 3, plus one pair without embeddings.
-PAIRS: tuple[tuple[str, str, bool, str], ...] = (
+PAIRS: tuple[Pair, ...] = (
     ("C021", "J01", True, "rated 3; the 'strong' explanation example"),
     ("C031", "J01", True, "rated 2; the 'moderate' example: under the minimum, skills missing"),
     ("C009", "J01", True, "rated 0; the 'weak' example: a different role"),
@@ -82,6 +91,19 @@ def fingerprint() -> dict[str, str]:
     }
 
 
+def results_digest(expected: Mapping[str, Any]) -> str:
+    """A digest of the expected results, kept in the history entry whose note explains them."""
+    return _digest({key: expected[key] for key in RESULT_KEYS})
+
+
+def allowed_range(frozen_total: float) -> tuple[float, float]:
+    """The totals the test accepts for a pair frozen at frozen_total."""
+    return (
+        round(max(0.0, frozen_total - TOLERANCE), 2),
+        round(min(100.0, frozen_total + TOLERANCE), 2),
+    )
+
+
 def _read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -98,26 +120,43 @@ def frozen_inputs(out_dir: Path) -> dict[str, dict[str, Any]]:
     return inputs
 
 
-def frozen_vectors(out_dir: Path) -> dict[str, Any]:
-    """The frozen vectors, copied again from evaluation/data when the embedding model changed."""
-    path = out_dir / VECTORS_FILE
+def frozen_vectors(
+    out_dir: Path,
+    pairs: Sequence[Pair] = PAIRS,
+    source_path: Path = DEFAULT_EVAL_DIR / EMBEDDINGS_FILE,
+) -> dict[str, Any]:
+    """The vectors of the pairs scored with embeddings.
+
+    While the embedding model and revision stay the same, a vector already frozen is kept as it
+    is and only missing ones are copied from evaluation/data, so adding a pair moves no other
+    pair even if the evaluation set was re-embedded since. With a new model or revision, every
+    vector is copied again.
+    """
     settings = DEFAULT_CONFIG.embedding
     needed = {
-        "candidates": {c for c, _, with_vectors, _ in PAIRS if with_vectors},
-        "jobs": {j for _, j, with_vectors, _ in PAIRS if with_vectors},
+        "candidates": {c for c, _, with_vectors, _ in pairs if with_vectors},
+        "jobs": {j for _, j, with_vectors, _ in pairs if with_vectors},
     }
+    kept: dict[str, Any] = {kind: {} for kind in needed}
+    path = out_dir / VECTORS_FILE
     if path.is_file():
-        vectors = _read(path)
-        same_model = (vectors["model"], vectors["revision"]) == (settings.model, settings.revision)
-        if same_model and all(needed[k] <= set(vectors[k]) for k in needed):
-            return vectors
-    source = load_embeddings(DEFAULT_EVAL_DIR / EMBEDDINGS_FILE)  # checks the model
-    vectors = {"model": settings.model, "revision": settings.revision}
+        old = _read(path)
+        if (old["model"], old["revision"]) == (settings.model, settings.revision):
+            kept = {kind: old[kind] for kind in needed}
+
+    missing = {kind: sorted(ids - set(kept[kind])) for kind, ids in needed.items()}
+    # Read (and check the model of) evaluation/data only when something has to be copied.
+    source = load_embeddings(source_path) if any(missing.values()) else None
+    vectors: dict[str, Any] = {"model": settings.model, "revision": settings.revision}
     for kind, ids in needed.items():
-        missing = sorted(ids - set(source[kind]))
-        if missing:
-            raise SystemExit(f"{EMBEDDINGS_FILE} has no vector for {', '.join(missing)}")
-        vectors[kind] = {record_id: source[kind][record_id] for record_id in sorted(ids)}
+        copied: dict[str, Any] = {}
+        if source is not None:
+            absent = [record_id for record_id in missing[kind] if record_id not in source[kind]]
+            if absent:
+                raise SystemExit(f"{source_path} has no vector for {', '.join(absent)}")
+            copied = {record_id: source[kind][record_id] for record_id in missing[kind]}
+        merged = {**kept[kind], **copied}
+        vectors[kind] = {record_id: merged[record_id] for record_id in sorted(ids)}
     return vectors
 
 
@@ -142,6 +181,7 @@ def expected_values(inputs: Mapping[str, Any], vectors: Mapping[str, Any]) -> li
     for candidate_id, job_id, embeddings, why in PAIRS:
         result = score_pair(inputs, vectors, candidate_id, job_id, embeddings)
         total = result["total"]
+        total_min, total_max = allowed_range(total)
         pairs.append(
             {
                 "id": pair_id(candidate_id, job_id, embeddings),
@@ -150,8 +190,9 @@ def expected_values(inputs: Mapping[str, Any], vectors: Mapping[str, Any]) -> li
                 "embeddings": embeddings,
                 "why": why,
                 "frozen_total": total,
-                "total_min": round(max(0.0, total - TOLERANCE), 2),
-                "total_max": round(min(100.0, total + TOLERANCE), 2),
+                # For the reader of the diff; the test recomputes them from frozen_total.
+                "total_min": total_min,
+                "total_max": total_max,
                 "band": result["explanation"]["band"],
                 "matched_skills": result["matched_skills"],
             }
@@ -185,22 +226,23 @@ def build(out_dir: Path, note: str | None) -> dict[str, str]:
     path = out_dir / EXPECTED_FILE
     history = _read(path)["history"] if path.is_file() else []
     current = fingerprint()
+    expected: dict[str, Any] = {
+        "model_version": DEFAULT_CONFIG.model_version,
+        "tolerance": TOLERANCE,
+        "fingerprint": current,
+        "pairs": expected_values(inputs, vectors),
+    }
     if note is not None:
         history.append(
             {
                 "date": date.today().isoformat(),
                 "model_version": DEFAULT_CONFIG.model_version,
                 "fingerprint": current,
+                "results": results_digest(expected),
                 "note": note,
             }
         )
-    expected = {
-        "model_version": DEFAULT_CONFIG.model_version,
-        "tolerance": TOLERANCE,
-        "fingerprint": current,
-        "pairs": expected_values(inputs, vectors),
-        "history": history,
-    }
+    expected["history"] = history
     return {
         EXPECTED_FILE: render(expected),
         INPUTS_FILE: render(inputs),

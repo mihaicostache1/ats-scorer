@@ -187,16 +187,7 @@
         "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
         "skill_taxonomy": "76d50d1e07a58f8f"
       },
-      "note": "Initial freeze of 11 pairs at hybrid-1.2.0 (L-19)"
-    },
-    {
-      "date": "2026-11-26",
-      "model_version": "hybrid-1.2.0",
-      "fingerprint": {
-        "weights_yaml": "bfdbcccb0c63ddb8",
-        "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
-        "skill_taxonomy": "76d50d1e07a58f8f"
-      },
+      "results": "05dd19b70707db0b",
       "note": "Initial freeze of 11 pairs at hybrid-1.2.0 (L-19)"
     }
   ]

@@ -2,9 +2,10 @@
 
 Eleven candidate/job pairs, with their inputs and embedding vectors, are frozen in
 tests/data/scorer_regression/ by evaluation/freeze_regression_pairs.py. Each must keep its total
-within the frozen range, its band and its matched skills. Changing weights.yaml, the embedding
-model or the skill taxonomy fails here even when no score moves, until the expected values are
-frozen again in the same PR with a note saying why.
+within TOLERANCE (from the script, not the file) of its frozen_total, its band and its matched
+skills. Changing weights.yaml, the embedding model or the skill taxonomy fails here even when no
+score moves, and so does any change to the expected results, until they are frozen again in the
+same PR with a note saying why.
 """
 
 import importlib.util
@@ -60,8 +61,15 @@ def test_the_frozen_pairs_are_the_listed_ones(expected: dict[str, Any]) -> None:
 
     assert [pair["id"] for pair in PAIRS] == listed, HOW_TO_UPDATE
     assert 8 <= len(PAIRS) <= 15
-    for pair in PAIRS:  # the ranges in the file were not widened by hand
-        assert pair["total_max"] - pair["total_min"] <= 2 * expected["tolerance"] + 1e-9
+
+
+def test_the_ranges_in_the_file_are_the_ones_applied(expected: dict[str, Any]) -> None:
+    # The test checks each total against frozen_total and TOLERANCE; the stored range is only for
+    # the reader, so it must not say something else.
+    assert expected["tolerance"] == freeze.TOLERANCE, HOW_TO_UPDATE
+    for pair in PAIRS:
+        stored = (pair["total_min"], pair["total_max"])
+        assert stored == freeze.allowed_range(pair["frozen_total"]), (pair["id"], HOW_TO_UPDATE)
 
 
 def test_settings_are_the_ones_the_pairs_were_frozen_with(expected: dict[str, Any]) -> None:
@@ -77,6 +85,9 @@ def test_every_freeze_says_why(expected: dict[str, Any]) -> None:
     assert history, "the regression pairs have no history"
     assert history[-1]["fingerprint"] == expected["fingerprint"], (
         f"the latest change to the expected values has no note. {HOW_TO_UPDATE}"
+    )
+    assert history[-1].get("results") == freeze.results_digest(expected), (
+        f"the expected results changed since the latest note. {HOW_TO_UPDATE}"
     )
     for entry in history:
         assert entry["date"] and len(entry["note"].strip()) >= 15, entry
@@ -96,9 +107,44 @@ def test_a_frozen_pair_keeps_its_result(expected: dict[str, Any], pair: dict[str
         INPUTS, VECTORS, pair["candidate_id"], pair["job_id"], pair["embeddings"]
     )
 
-    assert pair["total_min"] <= result["total"] <= pair["total_max"], (
-        f"total {result['total']}, frozen at {pair['frozen_total']} "
-        f"(allowed {pair['total_min']} to {pair['total_max']}). {HOW_TO_UPDATE}"
+    total = result["total"]
+
+    assert abs(total - pair["frozen_total"]) <= freeze.TOLERANCE + 1e-9, (
+        f"total {total}, frozen at {pair['frozen_total']} "
+        f"(allowed ±{freeze.TOLERANCE}). {HOW_TO_UPDATE}"
     )
     assert result["explanation"]["band"] == pair["band"], HOW_TO_UPDATE
     assert result["matched_skills"] == pair["matched_skills"], HOW_TO_UPDATE
+
+
+def _write_vectors(path: Path, revision: str, candidates: Any, jobs: Any) -> None:
+    model = DEFAULT_CONFIG.embedding.model
+    vectors = {"model": model, "revision": revision, "candidates": candidates, "jobs": jobs}
+    path.write_text(json.dumps(vectors), encoding="utf-8")
+
+
+def test_adding_a_pair_keeps_the_frozen_vectors(tmp_path: Path) -> None:
+    revision = DEFAULT_CONFIG.embedding.revision
+    _write_vectors(tmp_path / freeze.VECTORS_FILE, revision, {"C1": [0.1, 0.2]}, {"J1": [0.3]})
+    # evaluation/data was re-embedded since the freeze, with the same model and revision
+    source = tmp_path / "source.json"
+    _write_vectors(source, revision, {"C1": [0.9, 0.9], "C2": [0.5, 0.6]}, {"J1": [0.9]})
+    pairs = [("C1", "J1", True, "frozen before"), ("C2", "J1", True, "added now")]
+
+    vectors = freeze.frozen_vectors(tmp_path, pairs, source)
+
+    assert vectors["candidates"] == {"C1": [0.1, 0.2], "C2": [0.5, 0.6]}
+    assert vectors["jobs"] == {"J1": [0.3]}
+
+
+def test_a_new_embedding_revision_copies_every_vector_again(tmp_path: Path) -> None:
+    _write_vectors(tmp_path / freeze.VECTORS_FILE, "old", {"C1": [0.1, 0.2]}, {"J1": [0.3]})
+    source = tmp_path / "source.json"
+    revision = DEFAULT_CONFIG.embedding.revision
+    _write_vectors(source, revision, {"C1": [0.9, 0.9]}, {"J1": [0.9]})
+
+    vectors = freeze.frozen_vectors(tmp_path, [("C1", "J1", True, "frozen before")], source)
+
+    assert vectors["revision"] == revision
+    assert vectors["candidates"] == {"C1": [0.9, 0.9]}
+    assert vectors["jobs"] == {"J1": [0.9]}

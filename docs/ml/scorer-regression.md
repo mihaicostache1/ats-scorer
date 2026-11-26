@@ -12,13 +12,13 @@ Eleven candidate/job pairs are frozen with their expected results, and CI checks
 
 For each pair, the scorer runs on the frozen CV, job and embedding vectors, and the result must keep:
 
-- **the total**, within 2 points of the frozen value. Smaller moves are rounding or refactoring. A bigger move changes behaviour, so a reviewer should see it.
+- **the total**, within 2 points of `frozen_total`. Smaller moves are rounding or refactoring. A bigger move changes behaviour, so a reviewer should see it. The 2 points are `TOLERANCE` in the script; `total_min` and `total_max` in the file are only there for the reader, and the test fails if they don't match `frozen_total` ± `TOLERANCE`.
 - **the band** (strong, moderate or weak), exactly. It is what a recruiter sees first.
 - **the matched skills**, exactly and in the same order.
 
 The pairs come from the rated evaluation set. They cover all six jobs and every rating from 0 to 3. They include the three explanation examples (strong, moderate and weak), the same candidate for two jobs (C021: rated 3 for J01, 0 for J10), and one pair scored without embeddings, so the path where weights are spread over the other components is covered too. Each pair's reason is in `PAIRS` in the script.
 
-The inputs are copies, not links. The evaluation set can change without moving these tests.
+The inputs are copies, not links. The evaluation set can change without moving these tests. The same goes for the embedding vectors: while the model and revision stay the same, a frozen vector is never replaced, and adding a pair only copies that pair's vectors.
 
 ## Settings changes fail on purpose
 
@@ -41,9 +41,9 @@ When a change is intended, in the same PR:
    python evaluation/freeze_regression_pairs.py --note "Why the values change, e.g. L-20 raised the skill weight to 0.35"
    ```
 
-   The note is required (15 characters or more). It goes into the `history` of `expected.json` with the date, model version and fingerprint. The test fails if the latest fingerprint has no note.
+   The note is required (15 characters or more). It goes into the `history` of `expected.json` with the date, model version, fingerprint and `results`, a digest of the expected results it explains (model version, tolerance, fingerprint and pairs). The test fails if the latest fingerprint has no note, or if the expected results no longer match the latest note's digest, so a baseline can't change under an old note.
 3. Commit `ml/tests/data/scorer_regression/`. The diff of `expected.json` shows which totals, bands and matched skills moved, for the reviewer to judge.
 
 `python evaluation/freeze_regression_pairs.py --check` exits with 1 if the frozen files are not exactly what the scorer gives now. That's stricter than the test, which allows the 2-point margin.
 
-To add a pair, add it to `PAIRS` and run the script with a note. Its CV and job are copied the first time.
+To add a pair, add it to `PAIRS` and run the script with a note. Its CV, job and vectors are copied the first time; the other pairs' frozen inputs and vectors stay as they are.
