@@ -29,6 +29,12 @@ class EmbeddingSettings:
 
 
 @dataclass(frozen=True)
+class BandSettings:
+    strong: float  # lowest total that is "strong"
+    moderate: float  # lowest total that is "moderate"; below it is "weak"
+
+
+@dataclass(frozen=True)
 class ScorerConfig:
     model_version: str
     weights: Mapping[str, float]
@@ -36,6 +42,7 @@ class ScorerConfig:
     preferred_skill_weight: float
     embedding: EmbeddingSettings
     older_title_factor: float
+    bands: BandSettings
 
 
 def _section(data: Mapping[str, Any], key: str) -> Mapping[str, Any]:
@@ -94,6 +101,12 @@ def parse_config(data: Mapping[str, Any]) -> ScorerConfig:
     if not 0 <= older <= 1:
         raise ValueError("weights.yaml: 'title.older_title_factor' must be from 0 to 1")
 
+    bands = _section(data, "bands")
+    strong = _number(bands, "strong", "bands")
+    moderate = _number(bands, "moderate", "bands")
+    if not 0 < moderate < strong <= 100:
+        raise ValueError("weights.yaml: need 0 < bands.moderate < bands.strong <= 100")
+
     return ScorerConfig(
         model_version=_text(data, "model_version", ""),
         weights=weights,
@@ -107,6 +120,7 @@ def parse_config(data: Mapping[str, Any]) -> ScorerConfig:
             cosine_ceiling=ceiling,
         ),
         older_title_factor=older,
+        bands=BandSettings(strong=strong, moderate=moderate),
     )
 
 

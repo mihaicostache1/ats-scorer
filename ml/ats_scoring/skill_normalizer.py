@@ -261,6 +261,9 @@ class NormalizedSkill:
     esco_uri: str | None = None
     esco_label: str | None = None  # ESCO's preferred label of that concept
     suggestion: str | None = None
+    # Where extract_skills() found `raw`: text[start:end] == raw. None from normalize_skills().
+    start: int | None = None
+    end: int | None = None
 
     @property
     def accepted(self) -> bool:
@@ -385,11 +388,12 @@ class SkillNormalizer:
         Looks for alias-table entries and ESCO preferred labels, longest phrase first,
         and returns each skill once, in order of first mention. Only exact matches are
         returned: fuzzy and embedding matching on every phrase of a text would mostly
-        produce noise. `raw` is the phrase as written.
+        produce noise. `raw` is the phrase as written, and `start` and `end` are where the
+        first mention is: `text[skill.start:skill.end] == skill.raw`.
         """
         phrases, longest = self._phrase_index()
         tokens = list(_TOKEN.finditer(text))
-        spans: list[str] = []
+        spans: list[tuple[int, int]] = []
         position = 0
         while position < len(tokens):
             for length in range(min(longest, len(tokens) - position), 0, -1):
@@ -398,16 +402,19 @@ class SkillNormalizer:
                 needs_capital = phrases.get(clean_skill(surface))
                 if needs_capital is None or (needs_capital and surface.islower()):
                     continue
-                spans.append(surface)
+                spans.append((start, start + len(surface)))
                 position += length
                 break
             else:
                 position += 1
 
+        surfaces = [text[start:end] for start, end in spans]
         unique: dict[str, NormalizedSkill] = {}
-        for skill in self.normalize_skills(spans):
+        for skill, (start, end) in zip(self.normalize_skills(surfaces), spans, strict=True):
             if skill.normalized is not None:
-                unique.setdefault(clean_skill(skill.normalized), skill)
+                unique.setdefault(
+                    clean_skill(skill.normalized), replace(skill, start=start, end=end)
+                )
         return list(unique.values())
 
     def _known(self, key: str) -> NormalizedSkill | None:

@@ -341,6 +341,19 @@ def test_only_different_gender_coded_details_give_an_identical_score() -> None:
     assert score(other, JOB) == score(MARIA, JOB)
 
 
+def test_no_redacted_value_reaches_the_explanation() -> None:
+    """L-17: the explanation quotes CV phrases, so they come from the redacted record."""
+    cv = copy.deepcopy(MARIA)
+    cv["skills"][0]["raw"] = "Python (maria.jpg, maria.ionescu@example.com)"
+
+    explanation = score(cv, JOB)["explanation"]
+
+    assert leaks(explanation) == []
+    assert {"skill": "Python", "requirement": "required", "cv_phrase": "Python"} in explanation[
+        "matched_skills"
+    ]
+
+
 def test_the_score_still_uses_the_qualifications() -> None:
     result = score(MARIA, JOB)
 

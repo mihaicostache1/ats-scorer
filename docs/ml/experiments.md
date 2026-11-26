@@ -2,6 +2,103 @@
 
 One section per experiment on the scorer, newest first. Each says what was tried, how, what came out and what was decided. How the evaluation works: [evaluation.md](evaluation.md).
 
+## L-18: band thresholds
+
+**Status:** done, 2026-11-21. **Decision: strong from 70, moderate from 50, weak below**, in `weights.yaml` (`hybrid-1.2.0`). Owner: ML/DevOps lead.
+
+| What | Where |
+|---|---|
+| Search and check | [ml/evaluation/band_thresholds.py](../../ml/evaluation/band_thresholds.py) |
+| Result | [ml/evaluation/results/2026-11-21_band-thresholds.json](../../ml/evaluation/results/2026-11-21_band-thresholds.json) |
+| Thresholds | `bands` in [ml/ats_scoring/weights.yaml](../../ml/ats_scoring/weights.yaml) |
+| Band names and UI wording | [score-explanation.md](score-explanation.md#bands-in-the-ui) |
+
+### Question
+
+The ranked list shows a band next to each score: strong, moderate or weak (US-08). Where should the cuts be, and how often does a band agree with what a person would say about the candidate?
+
+**What the score is.** The score ranks candidates for one job. It is not a probability that the candidate passes screening, and the band is not a verdict: it is a coarse label on that ranking, to help a recruiter decide whom to read first. Everything below measures how well the bands line up with one person's ratings, not how likely anyone is to be hired.
+
+### Setup
+
+**Fit on the L-9 pairs, check on the L-15 pairs.** The thresholds are picked on the 30 carefully rated L-9 pairs (J01, J07, J10) and checked on the 30 pairs added in L-15 (J04, J09, J13), which were rated in a hurried session. The split is by job, so the check also asks whether thresholds carry over to jobs they were not picked on.
+
+**Target band per rating,** from the rating scale ([evaluation.md](evaluation.md#the-ratings-file)): 3 "strong fit, you would shortlist" should be strong, 2 "good fit, one gap" moderate, 1 "weak fit" and 0 "no fit" weak.
+
+**Thresholds tried:** multiples of 5 from 5 to 95, moderate below strong (171 pairs). 30 pairs cannot support a finer cut, and round numbers are easier to explain.
+
+**Objective:** the highest quadratic-weighted kappa between band and target band on the fit pairs, so a "no fit" in strong costs more than in moderate. Ties go to fewer two-band errors (a 3 in weak, or a 0 or 1 in strong), then to the middle of the tied thresholds.
+
+**Decision rule, fixed before the run:** the picked thresholds go into `weights.yaml` if the weighted kappa on the check pairs is at least 0.40. Otherwise bands stay out of the UI until there is better data.
+
+**Not a clean check, in one respect.** L-17 had already set provisional thresholds (60 / 40) by reading a table of all 60 pairs, so the check pairs had been looked at once before this rule was written. The rule does not use 60 / 40, and the fit half alone picks the thresholds, but the author knew the shape of the data.
+
+**Scorer:** `hybrid-1.2.0` with the stored embeddings. Its totals are the same as `hybrid-1.1.0` on every pair.
+
+### Results
+
+One run of `python evaluation/band_thresholds.py` on 2026-11-21, 60 rated pairs, one rater.
+
+**Picked: strong from 70, moderate from 50.** It was the only best pair on the fit half (weighted kappa 0.755, one two-band error). Next best: 70 / 55 (0.734), 60 / 50 (0.730), 65 / 50 (0.726). **The rule holds:** weighted kappa on the check half is 0.571 (95% bootstrap interval 0.384 to 0.722, resampling candidates within each job).
+
+| Half | Pairs | Weighted kappa | Same band as the rating | Two-band errors |
+|---|---|---|---|---|
+| Fit (J01, J07, J10) | 30 | 0.755 | 77% | 1 |
+| Check (J04, J09, J13) | 30 | 0.571 | 60% | 1 |
+| All | 60 | 0.673 | 68% | 2 |
+
+Each band against the ratings, all 60 pairs. Precision: of the pairs in the band, the share whose rating belongs there. Recall: of the pairs whose rating belongs in the band, the share that got it.
+
+| Band | Pairs | Rated 3 | 2 | 1 | 0 | Precision | Recall |
+|---|---|---|---|---|---|---|---|
+| strong (70+) | 5 | 5 | 0 | 0 | 0 | 1.00 | 0.28 |
+| moderate (50-69.99) | 19 | 11 | 5 | 3 | 0 | 0.26 | 0.63 |
+| weak (below 50) | 36 | 2 | 3 | 10 | 21 | 0.86 | 0.91 |
+
+By half:
+
+| Band | Fit: pairs | rated 3 / 2 / 1 / 0 | Check: pairs | rated 3 / 2 / 1 / 0 |
+|---|---|---|---|---|
+| strong | 5 | 5 / 0 / 0 / 0 | 0 | 0 / 0 / 0 / 0 |
+| moderate | 9 | 3 / 4 / 2 / 0 | 10 | 8 / 1 / 1 / 0 |
+| weak | 16 | 1 / 1 / 6 / 8 | 20 | 1 / 2 / 4 / 13 |
+
+Per job, with the median total of the pairs rated 3:
+
+| Job | Weighted kappa | Same band | Strong / moderate / weak | Highest total | Median total of the 3s |
+|---|---|---|---|---|---|
+| J01 Senior Backend Engineer | 0.923 | 90% | 2 / 2 / 6 | 83.8 | 79.0 |
+| J07 Data Analyst | 0.568 | 60% | 2 / 3 / 5 | 71.2 | 64.4 |
+| J10 Marketing Assistant | 0.815 | 80% | 1 / 4 / 5 | 73.4 | 70.7 |
+| J04 Lead Platform Engineer | 0.333 | 70% | 0 / 1 / 9 | 62.6 | 55.3 |
+| J09 UX Designer | 0.638 | 50% | 0 / 4 / 6 | 69.4 | 66.7 |
+| J13 Senior Data Scientist | 0.636 | 60% | 0 / 5 / 5 | 66.8 | 66.5 |
+
+- **Strong is precise and rare.** All 5 pairs in strong were rated 3, and no 0 or 1 ever reached it. But only 5 of the 18 pairs rated 3 are strong; 11 are moderate. On the check jobs nobody is strong, including the 9 pairs rated 3.
+- **Weak is reliable.** 31 of the 36 weak pairs were rated 0 or 1. Two pairs rated 3 fell in weak, one per half: C008/J07 (24.0, a candidate the scorer misses) and C084/J04 (48.1, just under the cut).
+- **Moderate is mixed.** It holds most of the good candidates the strong cut leaves out, plus three pairs rated 1. In the UI it reads as "worth a look", not "average".
+- **The same score means different things in different jobs.** The median total of the pairs rated 3 runs from 55 (J04) to 79 (J01). A fixed cut cannot fit every job: the top candidate for J04 scores 62.6, which is moderate even though they were rated 3. This is why the score is a ranking aid within a job, and why the list should be read top-down rather than by band alone.
+- **Missing embeddings barely move bands.** Scored without embeddings, 2 of the 60 pairs change band (C020/J10 from moderate to weak, C027/J07 from strong to moderate). Weighted kappa over all 60 goes from 0.673 to 0.642.
+- **For comparison, L-17's 60 / 40** gives weighted kappa 0.682 on the fit half and 0.935 on the check half, with 16 of the 18 pairs rated 3 in strong. It was chosen after looking at all 60 pairs, so its check figure is not a fair test, and the rule fixed before this run does not consider it. It is the natural candidate to test against 70 / 50 when new pairs are rated.
+
+### Decision
+
+**Use strong from 70, moderate from 50** (`weights.yaml`). The rule holds: check kappa 0.571 against a minimum of 0.40. The UI wording is chosen to match what the bands do: strong is rare and means "very likely a good fit", moderate holds most good candidates, and weak means "unlikely fit", never "rejected" ([score-explanation.md](score-explanation.md#bands-in-the-ui)).
+
+`hybrid-1.2.0` has not been released (L-17 is not merged yet), so the thresholds change within that version. Any later change needs a new `model_version`.
+
+What would help next:
+
+1. New rated pairs, ideally by a second rater, to test 70 / 50 against 60 / 40 on data neither was chosen on. The 60 pairs here have now been used for the bands as well as the weights.
+2. Per-job bands. The per-job table shows that the score's level depends on the job. A band relative to the job's own candidates (for example, the top tenth) would follow the ranking instead of a fixed number, but it needs enough candidates per job and a product decision.
+
+### Limits
+
+- **One rater, 60 synthetic pairs, 6 jobs.** The same limits as L-15. With 30 pairs per half, a band moving by one pair changes exact agreement by 3 points, and the bootstrap interval of the check kappa is wide (0.38 to 0.72).
+- **The check half was rated with less care.** Noisy labels pull its agreement down, so 0.571 may understate how well the bands work. They do not explain why strong is empty on the check jobs: their totals are lower.
+- **The check half was not unseen.** See Setup. The fit half alone picked the thresholds, under a rule written before the run.
+- **The target mapping is a choice.** Putting rating 2 in strong instead of moderate would favour a lower strong cut. The mapping follows the rating scale's wording, where only a 3 is "you would shortlist".
+
 ## L-15: tuning the hybrid scorer's weights
 
 **Status:** done, 2026-11-17. **Decision: keep the current weights.** Owner: ML/DevOps lead.

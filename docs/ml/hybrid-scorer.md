@@ -1,6 +1,6 @@
 # Hybrid scorer v1 (L-13)
 
-**Status:** implemented, `model_version` `hybrid-1.1.0` (1.0.0 plus redaction, L-14). Not called by the API yet. Owner: ML/DevOps lead.
+**Status:** implemented, `model_version` `hybrid-1.2.0` (1.0.0 plus redaction, L-14, plus the explanation and band, L-17, with the same totals as 1.1.0). Not called by the API yet. Owner: ML/DevOps lead.
 
 | What | Where |
 |---|---|
@@ -9,6 +9,7 @@
 | Embeddings (offline) | [ml/ats_scoring/embeddings.py](../../ml/ats_scoring/embeddings.py) |
 | Title similarity | [ml/ats_scoring/titles.py](../../ml/ats_scoring/titles.py) |
 | Redaction (L-14) | [ml/ats_scoring/redaction.py](../../ml/ats_scoring/redaction.py), see [redaction.md](redaction.md) |
+| Explanation and band (L-17, L-18) | [ml/ats_scoring/explanation.py](../../ml/ats_scoring/explanation.py), see [score-explanation.md](score-explanation.md); thresholds in [experiments.md](experiments.md#l-18-band-thresholds) |
 | Evaluation result | [ml/evaluation/results/2026-11-10_hybrid-1.1.0.json](../../ml/evaluation/results/2026-11-10_hybrid-1.1.0.json) (same scores as [1.0.0](../../ml/evaluation/results/2026-11-07_hybrid-1.0.0.json)) |
 | Ablation | [ml/evaluation/ablation.py](../../ml/evaluation/ablation.py) |
 | Timing | [ml/benchmarks/time_scoring.py](../../ml/benchmarks/time_scoring.py) |
@@ -23,7 +24,7 @@ The hybrid scorer beats the L-7 baseline on all three L-9 metrics: Spearman over
 
 | Component | Weight | How it is computed | `None` when |
 |---|---|---|---|
-| `skill_overlap` | 0.30 | Weighted share of the job's skills found in the CV's skill list. A required skill weighs 1.0 and a nice-to-have one 0.5. A skill listed as both counts as required | The job lists no skills |
+| `skill_overlap` | 0.30 | Weighted share of the job's skills found in the CV's skill list. A required skill weighs 1.0 and a nice-to-have one 0.5. A skill listed as both counts as required | The job lists no skills, or lists only nice-to-have skills while `preferred_weight` is 0 (the explanation still counts them and says they carry no weight) |
 | `embedding_similarity` | 0.35 | Cosine of the CV and job embeddings (`multilingual-e5-small`), mapped linearly from [0.80, 0.95] to 0-100 | Either embedding is missing |
 | `experience_fit` | 0.10 | 100 when the CV's `experience_years` meets the job's `min_experience_years`, falling linearly to 0 at no experience. More years than asked are not penalized | Either number is missing, or the job asks for 0 years |
 | `title_similarity` | 0.15 | Word overlap between the job title and the CV's headline and position titles, with seniority words removed. Older positions count 0.8 | The job or the CV has no title |
@@ -39,7 +40,7 @@ The total is the weighted mean of the components that are present. When a compon
 - **A minimum of 0 years is not scored.** Every candidate meets it, so it would add the same points to everyone and push unrelated candidates up to about 15/100.
 - **Title: seniority words are removed.** "Senior Backend Engineer", "Mid-level Backend Engineer" and "Backend Developer" count as the same role (hyphenated labels such as "mid-level" and "entry-level" are removed like "mid level"). Seniority is the experience component's job. `+` and `#` are kept, so "C", "C++" and "C#" Developer are different roles. Developer and engineer are treated as synonyms. Generic words (engineer, manager, specialist) count half, so "Backend Engineer" and "Frontend Engineer" score only 33.
 - **Qualifications only (US-06).** `score()` and `Embedder` first pass the CV through `redact()` (L-14, [redaction.md](redaction.md)), which removes the name, contact details, dates, birth date, photo references and gendered words, also inside the summary and bullets. Embeddings are then built from the same text as TF-IDF: headline, summary, skills, titles, bullets, degrees and certifications. Tests check that no redacted value reaches the scorer and that a different name gives an identical score.
-- **`score_explanations`** has one plain sentence per component, for example "Has 1.5 years of experience, below the 3 years the job asks for." or "Closest job title: Data Analyst (title fit 100/100, seniority aside).".
+- **`score_explanations`** has one plain sentence per component, for example "Has 1.5 years of experience, below the 3 years the job asks for." or "Job title fit: 100/100, from the closest title in the CV, seniority aside.". No sentence quotes the CV: a headline can hold a birth date or other detail that redaction misses.
 
 ## Weights
 
@@ -131,7 +132,7 @@ Proposed mapping to the `scores` table (backend to confirm):
 | `components["embedding_similarity"]`, or `text_similarity` when it is `None` | `semantic_score` (not nullable) |
 | `components["experience_fit"]` | `experience_score` |
 | `components["title_similarity"]` | `title_fit_score` |
-| `components`, `weights`, `matched_skills`, `missing_skills`, `score_explanations` | `component_breakdown` |
+| `explanation` ([score-explanation.md](score-explanation.md)): components with their contributions, matched skills with the CV's phrase, missing skills, experience, band | `component_breakdown` |
 | `model_version` | `model_version` |
 
 ## Speed
