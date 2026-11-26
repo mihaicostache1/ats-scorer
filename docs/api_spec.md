@@ -268,6 +268,29 @@ Returns the job's pipeline stages in order. Any role can read. Every organizatio
 
 ---
 
+#### `GET /api/v1/jobs/{id}/ranked-candidates`
+
+Admins and recruiters can list a job's applicants using stored B-18 scores. The response contains
+`ranked`, `needs_manual_review`, and `unranked` groups, each with `items` and `pagination`.
+`page` and `per_page` apply to each group. A row includes the candidate name, stage, latest CV
+status, stored score and band, and years of experience from the score explanation.
+
+| Query parameter | Behavior | Default |
+| --- | --- | --- |
+| `stage_id` | Match the current stage UUID in every group | All stages |
+| `min_score` | Minimum current-model score, inclusive | Any score |
+| `required_skill` | Match a required job skill in the current explanation, including scorer aliases | Any skill |
+| `min_experience_years` | Minimum experience in the current explanation, inclusive | Any experience |
+| `sort_by` | `score` or `applied_at` | `score` |
+| `sort_order` | `asc` or `desc` | `desc` |
+| `page` | Page number starting at 1 | `1` |
+| `per_page` | Page size from 1 to 100 | `20` |
+
+`ranked` contains scores from the current model. `unranked` contains `pending` and `rescoring`
+applications. Older model scores are visible with their original version and timestamp. Manual
+review rows have null score and band. Score, skill, and experience filters require a current-model
+score. Reads never recompute an outcome. See the [OpenAPI draft](openapi.yaml) for the response schema.
+
 ### 2.3 Candidates & CV Upload
 
 #### `POST /api/v1/candidates`
@@ -597,35 +620,13 @@ Each entry keeps the application's latest `overall_score` and `model_version` at
 Creating an application and every stage move are recorded as audit events (`create_application`, `move_application_stage`). The move event carries the job and the from/to stage IDs and names; the free-text reason is kept only in the stage history.
 
 #### `GET /api/v1/applications/{id}/score`
-Retrieves candidate hybrid ranking score breakdown and explanations. `skill_overlap_score`, `experience_score` and `title_fit_score` are `null` when the scoring model does not compute them; `null` never means a score of 0.
 
-**Response (`200 OK`)**:
-```json
-{
-  "id": "d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e",
-  "application_id": "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
-  "overall_score": 88.50,
-  "skill_overlap_score": 90.00,
-  "semantic_score": 85.50,
-  "experience_score": 92.00,
-  "title_fit_score": 84.00,
-  "model_version": "v1.0.0-baseline-cpu",
-  "component_breakdown": {
-    "matched_skills": ["Python", "FastAPI", "PostgreSQL", "Docker"],
-    "missing_skills": ["Redis"],
-    "skill_match_percentage": 75.0,
-    "weights": {
-      "skill_overlap": 0.40,
-      "semantic": 0.30,
-      "experience": 0.20,
-      "title_fit": 0.10
-    },
-    "score_explanations": [
-      "Candidate possesses 4 out of 5 required skills for Senior Backend Engineer.",
-      "Sentence transformer cosine vector similarity score is 0.855.",
-      "Candidate has 5.5 years experience (exceeds min requirement of 4 years)."
-    ]
-  },
-  "calculated_at": "2026-10-01T09:15:30Z"
-}
-```
+Returns the application's current outcome with `status`, `score`, `band`, `model_version`,
+`computed_at`, and the [L-17 explanation](ml/score-explanation.md). An application awaiting a score
+returns `200` with `status: pending`. Applications requiring manual review return
+`status: needs_manual_review`. Both states carry null score, band, and explanation. An older-model
+result remains visible with `status: rescoring` and its original explanation.
+
+Admins and recruiters can read any application in their organization. A viewer can read score
+details for applications in screening, interview, offer, or hired stages. Out-of-scope applications
+return `404`. See the [OpenAPI draft](openapi.yaml) for the complete response schema.

@@ -11,7 +11,6 @@ type StageHistoryResponse = components["schemas"]["StageHistoryResponse"];
 /** In-memory stores — mutations persist for the browser session. */
 let applicationsStore: ApplicationResponse[] = [...mockApplications];
 const historyStore: Record<string, StageHistoryResponse[]> = structuredClone(mockStageHistory);
-const scoresStore: Record<string, components["schemas"]["ScoreResponse"]> = { ...mockScores };
 
 /** Application status follows the type of its current stage. */
 function statusForStage(stageId: string): ApplicationResponse["status"] {
@@ -47,7 +46,7 @@ export const applicationHandlers = [
 
   /**
    * POST /applications
-   * Links a candidate to a job in the first stage and synthesises a score record.
+   * Links a candidate to a job in the first stage.
    * Returns 409 if the candidate already applied to the job.
    */
   http.post(`${BASE}/applications`, async ({ request }) => {
@@ -91,24 +90,6 @@ export const applicationHandlers = [
         moved_at: now,
       },
     ];
-
-    // Auto-generate a placeholder score for the new application.
-    const rand = () => Math.round(Math.random() * 30 + 60); // 60–90
-    scoresStore[newApp.id] = {
-      id: crypto.randomUUID(),
-      application_id: newApp.id,
-      overall_score: rand(),
-      skill_overlap_score: rand(),
-      semantic_score: rand(),
-      experience_score: rand(),
-      title_fit_score: rand(),
-      model_version: "v1.0.0-baseline-cpu",
-      component_breakdown: {
-        matched_skills: [],
-        missing_skills: [],
-        explanations: ["Score computed by mock handler."],
-      },
-    };
 
     return HttpResponse.json(newApp, { status: 201 });
   }),
@@ -169,10 +150,21 @@ export const applicationHandlers = [
   }),
 
   /**
-   * GET /applications/:id/score — retrieve AI hybrid score breakdown.
+   * GET /applications/:id/score — retrieve the current score outcome.
    */
   http.get(`${BASE}/applications/:id/score`, ({ params }) => {
-    const score = scoresStore[params.id as string];
-    return score ? HttpResponse.json(score) : notFound("Score for application", params.id);
+    const application = applicationsStore.find((entry) => entry.id === params.id);
+    if (!application) return notFound("Application", params.id);
+    const outcome: components["schemas"]["ScoreResponse"] = mockScores[application.id] ?? {
+      id: null,
+      application_id: application.id,
+      status: "pending",
+      score: null,
+      band: null,
+      model_version: null,
+      computed_at: null,
+      explanation: null,
+    };
+    return HttpResponse.json(outcome);
   }),
 ];

@@ -2,6 +2,7 @@ import type { components } from "@/api/generated/schema";
 import { MOCK_ORG_ID, MOCK_USER_ID } from "./auth";
 import { mockJobs, mockPipelineStages } from "./jobs";
 import { mockCandidates } from "./candidates";
+import scoreExplanations from "./score-explanations.json";
 
 type ApplicationResponse = components["schemas"]["ApplicationResponse"];
 type ScoreResponse = components["schemas"]["ScoreResponse"];
@@ -77,72 +78,24 @@ export const mockApplications: ApplicationResponse[] = [
   },
 ];
 
-/** Pre-computed scores keyed by applicationId. */
-export const mockScores: Record<string, ScoreResponse> = {
-  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c": {
-    id: "d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e",
-    application_id: "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
-    overall_score: 87.5,
-    skill_overlap_score: 90.0,
-    semantic_score: 85.0,
-    experience_score: 92.0,
-    title_fit_score: 80.0,
-    model_version: "v1.0.0-baseline-cpu",
-    component_breakdown: {
-      matched_skills: ["Python", "FastAPI", "PostgreSQL", "Docker"],
-      missing_skills: [],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
-      explanations: [
-        "Candidate matched 4 of 4 required skills (100%).",
-        "Vector semantic similarity cosine distance is 0.85.",
-        "Candidate has 5.5 years experience (exceeds requirement of 4 years).",
-        "Job title 'Backend Software Engineer' is a strong match for 'Senior Python Backend Engineer'.",
-      ],
-    },
-  },
-  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5d": {
-    id: "d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6f",
-    application_id: "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5d",
-    overall_score: 78.2,
-    skill_overlap_score: 75.0,
-    semantic_score: 82.0,
-    experience_score: 88.0,
-    title_fit_score: 60.0,
-    model_version: "v1.0.0-baseline-cpu",
-    component_breakdown: {
-      matched_skills: ["Python", "PyTorch", "scikit-learn"],
-      missing_skills: ["FastAPI", "Docker"],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
-      explanations: [
-        "Candidate matched 3 of 4 required skills (75%).",
-        "Vector semantic similarity cosine distance is 0.82.",
-        "Candidate has 6.0 years experience (exceeds requirement of 4 years).",
-        "Title 'ML Research Scientist' is a weak match for 'Senior Python Backend Engineer'.",
-      ],
-    },
-  },
-  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5e": {
-    id: "d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d70",
-    application_id: "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5e",
-    overall_score: 94.1,
-    skill_overlap_score: 100.0,
-    semantic_score: 91.0,
-    experience_score: 95.0,
-    title_fit_score: 88.0,
-    model_version: "v1.0.0-baseline-cpu",
-    component_breakdown: {
-      matched_skills: ["TypeScript", "React", "Next.js", "Tailwind CSS"],
-      missing_skills: [],
-      weights: { skill_overlap: 0.4, semantic: 0.3, experience: 0.2, title_fit: 0.1 },
-      explanations: [
-        "Candidate matched 4 of 4 required skills (100%).",
-        "Vector semantic similarity cosine distance is 0.91.",
-        "Candidate has 7.0 years experience (exceeds requirement of 6 years).",
-        "Title 'Senior Frontend Engineer' is a strong match for 'Principal Frontend Architect'.",
-      ],
-    },
-  },
-};
+/** Local copies of the L-17 examples keep the web build self-contained. */
+export const mockScores: Record<string, ScoreResponse> = Object.fromEntries(
+  Object.values(scoreExplanations).map((data, index) => {
+    const explanation = data as components["schemas"]["ScoreExplanation"];
+    const application = mockApplications[index];
+    const outcome: ScoreResponse = {
+      id: `d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6${index}`,
+      application_id: application.id,
+      status: "scored",
+      score: explanation.total,
+      band: explanation.band,
+      model_version: explanation.model_version,
+      computed_at: application.applied_at,
+      explanation,
+    };
+    return [application.id, outcome];
+  })
+);
 
 type StageHistoryResponse = components["schemas"]["StageHistoryResponse"];
 

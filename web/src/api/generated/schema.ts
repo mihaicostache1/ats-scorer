@@ -341,6 +341,31 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/jobs/{id}/ranked-candidates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Ranked Candidates for a Job
+     * @description Admin and recruiter only. Reads stored application scores. The ranked group contains
+     *     scores from the current model. Candidates requiring review have their own group.
+     *     Pending scores and scores from an older model appear in the unranked group.
+     *     Each group uses the requested page and page size with its own item count.
+     *     The stage filter applies to every group. Score, skill, and experience filters require
+     *     a score from the current model.
+     */
+    get: operations["getRankedCandidates"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/candidates": {
     parameters: {
       query?: never;
@@ -611,7 +636,9 @@ export interface paths {
     };
     /**
      * Get Score & Explanation Breakdown
-     * @description Retrieve AI hybrid fit score, component scores, model version, and matched/missing skills.
+     * @description Retrieve the application's current score outcome and L-17 explanation. A pending or
+     *     manual-review application has no numeric score. An older-model result is labelled rescoring.
+     *     Viewers can read results for applications in the screening, interview, offer or hired stage.
      */
     get: operations["getApplicationScore"];
     put?: never;
@@ -1308,73 +1335,63 @@ export interface components {
        */
       moved_at: string;
     };
-    ScoreResponse: {
-      /**
-       * Format: uuid
-       * @example d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e
-       */
-      id: string;
-      /**
-       * Format: uuid
-       * @example b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-       */
+    ScoreSummary: {
+      /** @enum {string} */
+      status: "scored" | "needs_manual_review" | "pending" | "rescoring";
+      /** @description The stored total for a scored or rescoring application. */
+      score: number | null;
+      /** @enum {string|null} */
+      band: "strong" | "moderate" | "weak" | null;
+      model_version: string | null;
+      /** Format: date-time */
+      computed_at: string | null;
+    };
+    RankedCandidate: components["schemas"]["ScoreSummary"] & {
+      /** Format: uuid */
       application_id: string;
-      /** @example 87.5 */
-      overall_score: number;
-      /**
-       * @description Null when the scoring model does not compute this component.
-       * @example 90
-       */
-      skill_overlap_score: number | null;
-      /** @example 85 */
-      semantic_score: number;
-      /**
-       * @description Null when the scoring model does not compute this component.
-       * @example 92
-       */
-      experience_score: number | null;
-      /**
-       * @description Null when the scoring model does not compute this component.
-       * @example 80
-       */
-      title_fit_score: number | null;
-      /** @example v1.0.0-baseline-cpu */
+      /** Format: uuid */
+      candidate_id: string;
+      full_name: string;
+      /** Format: uuid */
+      stage_id: string;
+      stage_name: string;
+      /** @enum {string|null} */
+      cv_status:
+        "queued" | "extracting" | "extracted" | "parsed" | "needs_review" | "failed" | null;
+      /** Format: date-time */
+      applied_at: string;
+      experience_years: number | null;
+    };
+    RankedCandidatesPage: {
+      items: components["schemas"]["RankedCandidate"][];
+      pagination: components["schemas"]["PaginationMeta"];
+    };
+    RankedCandidatesResponse: {
+      ranked: components["schemas"]["RankedCandidatesPage"];
+      needs_manual_review: components["schemas"]["RankedCandidatesPage"];
+      unranked: components["schemas"]["RankedCandidatesPage"];
+      advisory_note: string;
+    };
+    ScoreResponse: components["schemas"]["ScoreSummary"] & {
+      /** Format: uuid */
+      id: string | null;
+      /** Format: uuid */
+      application_id: string;
+      explanation: components["schemas"]["ScoreExplanation"] | null;
+    };
+    ScoreExplanation: {
+      /** @constant */
+      explanation_version: "1.0";
       model_version: string;
-      component_breakdown: {
-        /**
-         * @example [
-         *       "Python",
-         *       "FastAPI",
-         *       "PostgreSQL"
-         *     ]
-         */
-        matched_skills?: string[];
-        /**
-         * @example [
-         *       "Docker"
-         *     ]
-         */
-        missing_skills?: string[];
-        /**
-         * @example {
-         *       "skill_overlap": 0.4,
-         *       "semantic": 0.3,
-         *       "experience": 0.2,
-         *       "title_fit": 0.1
-         *     }
-         */
-        weights?: {
-          [key: string]: number;
-        };
-        /**
-         * @example [
-         *       "Candidate matched 3 of 4 required skills.",
-         *       "Vector semantic similarity cosine distance is 0.85.",
-         *       "Candidate has 5.5 years experience (exceeds requirement of 4 years)."
-         *     ]
-         */
-        explanations?: string[];
-      };
+      total: number;
+      /** @enum {string} */
+      band: "strong" | "moderate" | "weak";
+      summary: string;
+      components: components["schemas"]["component"][];
+      matched_skills: components["schemas"]["matched_skill"][];
+      missing_skills: components["schemas"]["missing_skills"];
+      experience: components["schemas"]["experience"];
+      advisory_note: string;
     };
     PaginatedJobsResponse: {
       items: components["schemas"]["JobResponse"][];
@@ -1401,6 +1418,54 @@ export interface components {
       has_next: boolean;
       /** @example false */
       has_prev: boolean;
+    };
+    text: string;
+    points: number;
+    component: {
+      /** @enum {unknown} */
+      name:
+        | "skill_overlap"
+        | "embedding_similarity"
+        | "experience_fit"
+        | "title_similarity"
+        | "text_similarity";
+      /** @description Short name to show, e.g. "Skills". */
+      label: components["schemas"]["text"];
+      /** @description 0 to 100, or null when it could not be computed. Null never means 0. */
+      score: number | null;
+      /** @description Share of the total actually applied, 0 to 1. 0 when score is null: its share is spread over the other components. */
+      weight: number;
+      /** @description Points this component added to the total: score times weight. The contributions add up to the total, give or take rounding. */
+      contribution: components["schemas"]["points"];
+      /** @description One or two sentences from the templates. */
+      statement: components["schemas"]["text"];
+    };
+    matched_skill: {
+      /** @description As the job writes it. */
+      skill: components["schemas"]["text"];
+      /** @enum {unknown} */
+      requirement: "required" | "preferred";
+      /** @description As the CV writes it, e.g. "Postgres" for the job's "PostgreSQL". */
+      cv_phrase: components["schemas"]["text"];
+    };
+    /** @description Job skills the candidate lacks, as the job writes them. */
+    missing_skills: {
+      required: components["schemas"]["text"][];
+      /** @description Nice-to-have skills. */
+      preferred: components["schemas"]["text"][];
+    };
+    years: number | null;
+    experience: {
+      /**
+       * @description meets: has at least the minimum. below: has fewer years. not_required: the job gives no minimum, or 0. unknown: the CV gives no total years. Only meets and below are scored.
+       * @enum {unknown}
+       */
+      status: "meets" | "below" | "not_required" | "unknown";
+      /** @description Total years of experience from the CV, or null when it gives none. */
+      candidate_years: components["schemas"]["years"];
+      /** @description The job's minimum, or null when it gives none. */
+      required_years: components["schemas"]["years"];
+      statement: components["schemas"]["text"];
     };
   };
   responses: {
@@ -2194,6 +2259,54 @@ export interface operations {
       404: components["responses"]["404NotFound"];
     };
   };
+  getRankedCandidates: {
+    parameters: {
+      query?: {
+        /** @description Application stage ID. */
+        stage_id?: string;
+        /** @description Inclusive score threshold. */
+        min_score?: number;
+        /** @description A required job skill matched in the score explanation. Accepts case and common scorer aliases. */
+        required_skill?: string;
+        /** @description Inclusive minimum years of experience from the score explanation. Unknown values are excluded. */
+        min_experience_years?: number;
+        sort_by?: "score" | "applied_at";
+        /** @description Sort direction. Under score sorting, the review and unranked groups use newest applications first. */
+        sort_order?: "asc" | "desc";
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path: {
+        id: components["parameters"]["UUIDPathParam"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Ranked candidates, candidates for manual review, and unranked candidates. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RankedCandidatesResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      403: components["responses"]["403Forbidden"];
+      404: components["responses"]["404NotFound"];
+      /** @description Invalid path or query parameter. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
+        };
+      };
+    };
+  };
   listCandidates: {
     parameters: {
       query?: {
@@ -2682,12 +2795,24 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Current score outcome or pending status. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
           "application/json": components["schemas"]["ScoreResponse"];
+        };
+      };
+      401: components["responses"]["401Unauthorized"];
+      404: components["responses"]["404NotFound"];
+      /** @description Invalid application ID. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DetailError"];
         };
       };
     };
