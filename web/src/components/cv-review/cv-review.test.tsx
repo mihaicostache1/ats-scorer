@@ -559,9 +559,12 @@ describe("unsaved changes", () => {
     await user.click(screen.getByRole("button", { name: "Save corrections" }));
     await screen.findByRole("button", { name: "Confirm as correct" });
 
-    const event = new Event("beforeunload", { cancelable: true });
-    window.dispatchEvent(event);
-    expect(event.defaultPrevented).toBe(false);
+    // The guard drops its listener in an effect cleanup, which can run after the label changes.
+    await waitFor(() => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    });
   });
 
   it("resets to what was saved", async () => {
