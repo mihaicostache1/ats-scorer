@@ -22,9 +22,11 @@ from app.schemas.job import (
     UpdateJobStatusRequest,
 )
 from app.schemas.pagination import PaginationMeta
+from app.schemas.ranking import RankedCandidatesResponse, RankingSort
 from app.services.audit_service import log_audit_event
 from app.services.embedding_inputs import JOB_EMBEDDING_FIELDS, invalidate_embedding
 from app.services.pipeline_service import get_job_stages
+from app.services.ranking import list_ranked_candidates
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -221,6 +223,46 @@ def get_job_stages_endpoint(
 ) -> list[PipelineStage]:
     """Return the job's own stages, or the organization defaults when it has none."""
     return get_job_stages(db, _get_job_or_404(db, id))
+
+
+@router.get(
+    "/{id}/ranked-candidates",
+    response_model=RankedCandidatesResponse,
+    summary="List ranked candidates for a job",
+    operation_id="getRankedCandidates",
+)
+def get_ranked_candidates(
+    id: uuid.UUID,
+    stage_id: uuid.UUID | None = Query(None),
+    min_score: float | None = Query(None, ge=0, le=100, allow_inf_nan=False),
+    required_skill: str | None = Query(None, min_length=1, max_length=255),
+    min_experience_years: float | None = Query(None, ge=0, allow_inf_nan=False),
+    sort_by: RankingSort = Query(RankingSort.SCORE),
+    sort_order: SortOrder = Query(SortOrder.DESC),
+    page: int = Query(1, ge=1),
+    ranked_page: int | None = Query(None, ge=1),
+    review_page: int | None = Query(None, ge=1),
+    unranked_page: int | None = Query(None, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_tenant_db),
+    _current_user: User = Depends(get_current_recruiter_or_admin),
+) -> RankedCandidatesResponse:
+    return list_ranked_candidates(
+        db,
+        _get_job_or_404(db, id),
+        stage_id=stage_id,
+        min_score=min_score,
+        required_skill=required_skill,
+        min_experience_years=min_experience_years,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        group_pages={
+            "ranked": ranked_page if ranked_page is not None else page,
+            "needs_manual_review": review_page if review_page is not None else page,
+            "unranked": unranked_page if unranked_page is not None else page,
+        },
+        per_page=per_page,
+    )
 
 
 @router.patch(

@@ -1,0 +1,1742 @@
+{
+  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5c": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 70.35,
+    "band": "strong",
+    "summary": "Strong match. Has 4 of 4 required skills. Has 5.5 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 81.82,
+        "weight": 0.4615,
+        "contribution": 37.76,
+        "statement": "Has 4 of 4 required skills. Has 1 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 5.5 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 60.0,
+        "weight": 0.2308,
+        "contribution": 13.85,
+        "statement": "Job title fit: 60/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 21.83,
+        "weight": 0.1538,
+        "contribution": 3.36,
+        "statement": "Shared words with the job: 22/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      },
+      {
+        "skill": "FastAPI",
+        "requirement": "required",
+        "cv_phrase": "FastAPI"
+      },
+      {
+        "skill": "PostgreSQL",
+        "requirement": "required",
+        "cv_phrase": "PostgreSQL"
+      },
+      {
+        "skill": "Docker",
+        "requirement": "required",
+        "cv_phrase": "Docker"
+      },
+      {
+        "skill": "Redis",
+        "requirement": "preferred",
+        "cv_phrase": "Redis"
+      }
+    ],
+    "missing_skills": {
+      "required": [],
+      "preferred": ["PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 5.5,
+      "required_years": 4.0,
+      "statement": "Has 5.5 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b5e": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 73.54,
+    "band": "strong",
+    "summary": "Strong match. Has 4 of 4 required skills. Has 7 years of experience; the job asks for at least 6 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 90.91,
+        "weight": 0.4615,
+        "contribution": 41.95,
+        "statement": "Has 4 of 4 required skills. Has 2 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 7 years of experience; the job asks for at least 6 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 57.14,
+        "weight": 0.2308,
+        "contribution": 13.19,
+        "statement": "Job title fit: 57/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 19.56,
+        "weight": 0.1538,
+        "contribution": 3.01,
+        "statement": "Shared words with the job: 20/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "TypeScript",
+        "requirement": "required",
+        "cv_phrase": "TypeScript"
+      },
+      {
+        "skill": "React",
+        "requirement": "required",
+        "cv_phrase": "React"
+      },
+      {
+        "skill": "Next.js",
+        "requirement": "required",
+        "cv_phrase": "Next.js"
+      },
+      {
+        "skill": "Tailwind CSS",
+        "requirement": "required",
+        "cv_phrase": "Tailwind CSS"
+      },
+      {
+        "skill": "Playwright",
+        "requirement": "preferred",
+        "cv_phrase": "Playwright"
+      },
+      {
+        "skill": "Figma",
+        "requirement": "preferred",
+        "cv_phrase": "Figma"
+      }
+    ],
+    "missing_skills": {
+      "required": [],
+      "preferred": ["Storybook"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 7.0,
+      "required_years": 6.0,
+      "statement": "Has 7 years of experience; the job asks for at least 6 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b892a1c3-4d5e-6f7a-8b9c-0d1e2f3a4b61": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.1.0",
+    "total": 7.69,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 3 years of experience, below the 6 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 50.0,
+        "weight": 0.1538,
+        "contribution": 7.69,
+        "statement": "Has 3 years of experience, below the 6 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 0.0,
+        "weight": 0.2308,
+        "contribution": 0.0,
+        "statement": "Job title fit: 0/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 0.0,
+        "weight": 0.1538,
+        "contribution": 0.0,
+        "statement": "Shared words with the job: 0/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["TypeScript", "React", "Next.js", "Tailwind CSS"],
+      "preferred": ["Storybook", "Playwright", "Figma"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 3.0,
+      "required_years": 6.0,
+      "statement": "Has 3 years of experience, below the 6 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000001": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.1.0",
+    "total": 49.49,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 7 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 7 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.38,
+        "weight": 0.1,
+        "contribution": 0.74,
+        "statement": "Shared words with the job: 7/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 7.0,
+      "required_years": 4.0,
+      "statement": "Has 7 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000003": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 30.49,
+    "band": "weak",
+    "summary": "Weak match. Has 1 of 4 required skills. Has 4.5 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.4615,
+        "contribution": 8.39,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 4.5 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 6.11,
+        "weight": 0.1538,
+        "contribution": 0.94,
+        "statement": "Shared words with the job: 6/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 4.5,
+      "required_years": 4.0,
+      "statement": "Has 4.5 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000004": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 46.74,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 3 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 75.0,
+        "weight": 0.1,
+        "contribution": 7.5,
+        "statement": "Has 3 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1,
+        "contribution": 0.49,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 3.0,
+      "required_years": 4.0,
+      "statement": "Has 3 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000005": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.89,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 4 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 4 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1538,
+        "contribution": 0.74,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 4.0,
+      "required_years": 4.0,
+      "statement": "Has 4 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000006": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 30.76,
+    "band": "weak",
+    "summary": "Weak match. Has 1 of 4 required skills. Has 5 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.4615,
+        "contribution": 8.39,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 5 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.87,
+        "weight": 0.1538,
+        "contribution": 1.21,
+        "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 5.0,
+      "required_years": 4.0,
+      "statement": "Has 5 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000007": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 49.21,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 6 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 6 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.64,
+        "weight": 0.1,
+        "contribution": 0.46,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 6.0,
+      "required_years": 4.0,
+      "statement": "Has 6 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000008": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.91,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 7 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 7 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1538,
+        "contribution": 0.76,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 7.0,
+      "required_years": 4.0,
+      "statement": "Has 7 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000009": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.89,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 8 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 8 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1538,
+        "contribution": 0.74,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 8.0,
+      "required_years": 4.0,
+      "statement": "Has 8 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000010": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 49.99,
+    "band": "weak",
+    "summary": "Weak match. Has 1 of 4 required skills. Has 2 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.3,
+        "contribution": 5.45,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 50.0,
+        "weight": 0.1,
+        "contribution": 5.0,
+        "statement": "Has 2 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.87,
+        "weight": 0.1,
+        "contribution": 0.79,
+        "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 2.0,
+      "required_years": 4.0,
+      "statement": "Has 2 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000011": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 18.02,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 3 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 75.0,
+        "weight": 0.1538,
+        "contribution": 11.54,
+        "statement": "Has 3 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.64,
+        "weight": 0.1538,
+        "contribution": 0.71,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 3.0,
+      "required_years": 4.0,
+      "statement": "Has 3 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000012": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.91,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 4 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 4 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1538,
+        "contribution": 0.76,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 4.0,
+      "required_years": 4.0,
+      "statement": "Has 4 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000013": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 49.23,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 5 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 5 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1,
+        "contribution": 0.48,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 5.0,
+      "required_years": 4.0,
+      "statement": "Has 5 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000014": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 30.76,
+    "band": "weak",
+    "summary": "Weak match. Has 1 of 4 required skills. Has 6 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.4615,
+        "contribution": 8.39,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 6 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.87,
+        "weight": 0.1538,
+        "contribution": 1.21,
+        "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 6.0,
+      "required_years": 4.0,
+      "statement": "Has 6 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000015": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.87,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 7 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 7 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.64,
+        "weight": 0.1538,
+        "contribution": 0.71,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 7.0,
+      "required_years": 4.0,
+      "statement": "Has 7 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000016": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 49.24,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 8 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 8 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1,
+        "contribution": 0.49,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 8.0,
+      "required_years": 4.0,
+      "statement": "Has 8 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000017": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 14.2,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 2 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 50.0,
+        "weight": 0.1538,
+        "contribution": 7.69,
+        "statement": "Has 2 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1538,
+        "contribution": 0.74,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 2.0,
+      "required_years": 4.0,
+      "statement": "Has 2 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000018": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 26.91,
+    "band": "weak",
+    "summary": "Weak match. Has 1 of 4 required skills. Has 3 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.4615,
+        "contribution": 8.39,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 75.0,
+        "weight": 0.1538,
+        "contribution": 11.54,
+        "statement": "Has 3 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.87,
+        "weight": 0.1538,
+        "contribution": 1.21,
+        "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 3.0,
+      "required_years": 4.0,
+      "statement": "Has 3 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000019": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 49.21,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 4 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 4 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.64,
+        "weight": 0.1,
+        "contribution": 0.46,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 4.0,
+      "required_years": 4.0,
+      "statement": "Has 4 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000020": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.91,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 5 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 5 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1538,
+        "contribution": 0.76,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 5.0,
+      "required_years": 4.0,
+      "statement": "Has 5 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000021": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.89,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 6 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 6 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1538,
+        "contribution": 0.74,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 6.0,
+      "required_years": 4.0,
+      "statement": "Has 6 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000022": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 54.99,
+    "band": "moderate",
+    "summary": "Moderate match. Has 1 of 4 required skills. Has 7 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 18.18,
+        "weight": 0.3,
+        "contribution": 5.45,
+        "statement": "Has 1 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1,
+        "contribution": 10.0,
+        "statement": "Has 7 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 7.87,
+        "weight": 0.1,
+        "contribution": 0.79,
+        "statement": "Shared words with the job: 8/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [
+      {
+        "skill": "Python",
+        "requirement": "required",
+        "cv_phrase": "Python"
+      }
+    ],
+    "missing_skills": {
+      "required": ["FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 7.0,
+      "required_years": 4.0,
+      "statement": "Has 7 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000023": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 21.87,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 8 years of experience; the job asks for at least 4 years.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 100.0,
+        "weight": 0.1538,
+        "contribution": 15.38,
+        "statement": "Has 8 years of experience; the job asks for at least 4 years."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.64,
+        "weight": 0.1538,
+        "contribution": 0.71,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "meets",
+      "candidate_years": 8.0,
+      "required_years": 4.0,
+      "statement": "Has 8 years of experience; the job asks for at least 4 years."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000024": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 14.22,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 2 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.4615,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": null,
+        "weight": 0.0,
+        "contribution": 0.0,
+        "statement": "No embedding is available, so similarity of meaning is not scored."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 50.0,
+        "weight": 0.1538,
+        "contribution": 7.69,
+        "statement": "Has 2 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.2308,
+        "contribution": 5.77,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.94,
+        "weight": 0.1538,
+        "contribution": 0.76,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 2.0,
+      "required_years": 4.0,
+      "statement": "Has 2 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  },
+  "b1900000-0000-4000-8000-000000000025": {
+    "explanation_version": "1.0",
+    "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
+    "total": 46.73,
+    "band": "weak",
+    "summary": "Weak match. Has 0 of 4 required skills. Has 3 years of experience, below the 4 years the job asks for.",
+    "components": [
+      {
+        "name": "skill_overlap",
+        "label": "Skills",
+        "score": 0.0,
+        "weight": 0.3,
+        "contribution": 0.0,
+        "statement": "Has 0 of 4 required skills. Has 0 of 3 nice-to-have skills."
+      },
+      {
+        "name": "embedding_similarity",
+        "label": "Similarity of meaning",
+        "score": 100.0,
+        "weight": 0.35,
+        "contribution": 35.0,
+        "statement": "Similarity of meaning with the job: 100/100 (compared with other candidates, not an absolute grade)."
+      },
+      {
+        "name": "experience_fit",
+        "label": "Experience",
+        "score": 75.0,
+        "weight": 0.1,
+        "contribution": 7.5,
+        "statement": "Has 3 years of experience, below the 4 years the job asks for."
+      },
+      {
+        "name": "title_similarity",
+        "label": "Job title",
+        "score": 25.0,
+        "weight": 0.15,
+        "contribution": 3.75,
+        "statement": "Job title fit: 25/100, from the closest title in the CV, seniority aside."
+      },
+      {
+        "name": "text_similarity",
+        "label": "Shared words",
+        "score": 4.79,
+        "weight": 0.1,
+        "contribution": 0.48,
+        "statement": "Shared words with the job: 5/100. It counts shared words, not meaning."
+      }
+    ],
+    "matched_skills": [],
+    "missing_skills": {
+      "required": ["Python", "FastAPI", "PostgreSQL", "Docker"],
+      "preferred": ["Redis", "PyTorch", "Fairlearn"]
+    },
+    "experience": {
+      "status": "below",
+      "candidate_years": 3.0,
+      "required_years": 4.0,
+      "statement": "Has 3 years of experience, below the 4 years the job asks for."
+    },
+    "advisory_note": "This score is advisory: it ranks candidates for this job and is not a chance of passing screening. It can be wrong and does not reject anyone. Read the CV before you decide."
+  }
+}

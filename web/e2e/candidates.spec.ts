@@ -13,21 +13,21 @@ test("browse, search and page the candidates list, then open a profile", async (
     await page.getByRole("link", { name: "Candidates" }).first().click();
     await expect(page).toHaveURL(/\/candidates$/);
     await expect(page.getByRole("heading", { name: "Candidates", level: 1 })).toBeVisible();
-    await expect(page.getByText("Showing 1 – 10 of 25 candidates")).toBeVisible();
+    await expect(page.getByText("Showing 1 – 10 of 28 candidates")).toBeVisible();
   });
 
   await test.step("paging updates the list and the URL", async () => {
     await page.getByRole("button", { name: "Next page" }).click();
 
     await expect(page).toHaveURL(/[?&]page=2/);
-    await expect(page.getByText("Showing 11 – 20 of 25 candidates")).toBeVisible();
+    await expect(page.getByText("Showing 11 – 20 of 28 candidates")).toBeVisible();
   });
 
   await test.step("the page survives a reload", async () => {
     await page.reload();
 
     await expect(page).toHaveURL(/[?&]page=2/);
-    await expect(page.getByText("Showing 11 – 20 of 25 candidates")).toBeVisible();
+    await expect(page.getByText("Showing 11 – 20 of 28 candidates")).toBeVisible();
   });
 
   await test.step("searching narrows the list, resets the page and is kept in the URL", async () => {
@@ -45,7 +45,7 @@ test("browse, search and page the candidates list, then open a profile", async (
 
     await page.getByRole("button", { name: "Clear search" }).click();
     await expect(page).toHaveURL(/\/candidates$/);
-    await expect(page.getByText("Showing 1 – 10 of 25 candidates")).toBeVisible();
+    await expect(page.getByText("Showing 1 – 10 of 28 candidates")).toBeVisible();
   });
 
   await test.step("a profile shows contact, applications, CVs and the parsed summary", async () => {

@@ -24,8 +24,10 @@ from app.schemas.application import (
 )
 from app.schemas.job import JobStatus
 from app.schemas.pagination import PaginationMeta
+from app.schemas.ranking import ScoreResponse
 from app.services.audit_service import log_audit_event
 from app.services.pipeline_service import get_job_stages
+from app.services.ranking import get_score_detail
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -206,6 +208,25 @@ def get_application_history(
         .order_by(ApplicationStageHistory.moved_at, ApplicationStageHistory.id)
         .all()
     )
+
+
+@router.get(
+    "/{id}/score",
+    response_model=ScoreResponse,
+    summary="Get the application's score and explanation",
+    operation_id="getApplicationScore",
+)
+def get_application_score(
+    id: uuid.UUID,
+    db: Session = Depends(get_tenant_db),
+    current_user: User = Depends(get_current_user),
+) -> ScoreResponse:
+    score = get_score_detail(
+        db, current_user.org_id, id, viewer=current_user.role not in ("admin", "recruiter")
+    )
+    if score is None:
+        raise _not_found("Application", id)
+    return score
 
 
 @router.patch(

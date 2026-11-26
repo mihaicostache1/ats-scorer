@@ -1,22 +1,17 @@
 """Compute and publish a job's scores without holding locks during inference."""
 
 import asyncio
-import hashlib
-import json
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from arq import Retry
-from ats_scoring import EMBEDDING_MODEL_VERSION, MODEL_VERSION, ScoreExplanation, score_batch
-from ats_scoring.parsed_cv import ParsedCV
-from ats_scoring.schema import LEGACY_SCHEMA_VERSION, ScoreResult
-from pydantic import ValidationError
+from ats_scoring import MODEL_VERSION, ScoreExplanation, score_batch
+from ats_scoring.schema import ScoreResult
 from sqlalchemy import and_, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.core.config import settings
 from app.core.logging import logger
 from app.db.session import SessionLocal
 from app.models.application import Application
@@ -24,15 +19,13 @@ from app.models.application_score import ApplicationScore
 from app.models.candidate import Candidate
 from app.models.cv_document import CvDocument
 from app.models.job import Job
-from app.schemas.cv_document import CvStatus
-from app.services.cv_parser import needs_review
-from app.services.embedding_inputs import JOB_EMBEDDING_FIELDS, candidate_names, profile_name
-
-_PROCESSING_CV_STATUSES = (
-    CvStatus.QUEUED.value,
-    CvStatus.EXTRACTING.value,
-    CvStatus.EXTRACTED.value,
+from app.services.scoring_inputs import (
+    PROCESSING_CV_STATUSES,
+    candidate_inputs,
+    job_inputs,
+    scoring_digest,
 )
+
 _VERSION_RETRY_DELAY_SECONDS = 30
 
 
@@ -50,45 +43,6 @@ class _ApplicationInputs:
 
     def already_scored(self) -> bool:
         return self.current_model == MODEL_VERSION and self.current_hash == self.inputs_hash
-
-
-def _digest(*values: Any) -> str:
-    data = json.dumps(values, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
-    return hashlib.sha256(data.encode("utf-8")).hexdigest()
-
-
-def _embedding(record: Candidate | Job) -> tuple[float, ...] | None:
-    if record.embedding_model_version == EMBEDDING_MODEL_VERSION and record.embedding is not None:
-        return tuple(float(value) for value in record.embedding)
-    return None
-
-
-def _ready(profile: dict[str, Any], cv_status: str | None) -> bool:
-    if not isinstance(profile, dict) or not profile:
-        return False
-    if cv_status not in (None, CvStatus.PARSED.value):
-        return False
-    if profile.get("schema_version") in (None, LEGACY_SCHEMA_VERSION):
-        # The scorer also supports draft profiles with plain-string skills.
-        confidence = profile.get("confidence", {})
-        return isinstance(confidence, dict) and all(
-            not isinstance(value, bool)
-            and isinstance(value, int | float)
-            and settings.CV_REVIEW_CONFIDENCE_THRESHOLD <= value <= 1
-            for value in confidence.values()
-        )
-    try:
-        parsed = ParsedCV.model_validate(profile)
-    except ValidationError:
-        return False
-    return not needs_review(parsed, settings.CV_REVIEW_CONFIDENCE_THRESHOLD)
-
-
-def _job_inputs(job: Job) -> tuple[dict[str, Any], tuple[float, ...] | None]:
-    return (
-        {name: getattr(job, name) for name in (*JOB_EMBEDDING_FIELDS, "min_experience_years")},
-        _embedding(job),
-    )
 
 
 def _job(db: Session, job_id: uuid.UUID, org_id: uuid.UUID, *, lock: bool = False) -> Job | None:
@@ -138,24 +92,17 @@ def _applications(
     inputs = []
     for id_, candidate, status, current_id, current_model, current_hash in session.execute(query):
         # Apply this on both reads so a CV uploaded during inference also defers publication.
-        if status in _PROCESSING_CV_STATUSES:
+        if status in PROCESSING_CV_STATUSES:
             continue
-        profile = candidate.parsed_data
-        names = candidate_names(
-            candidate.full_name,
-            profile_name(candidate.parsed_data_original),
-            candidate.embedding_name_aliases,
-        )
-        embedding = _embedding(candidate)
-        ready = _ready(profile, status)
+        snapshot = candidate_inputs(candidate, status, job_hash)
         inputs.append(
             _ApplicationInputs(
                 id=id_,
-                profile=profile,
-                names=names,
-                embedding=embedding,
-                ready=ready,
-                inputs_hash=_digest(job_hash, candidate.id.hex, profile, names, embedding, ready),
+                profile=snapshot.profile,
+                names=snapshot.names,
+                embedding=snapshot.embedding,
+                ready=snapshot.ready,
+                inputs_hash=snapshot.inputs_hash,
                 current_id=current_id,
                 current_model=current_model,
                 current_hash=current_hash,
@@ -176,7 +123,7 @@ def _publish(
     with sessions.begin() as db:
         # Serialize publishes for this job and prevent a requirements edit while committing.
         job = _job(db, job_id, org_id, lock=True)
-        if job is None or _digest(*_job_inputs(job)) != job_hash:
+        if job is None or scoring_digest(*job_inputs(job)) != job_hash:
             return 0
 
         # Lock candidates before applications, in a stable order across jobs. Profile saves
@@ -240,8 +187,8 @@ def score_job_applications(
         job = _job(db, job_id, org_id)
         if job is None:
             return 0
-        job_fields, job_embedding = _job_inputs(job)
-        job_hash = _digest(job_fields, job_embedding)
+        job_fields, job_embedding = job_inputs(job)
+        job_hash = scoring_digest(job_fields, job_embedding)
         pending = {
             item.id: item for item in _applications(db, job, job_hash) if not item.already_scored()
         }

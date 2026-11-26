@@ -159,8 +159,9 @@ instead (for example `npm.cmd test`).
   (final status, leaving the page, 404, repeated failures, time budget), with fake timers.
 
 The end-to-end tests rely on the mock data: the demo accounts (`src/mocks/fixtures/auth.ts`), 25 jobs
-(`src/mocks/fixtures/jobs.ts`) and 25 candidates (`src/mocks/fixtures/candidates.ts`). If you change
-those fixtures, update the numbers in the specs.
+(`src/mocks/fixtures/jobs.ts`) and 28 candidates (`src/mocks/fixtures/candidates.ts`), of which
+Emilia Santos has no CV and no applications. If you change those fixtures, update the numbers in the
+specs.
 
 ### Writing tests
 
