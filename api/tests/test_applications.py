@@ -7,12 +7,16 @@ from typing import Any
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.orm import Session
+from sqlalchemy import Engine, select
+from sqlalchemy.orm import Session, sessionmaker
 
+from app.models.application_score import ApplicationScore
 from app.models.audit_event import AuditEvent
+from app.models.candidate import Candidate
 from app.models.pipeline_stage import PipelineStage
 from app.models.score import Score
 from app.models.user import User
+from app.services.scoring_pipeline import score_job
 
 APPLICATIONS_URL = "/api/v1/applications"
 CANDIDATES_URL = "/api/v1/candidates"
@@ -305,6 +309,7 @@ async def test_move_application_stage(
 @pytest.mark.asyncio
 async def test_stage_move_keeps_the_score_shown_at_the_time(
     async_client: AsyncClient,
+    db_engine: Engine,
     committed_db: Session,
     create_user: Callable[..., User],
     login_as: Callable[[User], None],
@@ -374,6 +379,26 @@ async def test_stage_move_keeps_the_score_shown_at_the_time(
         (None, None),
         (72.5, "tfidf-skills-0.1.0"),
         (91.25, "tfidf-skills-0.2.0"),
+    ]
+
+    parsed = committed_db.get(Candidate, score.candidate_id)
+    assert parsed is not None
+    parsed.parsed_data = {"skills": ["Python"], "headline": "Backend Engineer"}
+    committed_db.commit()
+    ctx = {"sessions": sessionmaker(bind=db_engine)}
+    assert await score_job(ctx, str(admin.org_id), job["id"]) == 1
+    [current] = committed_db.scalars(select(ApplicationScore)).all()
+    assert current.score is not None
+    await move("Hired")
+    assert (await snapshots())[-1] == (float(current.score), current.model_version)
+
+    parsed.parsed_data = {}
+    committed_db.commit()
+    assert await score_job(ctx, str(admin.org_id), job["id"]) == 1
+    await move("Interview")
+    assert (await snapshots())[-2:] == [
+        (float(current.score), current.model_version),
+        (None, None),
     ]
 
 

@@ -681,7 +681,7 @@ async def test_parser_missing_and_timeout_have_stable_errors(
 
 def test_worker_settings() -> None:
     """The worker registers the job under the name the API enqueues, with retries and a timeout."""
-    (job,) = WorkerSettings.functions
+    (job,) = (job for job in WorkerSettings.functions if job.name == EXTRACT_CV_TEXT_JOB)
     assert job.name == EXTRACT_CV_TEXT_JOB == "extract_cv_text"
     assert job.coroutine is extract_cv_text
     assert job.max_tries == settings.CV_EXTRACTION_MAX_TRIES

@@ -6,17 +6,25 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from ats_scoring import MODEL_VERSION
 from httpx import AsyncClient
-from sqlalchemy.orm import Session
+from sqlalchemy import Engine, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
+from app.core.dependencies import get_tenant_db
 from app.core.security import create_access_token
 from app.main import app
+from app.models.application import Application
+from app.models.application_score import ApplicationScore
 from app.models.application_stage_history import ApplicationStageHistory
 from app.models.audit_event import AuditEvent
+from app.models.candidate import Candidate
 from app.models.cv_document import CvDocument
 from app.models.organization import Organization
 from app.models.user import User
+from app.services.scoring_pipeline import score_job
 from tests.conftest import RecordingJobQueue
 
 # Synthetic CVs from the L-5 generator.
@@ -242,6 +250,7 @@ async def test_org_b_cannot_read_or_write_org_a_candidates(
 @pytest.mark.asyncio
 async def test_org_b_cannot_read_or_write_org_a_applications_and_stages(
     async_client: AsyncClient,
+    db_engine: Engine,
     committed_db: Session,
     create_user: Callable[..., User],
     login_as: Callable[[User], None],
@@ -278,6 +287,46 @@ async def test_org_b_cannot_read_or_write_org_a_applications_and_stages(
     assert stages_a.keys() == stages_b.keys()
     assert not set(stages_a.values()) & set(stages_b.values())
     assert application_b["stage_id"] == stages_b["Applied"]
+
+    # The worker requires both the tenant and job, and skips invalid cross-tenant links.
+    a_id, b_id = uuid.UUID(application_a["id"]), uuid.UUID(application_b["id"])
+    job_a_id, job_b_id = uuid.UUID(job_a["id"]), uuid.UUID(job_b["id"])
+    for candidate in (candidate_a, candidate_b):
+        record = committed_db.get(Candidate, uuid.UUID(candidate["id"]))
+        assert record is not None
+        record.parsed_data = {"skills": ["Python"]}
+    bad_link = Application(
+        org_id=admin_b.org_id,
+        job_id=job_b_id,
+        candidate_id=uuid.UUID(candidate_a["id"]),
+        stage_id=uuid.UUID(stages_b["Applied"]),
+    )
+    committed_db.add(bad_link)
+    committed_db.commit()
+    ctx = {"sessions": sessionmaker(bind=db_engine)}
+    assert await score_job(ctx, str(admin_b.org_id), str(job_a_id)) == 0
+    assert not committed_db.scalars(select(ApplicationScore)).all()
+    assert await score_job(ctx, str(admin_a.org_id), str(job_a_id)) == 1
+    assert await score_job(ctx, str(admin_b.org_id), str(job_b_id)) == 1
+    assert set(committed_db.scalars(select(ApplicationScore.application_id))) == {a_id, b_id}
+    committed_db.delete(bad_link)
+    committed_db.commit()
+
+    with Session(db_engine) as db:
+        own_scores = get_tenant_db(admin_b, db).scalars(select(ApplicationScore)).all()
+        assert [row.application_id for row in own_scores] == [b_id]
+        db.add(
+            ApplicationScore(
+                org_id=admin_b.org_id,
+                application_id=a_id,
+                status="needs_review",
+                model_version=MODEL_VERSION,
+                inputs_hash="0" * 64,
+                is_current=False,
+            )
+        )
+        with pytest.raises(IntegrityError, match="fk_application_scores_org_application"):
+            db.flush()
 
     # Reads: org A's application is not listed under any filter, nor fetchable.
     for params in (

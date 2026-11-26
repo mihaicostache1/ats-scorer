@@ -17,13 +17,20 @@ def profile_name(profile: dict[str, Any]) -> str | None:
     return name if isinstance(name, str) and name.strip() else None
 
 
-def candidate_input(
-    profile: dict[str, Any], full_name: str, original_name: str | None, aliases: list[str]
-) -> str:
+def candidate_names(full_name: str, original_name: str | None, aliases: list[str]) -> list[str]:
+    """Names the current and previous profiles may still contain in free text."""
     names = [full_name, *aliases]
     if original_name:
         names.append(original_name)
-    text: str = candidate_embedding_text(profile, additional_names=names)
+    return names
+
+
+def candidate_input(
+    profile: dict[str, Any], full_name: str, original_name: str | None, aliases: list[str]
+) -> str:
+    text: str = candidate_embedding_text(
+        profile, additional_names=candidate_names(full_name, original_name, aliases)
+    )
     return text
 
 

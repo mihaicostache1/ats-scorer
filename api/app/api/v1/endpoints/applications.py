@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_recruiter_or_admin, get_current_user, get_tenant_db
 from app.models.application import Application
+from app.models.application_score import ApplicationScore
 from app.models.application_stage_history import ApplicationStageHistory
 from app.models.candidate import Candidate
 from app.models.job import Job
@@ -242,21 +243,32 @@ def move_application_stage(
         target.stage_type, ApplicationStatus.ACTIVE.value
     )
     application.rejection_reason = payload.reason if target.stage_type == "rejected" else None
-    # Copied into the history row because a re-score replaces the row in scores.
-    latest_score = (
-        db.query(Score)
-        .filter(Score.application_id == application.id)
-        .order_by(Score.calculated_at.desc(), Score.id)
-        .first()
+    current_score = (
+        db.query(ApplicationScore)
+        .filter(ApplicationScore.application_id == application.id, ApplicationScore.is_current)
+        .one_or_none()
     )
+    if current_score is None:
+        # Applications already scored by the legacy model may not have a new outcome yet.
+        legacy_score = (
+            db.query(Score)
+            .filter(Score.application_id == application.id)
+            .order_by(Score.calculated_at.desc(), Score.id)
+            .first()
+        )
+        overall_score = legacy_score.overall_score if legacy_score else None
+        model_version = legacy_score.model_version if legacy_score else None
+    else:
+        overall_score = current_score.score
+        model_version = current_score.model_version if overall_score is not None else None
     application.stage_history.append(
         ApplicationStageHistory(
             org_id=application.org_id,
             from_stage_id=previous.id,
             to_stage_id=target.id,
             reason=payload.reason,
-            overall_score=latest_score.overall_score if latest_score else None,
-            model_version=latest_score.model_version if latest_score else None,
+            overall_score=overall_score,
+            model_version=model_version,
             moved_by=current_user.id,
         )
     )

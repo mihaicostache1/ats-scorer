@@ -11,6 +11,7 @@ from app.core.config import settings
 
 # Name the worker registers the CV extraction job under.
 EXTRACT_CV_TEXT_JOB = "extract_cv_text"
+SCORE_JOB = "score_job"
 
 
 class QueueUnavailableError(Exception):
