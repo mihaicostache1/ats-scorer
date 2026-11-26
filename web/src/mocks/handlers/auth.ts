@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { mockAccounts, mockOrg, type MockAccount } from "../fixtures/auth";
+import { mockMembers } from "../fixtures/users";
 import type { components } from "@/api/generated/schema";
 import { BASE } from "./utils";
 
@@ -15,9 +16,28 @@ const REFRESH_PATH = new URL(`${BASE}/auth/refresh`, "http://localhost").pathnam
 
 type TokenResponse = components["schemas"]["TokenResponse"];
 
-/** In-memory accounts; registrations add to it for the browser session. */
-const accounts: MockAccount[] = [...mockAccounts];
+/** Copies, so changing a role or deactivating a user never edits the shared fixtures. */
+const seedAccounts = (): MockAccount[] =>
+  [...mockAccounts, ...mockMembers].map((a) => ({ ...a, user: { ...a.user } }));
+
+/** In-memory accounts; registrations and accepted invitations add to it for the browser session. */
+let accounts: MockAccount[] = seedAccounts();
 const orgSlugs = new Set<string>([mockOrg.slug]);
+
+/**
+ * Account store used by the user-management handlers (B-15 stand-in). Because sign-in, refresh and
+ * `/auth/me` read the same array, a deactivation or role change applies to the very next request.
+ */
+export const accountStore = {
+  all: (): MockAccount[] => accounts,
+  find: (id: string): MockAccount | undefined => accounts.find((a) => a.user.id === id),
+  add: (account: MockAccount): void => {
+    accounts.push(account);
+  },
+  reset: (): void => {
+    accounts = seedAccounts();
+  },
+};
 
 const detail = (status: number, message: string) =>
   HttpResponse.json({ detail: message }, { status });

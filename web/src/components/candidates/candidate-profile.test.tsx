@@ -34,6 +34,10 @@ vi.mock("@/api", () => ({
   downloadCandidateCV: download,
   getCandidateCvDocument,
   retryCandidateCvExtraction: vi.fn(),
+  getApplicationScore: vi.fn(async () => ({
+    error: { detail: "Not found" },
+    response: { status: 404 },
+  })),
 }));
 vi.mock("@/components/ui/toast", () => ({ toast }));
 vi.mock("@/providers/session-provider", () => ({ useSession: () => ({ can: () => true }) }));

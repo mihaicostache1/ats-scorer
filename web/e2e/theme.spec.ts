@@ -58,7 +58,7 @@ test.describe("when the operating system is light", () => {
     await page.getByLabel("Password").fill(ADMIN.password);
     await page.getByRole("button", { name: "Sign in" }).click();
 
-    await expect(page.getByRole("heading", { name: "Jobs Postings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jobs", exact: true })).toBeVisible();
     await expect(html(page)).toHaveClass(/dark/);
     // The header has its own theme menu once signed in.
     await choose(page, "Light");

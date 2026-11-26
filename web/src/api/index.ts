@@ -33,6 +33,36 @@ export function getCurrentUser() {
   return apiClient.GET("/auth/me");
 }
 
+/** Public: redeems a single-use invitation. Creates the account but does not sign anyone in. */
+export function acceptInvitation(body: components["schemas"]["AcceptInvitationRequest"]) {
+  return apiClient.POST("/auth/accept-invite", { body });
+}
+
+// ─── Users (admin only) ───────────────────────────────────────────────────────
+
+export function listUsers(params?: {
+  role?: components["schemas"]["UserRole"];
+  is_active?: boolean;
+  search?: string;
+  page?: number;
+  per_page?: number;
+}) {
+  return apiClient.GET("/users", { params: { query: params } });
+}
+
+/** Returns a shareable link, shown only once. No email is sent. */
+export function inviteUser(body: components["schemas"]["InviteUserRequest"]) {
+  return apiClient.POST("/users/invitations", { body });
+}
+
+export function changeUserRole(id: string, body: components["schemas"]["UpdateUserRoleRequest"]) {
+  return apiClient.PATCH("/users/{id}/role", { params: { path: { id } }, body });
+}
+
+export function deactivateUser(id: string) {
+  return apiClient.POST("/users/{id}/deactivate", { params: { path: { id } } });
+}
+
 // ─── Org ──────────────────────────────────────────────────────────────────────
 
 export function getOrganization() {

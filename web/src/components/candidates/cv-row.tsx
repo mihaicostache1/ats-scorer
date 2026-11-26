@@ -6,7 +6,7 @@ import { Download, FileText, Loader2, RotateCcw } from "lucide-react";
 
 import { downloadCandidateCV, retryCandidateCvExtraction } from "@/api";
 import { Can } from "@/components/auth/can";
-import { Badge } from "@/components/ui/badge";
+import { Badge, StatusDot } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { NETWORK_ERROR_MESSAGE, parseApiFailure } from "@/lib/api-error";
@@ -19,6 +19,7 @@ import {
   describeCvStatus,
   errorHint,
   isReviewable,
+  isTerminalStatus,
   type CvDocument,
 } from "./cv-status";
 import { POLL_BUDGET_MS, useCvPolling, type PollState } from "./use-cv-polling";
@@ -52,7 +53,7 @@ function DownloadButton({ candidateId, cv }: { candidateId: string; cv: CvDocume
     <Button
       type="button"
       variant="outline"
-      size="sm"
+      size="xs"
       className="gap-1.5"
       disabled={busy}
       onClick={download}
@@ -119,12 +120,14 @@ export function CvRow({
   return (
     <li
       style={staggerStyle(index)}
-      className="animate-row-in flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-3 first:pt-0 last:pb-0"
+      className="animate-row-in relative flex flex-col gap-3 py-4 first:pt-0 last:pb-0"
     >
       <div className="flex min-w-0 items-start gap-3">
-        <FileText className="text-muted-foreground mt-0.5 size-5 shrink-0" aria-hidden="true" />
+        <FileText className="text-muted-foreground mt-0.5 size-4 shrink-0" aria-hidden="true" />
         <div className="min-w-0">
-          <p className="text-foreground text-sm font-semibold break-all">{cv.original_filename}</p>
+          <p className="text-foreground text-[13.5px] font-medium break-all">
+            {cv.original_filename}
+          </p>
           <p className="text-muted-foreground mt-0.5 text-xs">
             {[
               formatBytes(cv.size_bytes),
@@ -142,15 +145,22 @@ export function CvRow({
           {pollMessage && <p className="text-muted-foreground mt-0.5 text-xs">{pollMessage}</p>}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      {!isTerminalStatus(cv.status) && pollState !== "lost" && pollState !== "timed-out" && (
+        // The worker reports a state, not a percentage, so progress is shown as indeterminate.
+        <div aria-hidden="true" className="bg-secondary ml-7 h-1 overflow-hidden rounded-full">
+          <div className="animate-indeterminate bg-electric h-full w-1/3 rounded-full" />
+        </div>
+      )}
+      <div className="ml-7 flex flex-wrap items-center gap-2">
         <Badge variant={status.variant}>
+          <StatusDot />
           <span className="sr-only">Parse status: </span>
           {status.label}
         </Badge>
         {isReviewable(cv.status) && (
           <Link
             href={cvReviewHref(candidateId, cv.id)}
-            className={buttonVariants({ variant: "default", size: "sm" })}
+            className={buttonVariants({ variant: "default", size: "xs" })}
             aria-label={`Review ${cv.original_filename}`}
           >
             Review
@@ -160,7 +170,7 @@ export function CvRow({
           <Can action="candidate:write">
             <Button
               type="button"
-              size="sm"
+              size="xs"
               className="gap-1.5"
               disabled={retrying}
               onClick={retry}
@@ -176,7 +186,7 @@ export function CvRow({
           </Can>
         )}
         {(pollState === "lost" || pollState === "timed-out") && (
-          <Button type="button" variant="outline" size="sm" onClick={checkNow}>
+          <Button type="button" variant="outline" size="xs" onClick={checkNow}>
             Check again
           </Button>
         )}

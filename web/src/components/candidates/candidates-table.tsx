@@ -1,9 +1,9 @@
 import * as React from "react";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { TABLE } from "@/components/jobs/jobs-table";
+import { Badge, StatusDot, type BadgeProps } from "@/components/ui/badge";
 import { SkeletonTableRow } from "@/components/ui/skeleton";
-import { formatDate } from "@/lib/format";
+import { formatDate, getInitials } from "@/lib/format";
 import { staggerStyle } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { readParsedSummary } from "./parsed-cv";
@@ -12,18 +12,31 @@ import { CANDIDATE_PAGE_SIZE, type CandidateResponse } from "./use-candidates";
 const MAX_SKILLS_SHOWN = 3;
 
 /**
- * Columns, in reading order. Skills and the added date drop out on narrower screens so the rest fit
- * without horizontal scrolling.
+ * Columns, in reading order. Everything shown comes from the candidate record: there is no
+ * cross-job score on a candidate (scores belong to an application for one job), so none is shown.
+ * Lower-priority columns drop out on narrower screens.
  */
 const COLUMNS = [
   { key: "candidate", header: "Candidate" },
-  { key: "location", header: "Location" },
-  { key: "phone", header: "Phone", className: "hidden md:table-cell" },
+  { key: "profile", header: "Profile" },
+  { key: "headline", header: "Headline", className: "hidden xl:table-cell" },
   { key: "skills", header: "Top skills", className: "hidden lg:table-cell" },
-  { key: "added", header: "Added", className: "hidden lg:table-cell" },
+  { key: "location", header: "Location", className: "hidden md:table-cell" },
+  { key: "added", header: "Added", className: "hidden sm:table-cell text-right" },
 ] as const;
 
 const none = <span className="text-muted-foreground">—</span>;
+
+/** Where the candidate's profile stands, from the data on the record. */
+export function profileStatus(candidate: CandidateResponse): {
+  label: string;
+  variant: BadgeProps["variant"];
+} {
+  if (candidate.parsed_profile_reviewed_at) return { label: "Reviewed", variant: "success" };
+  // Same soft green as a parsed CV (cv-status.ts): Cobalt is the brand accent, not a status.
+  if (readParsedSummary(candidate.parsed_data)) return { label: "Parsed", variant: "success" };
+  return { label: "Not parsed", variant: "secondary" };
+}
 
 export function CandidatesTable({
   candidates,
@@ -40,20 +53,15 @@ export function CandidatesTable({
 }) {
   return (
     <div className="overflow-x-auto" aria-busy={isLoading || isRefreshing}>
-      <table
-        className={cn("w-full text-left text-sm transition-opacity", isRefreshing && "opacity-60")}
-      >
+      <table className={cn(TABLE.table, "transition-opacity", isRefreshing && "opacity-60")}>
         <caption className="sr-only">Candidates</caption>
-        <thead className="border-border/60 bg-foreground/[0.03] text-muted-foreground border-b font-medium">
+        <thead className={TABLE.head}>
           <tr>
             {COLUMNS.map((col) => (
               <th
                 key={col.key}
                 scope="col"
-                className={cn(
-                  "text-footnote h-10 px-4 font-medium whitespace-nowrap",
-                  "className" in col && col.className
-                )}
+                className={cn(TABLE.th, "className" in col && col.className)}
               >
                 {col.header}
               </th>
@@ -73,22 +81,27 @@ export function CandidatesTable({
             </tr>
           ) : (
             candidates.map((candidate, index) => {
-              const skills = readParsedSummary(candidate.parsed_data)?.skills ?? [];
+              const parsed = readParsedSummary(candidate.parsed_data);
+              const skills = parsed?.skills ?? [];
+              const status = profileStatus(candidate);
               return (
-                <tr
-                  key={candidate.id}
-                  style={staggerStyle(index)}
-                  className="animate-row-in hover:bg-foreground/[0.04] transition-colors duration-(--motion-base)"
-                >
-                  <td className="px-4 py-3 align-top">
-                    <Link
-                      href={`/candidates/${candidate.id}`}
-                      className="text-foreground focus-visible:ring-primary/25 rounded-md font-semibold hover:underline focus-visible:ring-4 focus-visible:outline-none"
-                    >
-                      {candidate.full_name}
-                    </Link>
-                    <div className="text-muted-foreground mt-0.5 text-xs break-all">
-                      {candidate.email}
+                <tr key={candidate.id} style={staggerStyle(index)} className={TABLE.row}>
+                  <td className={TABLE.td}>
+                    <div className="flex items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="bg-secondary text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded-md text-[10.5px] font-medium"
+                      >
+                        {getInitials(candidate.full_name)}
+                      </span>
+                      <div className="min-w-0">
+                        <Link href={`/candidates/${candidate.id}`} className={TABLE.link}>
+                          {candidate.full_name}
+                        </Link>
+                        <div className="text-muted-foreground truncate text-[12.5px]">
+                          {candidate.email}
+                        </div>
+                      </div>
                     </div>
                     {!!candidate.possible_duplicates?.length && (
                       <Badge variant="warning" className="mt-1">
@@ -96,41 +109,46 @@ export function CandidatesTable({
                       </Badge>
                     )}
                   </td>
-                  <td className="px-4 py-3 align-top">
-                    {candidate.location ? (
-                      <div className="flex items-center gap-1.5">
-                        <MapPin
-                          className="text-muted-foreground size-3.5 shrink-0"
-                          aria-hidden="true"
-                        />
-                        <span>{candidate.location}</span>
-                      </div>
+                  <td className={TABLE.td}>
+                    <Badge variant={status.variant}>
+                      <StatusDot />
+                      {status.label}
+                    </Badge>
+                  </td>
+                  <td className={cn(TABLE.td, "hidden max-w-56 xl:table-cell")}>
+                    {parsed?.headline ? (
+                      <span className="text-foreground/90 line-clamp-1">{parsed.headline}</span>
                     ) : (
                       none
                     )}
                   </td>
-                  <td className="hidden px-4 py-3 align-top whitespace-nowrap md:table-cell">
-                    {candidate.phone ?? none}
-                  </td>
-                  <td className="hidden px-4 py-3 align-top lg:table-cell">
+                  <td className={cn(TABLE.td, "hidden lg:table-cell")}>
                     {skills.length === 0 ? (
                       none
                     ) : (
-                      <div className="flex flex-wrap gap-1">
+                      <span className="flex items-center gap-1.5">
                         {skills.slice(0, MAX_SKILLS_SHOWN).map((skill) => (
                           <Badge key={skill} variant="secondary" className="font-normal">
                             {skill}
                           </Badge>
                         ))}
                         {skills.length > MAX_SKILLS_SHOWN && (
-                          <span className="text-muted-foreground self-center text-xs">
+                          <span className="text-muted-foreground font-mono text-xs">
                             +{skills.length - MAX_SKILLS_SHOWN}
                           </span>
                         )}
-                      </div>
+                      </span>
                     )}
                   </td>
-                  <td className="text-muted-foreground hidden px-4 py-3 align-top whitespace-nowrap lg:table-cell">
+                  <td className={cn(TABLE.td, "text-muted-foreground hidden md:table-cell")}>
+                    {candidate.location ?? none}
+                  </td>
+                  <td
+                    className={cn(
+                      TABLE.td,
+                      "text-muted-foreground hidden text-right whitespace-nowrap tabular-nums sm:table-cell"
+                    )}
+                  >
                     {formatDate(candidate.created_at)}
                   </td>
                 </tr>

@@ -27,7 +27,7 @@ test("signed-out visitor logs in and browses the jobs list", async ({ page }) =>
     await page.getByRole("button", { name: "Sign in" }).click();
 
     await expect(page).toHaveURL(/\/jobs$/);
-    await expect(page.getByRole("heading", { name: "Jobs Postings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jobs", exact: true })).toBeVisible();
     await expect(page.getByText("Showing 1 – 10 of 25 jobs")).toBeVisible();
     await expect(page.getByRole("link", { name: "New job" })).toBeVisible();
   });
@@ -55,7 +55,7 @@ test("signed-out visitor logs in and browses the jobs list", async ({ page }) =>
     await page.reload();
 
     await expect(page).toHaveURL(/[?&]page=2/);
-    await expect(page.getByRole("heading", { name: "Jobs Postings" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jobs", exact: true })).toBeVisible();
     await expect(page.getByText("Showing 11 – 20 of 25 jobs")).toBeVisible();
   });
 });

@@ -50,6 +50,28 @@ candidates shows polling picking up where it left off. The scenarios live in
 `src/mocks/scenarios/cv-scenarios.ts`; `cv-scenarios.test.ts` runs every one through the real handlers
 and fails if a scenario has no test.
 
+## Users and invitations
+
+The Users page (`/users`, admins only) and the accept-invite page (`/accept-invite`) use the B-15 API. In
+mock mode, `src/mocks/handlers/users.ts` copies the real service's rules and
+error texts, so the UI is written against real behaviour: the last active admin can't be demoted or
+deactivated, you can't deactivate yourself, and every unusable invitation gets the same 400.
+
+The demo org has extra members (`src/mocks/fixtures/users.ts`), with the usual password. `admin@demo.com`
+is the **only** admin, so demoting or deactivating it shows the last-admin message; `former@demo.com` is
+inactive and can't sign in. Open an invitation page with one of these fixed tokens (mock mode only):
+
+| Link                                       | What it shows                                      |
+| ------------------------------------------ | -------------------------------------------------- |
+| `/accept-invite#token=demo-valid-invite`   | the form, for `new.colleague@demo.com` (recruiter) |
+| `/accept-invite#token=demo-expired-invite` | the expired page, once the form is submitted       |
+| `/accept-invite#token=demo-used-invite`    | the same expired page                              |
+| `/accept-invite` (no token)                | the expired page straight away                     |
+
+The token lives in the URL **fragment**, which browsers never send to a server, and goes to the API in
+the request body; the page removes it from the address bar once read. Mock state is held in memory, so
+a full page load resets it (invitations created on `/users` are gone after a reload).
+
 ## Theme
 
 The sun/moon/monitor button in the header (and in the corner of the login and register pages) switches
@@ -153,12 +175,18 @@ instead (for example `npm.cmd test`).
   not-found states, and a viewer being kept out.
 - `e2e/cv-upload.spec.ts`: uploading CVs and following them to parsed, needs review and failed, retry,
   files refused in the browser, a refused upload, and polling stopping when the page is left.
+- `e2e/users.spec.ts`: user management (last-admin and self-deactivation messages, role change,
+  deactivation, invite link and copy), a recruiter being kept out, accepting an invitation and signing
+  in, and the expired-invite page.
+- `src/mocks/handlers/users.test.ts`: the user-management mock's rules (last admin, self-deactivation,
+  invitation tokens), run in Node.
 - `src/mocks/scenarios/cv-scenarios.test.ts`: every CV upload scenario, run through the real mock
   handlers in Node. Add a scenario and this fails until it has a test.
 - `src/components/candidates/use-cv-polling.test.tsx`: the backoff schedule and every way polling stops
   (final status, leaving the page, 404, repeated failures, time budget), with fake timers.
 
-The end-to-end tests rely on the mock data: the demo accounts (`src/mocks/fixtures/auth.ts`), 25 jobs
+The end-to-end tests rely on the mock data: the demo accounts (`src/mocks/fixtures/auth.ts`), the extra
+members and invitation tokens (`src/mocks/fixtures/users.ts`), 25 jobs
 (`src/mocks/fixtures/jobs.ts`) and 25 candidates (`src/mocks/fixtures/candidates.ts`). If you change
 those fixtures, update the numbers in the specs.
 

@@ -202,7 +202,7 @@ export function LabelingTool({ data }: { data: LabelingData }) {
     const summary = counts(progress, pairs);
     const unrated = firstUnrated(progress, pairs);
     body = (
-      <section className="glass space-y-4 rounded-2xl p-6">
+      <section className="surface space-y-4 rounded-2xl p-6">
         <h2 className="text-foreground text-title-3 flex items-center gap-2">
           <CircleCheck className="text-success size-5" aria-hidden="true" />
           All pairs seen

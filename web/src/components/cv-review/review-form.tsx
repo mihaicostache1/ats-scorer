@@ -170,7 +170,7 @@ function ReviewField({
 // ─── Layout pieces ────────────────────────────────────────────────────────────
 
 const focusRing =
-  "focus-visible:ring-primary/25 rounded-md outline-none focus-visible:ring-4 focus:outline-none";
+  "focus-visible:ring-ring rounded-md outline-none focus-visible:ring-2 focus:outline-none";
 
 function Section({
   id,
@@ -190,17 +190,25 @@ function Section({
   const low = sectionPointer ? lowSectionConfidence(confidence, sectionPointer.slice(1)) : null;
 
   return (
-    <section aria-labelledby={`${id}-heading`} className="glass space-y-4 rounded-2xl p-6">
+    <section
+      aria-labelledby={`${id}-heading`}
+      className="border-border space-y-4 border-b py-7 first:pt-2 last:border-b-0"
+    >
       <div>
         <h2
           id={`${id}-heading`}
           tabIndex={-1}
           data-pointer={sectionPointer}
-          className={cn("text-foreground text-headline", focusRing)}
+          className={cn(
+            "text-foreground scroll-mt-4 text-[15px] font-semibold tracking-[-0.01em]",
+            focusRing
+          )}
         >
           {title}
         </h2>
-        {description && <p className="text-muted-foreground text-footnote mt-0.5">{description}</p>}
+        {description && (
+          <p className="text-muted-foreground mt-0.5 text-[13px] leading-relaxed">{description}</p>
+        )}
         {low !== null && (
           <p className="text-footnote mt-1">
             <LowConfidenceNote value={low} scope="section" />
@@ -236,7 +244,7 @@ function RowFrame({
       tabIndex={-1}
       data-pointer={pointer}
       className={cn(
-        "border-border/60 min-w-0 space-y-3 rounded-xl border p-4",
+        "border-border bg-background-secondary/50 min-w-0 space-y-3 rounded-lg border p-4",
         focusRing,
         low !== null && "border-warning/60"
       )}
@@ -558,7 +566,7 @@ function ExperienceSection() {
                       onChange={(event) => field.onChange(event.target.checked)}
                       onBlur={field.onBlur}
                       data-pointer={at("is_current")}
-                      className="accent-primary focus-visible:ring-primary/25 size-5 rounded outline-none focus-visible:ring-4 disabled:opacity-50"
+                      className="accent-primary focus-visible:ring-ring size-5 rounded outline-none focus-visible:ring-2 disabled:opacity-50"
                     />
                   </FormControl>
                   <FormLabel className="leading-snug">Current position</FormLabel>

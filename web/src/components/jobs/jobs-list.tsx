@@ -13,7 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buildUrl, parseOneOf, parsePositiveInt } from "@/lib/url-state";
-import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/page-header";
 import { JobsTable } from "./jobs-table";
 import { JobsToolbar, STATUS_FILTERS } from "./jobs-toolbar";
 import { JOB_PAGE_SIZE, useJobs } from "./use-jobs";
@@ -23,8 +23,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 /** Wireframe action: "+ Create Job" → the job form. */
 function NewJobLink({ children }: { children: React.ReactNode }) {
   return (
-    <Link href="/jobs/new" className={cn(buttonVariants(), "gap-2")}>
-      <Plus className="size-4" />
+    <Link href="/jobs/new" className={buttonVariants()}>
+      <Plus aria-hidden="true" />
       {children}
     </Link>
   );
@@ -34,9 +34,9 @@ function NewJobLink({ children }: { children: React.ReactNode }) {
 export function JobsListSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label="Loading jobs">
-      <Skeleton className="h-9 w-56" />
-      <Skeleton className="h-9 w-full max-w-md" />
-      <Skeleton className="h-72 w-full" />
+      <Skeleton className="h-9 w-40" />
+      <Skeleton className="h-9 w-full max-w-lg" />
+      <Skeleton className="h-96 w-full rounded-xl" />
     </div>
   );
 }
@@ -121,36 +121,35 @@ export function JobsList() {
     <EmptyState
       icon={Briefcase}
       title="No jobs created yet"
-      description="Get started by creating your first job posting to define required ESCO skills and score incoming resume candidates automatically."
+      description="Create a job with its required and nice-to-have skills. Candidates are matched against what you write here."
       action={
         <Can action="job:write">
-          <NewJobLink>Create Your First Job</NewJobLink>
+          <NewJobLink>Create your first job</NewJobLink>
         </Can>
       }
-      className="border-2 p-12"
+      className="border-0"
     />
   );
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-foreground text-large-title">Jobs Postings</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Manage job postings, required ESCO skills, and pipeline stages.
-          </p>
-        </div>
-        <Can action="job:write">
-          <NewJobLink>New job</NewJobLink>
-        </Can>
-      </div>
-
-      <JobsToolbar
-        search={searchText}
-        onSearchChange={setSearchText}
-        status={status}
-        onStatusChange={(value) => go({ status: value, page: 1 })}
-      />
+      <PageHeader
+        title="Jobs"
+        description="Every role in your organization, its requirements and where it stands."
+        actions={
+          <Can action="job:write">
+            <NewJobLink>New job</NewJobLink>
+          </Can>
+        }
+      >
+        <JobsToolbar
+          search={searchText}
+          onSearchChange={setSearchText}
+          status={status}
+          onStatusChange={(value) => go({ status: value, page: 1 })}
+          total={pagination?.total_items}
+        />
+      </PageHeader>
 
       {state.phase === "error" ? (
         <ErrorState
@@ -160,7 +159,7 @@ export function JobsList() {
           onRetry={refetch}
         />
       ) : (
-        <div className="glass overflow-hidden rounded-2xl">
+        <div className="surface overflow-hidden rounded-xl">
           <JobsTable
             jobs={jobs}
             isLoading={isLoading}

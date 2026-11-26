@@ -3,86 +3,101 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Briefcase,
-  Database,
-  FileCheck2,
-  FileCode2,
-  Layers,
-  LayoutDashboard,
-  ShieldAlert,
-  Sparkles,
-  Users,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import type { Action } from "@/lib/permissions";
+import { ArrowUpRight, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LogoMark } from "@/components/brand/logo";
 import { useSession } from "@/providers/session-provider";
 import { cn } from "@/lib/utils";
+import { NAV_SECTIONS, type NavItem } from "./nav-config";
 
-interface SidebarItem {
-  title: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-  /** Hidden unless the signed-in role may perform this action. */
-  requires?: Action;
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-interface SidebarSection {
-  title: string;
-  /** Only shown in development builds. */
-  devOnly?: boolean;
-  items: SidebarItem[];
+function NavLink({
+  item,
+  active,
+  collapsed,
+  onClick,
+}: {
+  item: NavItem;
+  active: boolean;
+  collapsed: boolean;
+  onClick?: () => void;
+}) {
+  const Icon = item.icon;
+  const className = cn(
+    "group relative flex h-8 items-center gap-2.5 rounded-md px-2 text-[13.5px] transition-colors duration-(--motion-fast)",
+    "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
+    collapsed && "justify-center px-0",
+    active
+      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-[var(--glass-highlight),0_0_0_1px_var(--sidebar-border),0_1px_2px_rgb(10_16_34/0.04)] before:bg-electric before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full"
+      : "text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground"
+  );
+  const content = (
+    <>
+      <Icon
+        aria-hidden="true"
+        className={cn(
+          "size-4 shrink-0",
+          active ? "text-electric" : "text-muted-foreground group-hover:text-foreground"
+        )}
+      />
+      <span className={cn("truncate", collapsed && "sr-only")}>{item.title}</span>
+      {item.external && !collapsed && (
+        <ArrowUpRight aria-hidden="true" className="text-muted-foreground ml-auto size-3.5" />
+      )}
+    </>
+  );
+
+  if (item.external) {
+    return (
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        title={collapsed ? item.title : undefined}
+        onClick={onClick}
+      >
+        {content}
+        <span className="sr-only"> (opens in a new tab)</span>
+      </a>
+    );
+  }
+  return (
+    <Link
+      href={item.href}
+      className={className}
+      aria-current={active ? "page" : undefined}
+      title={collapsed ? item.title : undefined}
+      onClick={onClick}
+    >
+      {content}
+    </Link>
+  );
 }
 
-const sections: SidebarSection[] = [
-  {
-    title: "Overview",
-    items: [
-      { title: "Dashboard", href: "/", icon: LayoutDashboard },
-      { title: "Job Openings", href: "/jobs", icon: Briefcase },
-      { title: "Candidates", href: "/candidates", icon: Users, requires: "candidate:read" },
-      { title: "Pipeline Stages", href: "/#pipeline", icon: Layers },
-    ],
-  },
-  {
-    title: "Compliance & AI",
-    items: [
-      { title: "Audit Trail", href: "/#audit", icon: ShieldAlert, requires: "audit:read" },
-      { title: "Consent Records", href: "/#consent", icon: FileCheck2 },
-      { title: "Vector Embeddings", href: "/#vectors", icon: Database },
-    ],
-  },
-  {
-    title: "Developer Tools",
-    devOnly: true,
-    items: [
-      {
-        title: "Component Library",
-        href: "/dev/components",
-        icon: Sparkles,
-        badge: "Showcase",
-      },
-      {
-        title: "API Docs (FastAPI)",
-        href: "http://localhost:8000/docs",
-        icon: FileCode2,
-      },
-    ],
-  },
-];
-
+/**
+ * Workspace navigation. Light and quiet in the default appearance, deep navy in the dark one.
+ * On desktop it can collapse to an icon rail; the choice is remembered.
+ */
 export function AppSidebar({
   className,
   onItemClick,
+  collapsed = false,
+  onToggleCollapsed,
 }: {
   className?: string;
   onItemClick?: () => void;
+  collapsed?: boolean;
+  /** Present on desktop only; the mobile slide-over has no collapsed state. */
+  onToggleCollapsed?: () => void;
 }) {
   const pathname = usePathname();
-  const { can } = useSession();
-  const visibleSections = sections
-    .filter((section) => !section.devOnly || process.env.NODE_ENV === "development")
+  const { can, user } = useSession();
+  const sections = NAV_SECTIONS.filter(
+    (section) => !section.devOnly || process.env.NODE_ENV === "development"
+  )
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => !item.requires || can(item.requires)),
@@ -91,92 +106,83 @@ export function AppSidebar({
 
   return (
     <aside
-      className={cn("glass-side flex w-64 flex-col", className)}
-      aria-label="Sidebar navigation"
+      className={cn(
+        "glass-bar flex flex-col border-r border-(--glass-border) transition-[width] duration-(--motion-base) ease-(--ease-fluid)",
+        collapsed ? "w-[60px]" : "w-60",
+        className
+      )}
+      aria-label="Sidebar"
     >
-      <div className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
-        {visibleSections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <h4 className="text-muted-foreground text-footnote px-3 font-semibold">
-              {section.title}
-            </h4>
-            <div className="space-y-0.5 pt-1">
-              {section.items.map((item) => {
-                const Icon = item.icon;
-                const isExternal = item.href.startsWith("http");
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-                const content = (
-                  <div
-                    className={cn(
-                      "group ease-fluid flex min-h-10 items-center justify-between rounded-[10px] px-3 py-2 text-[15px] font-medium transition-[color,background-color,box-shadow,scale,translate] duration-(--motion-fast)",
-                      isActive
-                        ? "glass-subtle text-sidebar-accent-foreground ring-primary/25 font-semibold ring-1"
-                        : "text-sidebar-foreground hover:bg-foreground/5 motion-safe:hover:translate-x-0.5 motion-safe:active:scale-[0.99]"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        className={cn(
-                          "size-[18px] shrink-0",
-                          isActive ? "text-sidebar-accent-foreground" : "text-muted-foreground"
-                        )}
-                      />
-                      <span>{item.title}</span>
-                    </div>
-
-                    {item.badge && (
-                      <Badge
-                        variant={isActive ? "default" : "secondary"}
-                        className="px-2 py-0 text-xs font-medium"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </div>
-                );
-
-                if (isExternal) {
-                  return (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="focus-visible:ring-primary/25 block rounded-[10px] focus-visible:ring-4 focus-visible:outline-none"
-                      onClick={onItemClick}
-                    >
-                      {content}
-                    </a>
-                  );
-                }
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="focus-visible:ring-primary/25 block rounded-[10px] focus-visible:ring-4 focus-visible:outline-none"
-                    onClick={onItemClick}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    {content}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+      <div className={cn("flex h-14 shrink-0 items-center", collapsed ? "justify-center" : "px-4")}>
+        <Link
+          href="/overview"
+          onClick={onItemClick}
+          className="focus-visible:ring-ring flex items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:outline-none"
+          aria-label="ATS Scorer, go to overview"
+        >
+          <LogoMark className="size-7" />
+          {!collapsed && (
+            <span className="text-foreground text-[15px] font-semibold tracking-[-0.02em]">
+              ATS Scorer
+            </span>
+          )}
+        </Link>
       </div>
 
-      {/* Footer info box */}
-      <div className="glass-subtle m-3 rounded-xl p-3">
-        <div className="flex items-center justify-between">
-          <div className="text-foreground text-footnote font-medium">
-            Environment: <span className="text-success font-semibold">Dev</span>
+      <nav aria-label="Main" className="flex-1 space-y-6 overflow-y-auto px-3 pt-3 pb-4">
+        {sections.map((section) => (
+          <div key={section.title}>
+            <h2
+              className={cn(
+                "text-muted-foreground text-eyebrow-sm mb-2 px-2",
+                collapsed && "sr-only"
+              )}
+            >
+              {section.title}
+            </h2>
+            <ul className="space-y-0.5">
+              {section.items.map((item) => (
+                <li key={item.href}>
+                  <NavLink
+                    item={item}
+                    active={!item.external && isActive(pathname, item.href)}
+                    collapsed={collapsed}
+                    onClick={onItemClick}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="bg-success size-2 animate-pulse rounded-full" />
-        </div>
-        <p className="text-muted-foreground text-caption mt-1">Connected to PostgreSQL & Redis</p>
+        ))}
+      </nav>
+
+      <div
+        className={cn(
+          "border-sidebar-border flex items-center gap-2 border-t py-3",
+          collapsed ? "flex-col px-2" : "px-4"
+        )}
+      >
+        {!collapsed && user && (
+          <p className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
+            Signed in as <span className="text-foreground capitalize">{user.role}</span>
+          </p>
+        )}
+        {onToggleCollapsed && (
+          <button
+            type="button"
+            onClick={onToggleCollapsed}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-pressed={collapsed}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="text-muted-foreground hover:bg-sidebar-accent hover:text-foreground focus-visible:ring-ring flex size-8 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="size-4" aria-hidden="true" />
+            ) : (
+              <PanelLeftClose className="size-4" aria-hidden="true" />
+            )}
+          </button>
+        )}
       </div>
     </aside>
   );

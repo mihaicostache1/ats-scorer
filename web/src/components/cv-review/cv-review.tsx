@@ -28,7 +28,7 @@ import type { CandidateResponse } from "@/components/candidates/use-candidates";
 import { unwrap, useResource } from "@/components/candidates/use-resource";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
-import { Badge } from "@/components/ui/badge";
+import { Badge, StatusDot } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,9 +54,6 @@ import { useUnsavedChangesGuard } from "./use-unsaved-changes";
 
 type Path = FieldPath<ReviewFormValues>;
 type CvDocument = Parameters<typeof describeCvStatus>[0];
-
-const backLink =
-  "text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 inline-flex items-center gap-1.5 rounded-md text-sm focus-visible:ring-4 focus-visible:outline-none";
 
 /** Keeps roles without `cv-review:read` out. Every role has it today; the API is the source of truth. */
 export function CvReviewAccess({ children }: { children: React.ReactNode }) {
@@ -139,14 +136,13 @@ function showServerErrors(form: UseFormReturn<ReviewFormValues>, failure: ApiFai
 
 function ReviewSkeleton() {
   return (
-    <div className="mx-auto max-w-[1600px] space-y-4" role="status" aria-label="Loading CV review">
-      <Skeleton className="h-5 w-40" />
+    <div className="space-y-4" role="status" aria-label="Loading CV review">
       <Skeleton className="h-12 w-96 max-w-full" />
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Skeleton className="h-[70dvh] w-full" />
+      <div className="grid gap-4 lg:grid-cols-[57fr_43fr]">
+        <Skeleton className="h-[70dvh] w-full rounded-xl" />
         <div className="space-y-4">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-48 w-full rounded-xl" />
         </div>
       </div>
     </div>
@@ -251,6 +247,56 @@ export function CvReview({ candidateId, cvId }: { candidateId: string; cvId: str
   );
 }
 
+// ─── Split view ───────────────────────────────────────────────────────────────
+
+const SPLIT_KEY = "ats-review-split";
+const SPLIT_DEFAULT = 57;
+const SPLIT_MIN = 35;
+const SPLIT_MAX = 72;
+
+/** In-page navigation for the fields panel. */
+const SECTION_LINKS = [
+  ["#cv-contact-heading", "Contact"],
+  ["#cv-profile-heading", "Profile"],
+  ["#cv-skills-heading", "Skills"],
+  ["#cv-experience-heading", "Experience"],
+  ["#cv-education-heading", "Education"],
+  ["#cv-languages-heading", "Languages"],
+  ["#cv-certifications-heading", "Certifications"],
+] as const;
+
+/** The split lives in localStorage; a same-tab event tells the editor it changed. */
+const SPLIT_EVENT = "ats-review-split";
+let memorySplit = SPLIT_DEFAULT;
+
+function readSplit(): number {
+  try {
+    const stored = Number(localStorage.getItem(SPLIT_KEY));
+    return stored >= SPLIT_MIN && stored <= SPLIT_MAX ? stored : memorySplit;
+  } catch {
+    return memorySplit;
+  }
+}
+
+function writeSplit(value: number) {
+  memorySplit = Math.round(Math.min(SPLIT_MAX, Math.max(SPLIT_MIN, value)) * 10) / 10;
+  try {
+    localStorage.setItem(SPLIT_KEY, String(memorySplit));
+  } catch {
+    // Storage blocked: kept in memory for this page.
+  }
+  window.dispatchEvent(new Event(SPLIT_EVENT));
+}
+
+function subscribeSplit(onChange: () => void) {
+  window.addEventListener(SPLIT_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(SPLIT_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
 // ─── Editor ───────────────────────────────────────────────────────────────────
 
 function Banner({
@@ -266,10 +312,10 @@ function Banner({
     <p
       role="note"
       className={cn(
-        "flex items-start gap-2 rounded-xl border p-3 text-sm",
+        "flex items-start gap-2 rounded-lg border p-3 text-[13px] leading-relaxed",
         tone === "warning"
-          ? "border-warning/30 bg-warning/10 text-foreground"
-          : "border-border bg-secondary/60 text-foreground"
+          ? "border-warning/30 bg-warning-soft text-foreground"
+          : "border-border bg-background-secondary text-foreground"
       )}
     >
       <Icon
@@ -366,15 +412,46 @@ function ReviewEditor({
     }
   };
 
+  // The split between document and fields, as a percentage of the width; remembered per browser.
+  const splitRef = React.useRef<HTMLDivElement>(null);
+  const split = React.useSyncExternalStore(subscribeSplit, readSplit, () => SPLIT_DEFAULT);
+  const setSplit = React.useCallback((value: number) => writeSplit(value), []);
+  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    const container = splitRef.current;
+    if (!container) return;
+    event.preventDefault();
+    const rect = container.getBoundingClientRect();
+    const onMove = (move: PointerEvent) =>
+      setSplit(((move.clientX - rect.left) / rect.width) * 100);
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      document.body.style.removeProperty("user-select");
+    };
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+  const onSplitKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? 10 : 2;
+    if (event.key === "ArrowLeft") setSplit(split - step);
+    else if (event.key === "ArrowRight") setSplit(split + step);
+    else if (event.key === "Home") setSplit(SPLIT_MIN);
+    else if (event.key === "End") setSplit(SPLIT_MAX);
+    else return;
+    event.preventDefault();
+  };
+
   const submit = form.handleSubmit(save);
   const status = CV_STATUS_BADGE[cv.status];
 
   return (
     <ReviewProvider value={{ confidence: saved.confidence, readOnly: !canEdit }}>
-      <div className="mx-auto max-w-[1600px] space-y-4">
+      {/* Full-bleed workspace under the app header: the document and the fields each scroll alone. */}
+      <div className="-mx-4 -mt-6 -mb-6 flex flex-col sm:-mx-6 sm:-mt-8 sm:-mb-8 lg:-mx-8 lg:h-[calc(100dvh-3.5rem)]">
         <nav
           aria-label="Skip links"
-          className="sr-only focus-within:not-sr-only focus-within:flex focus-within:gap-2"
+          className="sr-only focus-within:not-sr-only focus-within:flex focus-within:gap-2 focus-within:p-2"
         >
           {[
             ["#cv-corrections", "Skip to corrections"],
@@ -390,160 +467,239 @@ function ReviewEditor({
           ))}
         </nav>
 
-        <header>
-          <Link href={`/candidates/${candidate.id}`} className={backLink}>
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Back to candidate
-          </Link>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h1 className="text-foreground text-large-title">Review parsed CV</h1>
-            <Badge variant={status.variant}>{status.label}</Badge>
+        {/* Compact header: who, which file, where it stands, and the way back. */}
+        <header className="border-border bg-background flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link
+              href={`/candidates/${candidate.id}`}
+              className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+              aria-label="Back to candidate"
+              title="Back to candidate"
+            >
+              <ArrowLeft aria-hidden="true" />
+            </Link>
+            <div className="min-w-0">
+              <p className="text-muted-foreground truncate text-[12.5px]">
+                <span className="text-foreground font-medium">{name}</span>
+                <span aria-hidden="true"> · </span>
+                <span className="font-mono text-[11.5px]">{cv.original_filename}</span>
+              </p>
+              <h1 className="text-foreground text-[17px] leading-tight font-semibold tracking-[-0.015em]">
+                Review parsed CV
+              </h1>
+            </div>
           </div>
-          <p className="text-muted-foreground mt-1 text-sm break-words">
-            {name} · {cv.original_filename}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={status.variant}>
+              <StatusDot />
+              {status.label}
+            </Badge>
+            {flagged.length > 0 && <Badge variant="warning">{flagged.length} to check</Badge>}
+            <span className="text-muted-foreground hidden text-xs md:inline">
+              {reviewedAt ? `Reviewed ${formatDate(reviewedAt)}` : "Awaiting review"}
+            </span>
+          </div>
         </header>
 
-        <PossibleDuplicates matches={matches} />
-        {!canEdit && (
-          <Banner tone="info" icon={Lock}>
-            You can look at this CV and its parsed fields, but your role can&apos;t change them.
-          </Banner>
-        )}
-        {!isLatestCv && (
-          <Banner tone="warning" icon={TriangleAlert}>
-            This isn&apos;t the candidate&apos;s latest CV. The fields on the right come from their
-            latest upload, so they may not match this PDF.
-          </Banner>
-        )}
-
-        {flagged.length > 0 && (
-          <details open className="glass rounded-2xl p-4">
-            <summary className="text-foreground focus-visible:ring-primary/25 cursor-pointer rounded-md text-sm font-medium focus-visible:ring-4 focus-visible:outline-none">
-              {flagged.length} {flagged.length === 1 ? "field" : "fields"} to check
-            </summary>
-            <p className="text-muted-foreground text-footnote mt-2">
-              The parser was unsure about these. Choose one to jump to it.
-            </p>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {flagged.map((field) => (
-                <li key={field.pointer}>
-                  <button
-                    type="button"
-                    onClick={() => focusPointer(field.pointer)}
-                    className="border-warning/40 bg-warning/10 text-foreground hover:bg-warning/15 focus-visible:ring-primary/25 rounded-full border px-3 py-1 text-xs font-medium focus-visible:ring-4 focus-visible:outline-none"
-                  >
-                    {field.label} · {formatConfidence(field.confidence)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <div
+          ref={splitRef}
+          className="flex min-h-0 flex-1 flex-col lg:flex-row"
+          style={{ "--split": `${split}%` } as React.CSSProperties}
+        >
+          {/* Left: the original document on a calm reading well. */}
           <section
             id="cv-original"
             tabIndex={-1}
             aria-label="Original CV"
-            className="h-[70dvh] outline-none lg:sticky lg:top-4 lg:h-[calc(100dvh-2rem)]"
+            className="flex h-[70dvh] min-h-0 flex-col bg-(--document-well) outline-none lg:h-auto lg:w-(--split) lg:shrink-0"
           >
             <PdfPane candidateId={candidate.id} cvId={cv.id} filename={cv.original_filename} />
           </section>
 
-          <div id="cv-corrections" tabIndex={-1} className="min-w-0 outline-none">
-            <Form {...form}>
-              <form
-                aria-label="Parsed fields"
-                noValidate
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (canEdit && !isSubmitting) void submit();
-                }}
-                onKeyDown={(event) => {
-                  if (
-                    canEdit &&
-                    (event.ctrlKey || event.metaKey) &&
-                    event.key.toLowerCase() === "s"
-                  ) {
-                    event.preventDefault();
-                    if (!isSubmitting) void submit();
-                  }
-                }}
-                className="space-y-4"
-              >
-                {problems.length > 0 && (
-                  <div
-                    role="alert"
-                    className="border-destructive/30 bg-destructive/5 rounded-2xl border p-4"
+          {/* Resize handle: drag, or focus it and use the arrow keys. */}
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize the document and fields panels"
+            aria-valuemin={SPLIT_MIN}
+            aria-valuemax={SPLIT_MAX}
+            aria-valuenow={Math.round(split)}
+            tabIndex={0}
+            onPointerDown={startDrag}
+            onKeyDown={onSplitKey}
+            onDoubleClick={() => setSplit(SPLIT_DEFAULT)}
+            className="group bg-border focus-visible:bg-electric hover:bg-electric/60 relative hidden w-px shrink-0 cursor-col-resize outline-none lg:block"
+          >
+            <span
+              aria-hidden="true"
+              className="bg-background border-border-strong group-hover:border-electric group-focus-visible:border-electric absolute top-1/2 left-1/2 flex h-8 w-2.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border"
+            >
+              <span className="bg-muted-foreground/60 h-3 w-px" />
+            </span>
+          </div>
+
+          {/* Right: the extracted fields. */}
+          <div
+            id="cv-corrections"
+            tabIndex={-1}
+            className="bg-background flex min-h-0 min-w-0 flex-1 flex-col outline-none"
+          >
+            <nav
+              aria-label="Sections"
+              className="glass-bar sticky top-14 z-10 flex gap-1 overflow-x-auto border-b border-(--glass-border) px-4 py-2 sm:px-6 lg:static lg:top-auto"
+            >
+              {SECTION_LINKS.map(([href, label]) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:ring-ring rounded-md px-2.5 py-1.5 text-[12.5px] whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <div className="space-y-5 px-4 pt-5 sm:px-6 lg:px-8">
+                <PossibleDuplicates matches={matches} />
+                {!canEdit && (
+                  <Banner tone="info" icon={Lock}>
+                    You can look at this CV and its parsed fields, but your role can&apos;t change
+                    them.
+                  </Banner>
+                )}
+                {!isLatestCv && (
+                  <Banner tone="warning" icon={TriangleAlert}>
+                    This isn&apos;t the candidate&apos;s latest CV. The fields on the right come
+                    from their latest upload, so they may not match this PDF.
+                  </Banner>
+                )}
+
+                {flagged.length > 0 && (
+                  <details
+                    open
+                    className="border-warning/30 bg-warning-soft/60 rounded-lg border p-4"
                   >
-                    <p className="text-destructive flex items-center gap-2 text-sm font-medium">
-                      <CircleAlert className="size-4" aria-hidden="true" />
-                      Fix {problems.length} {problems.length === 1 ? "problem" : "problems"} to save
+                    <summary className="text-foreground focus-visible:ring-ring cursor-pointer rounded-sm text-sm font-medium focus-visible:ring-2 focus-visible:outline-none">
+                      {flagged.length} {flagged.length === 1 ? "field" : "fields"} to check
+                    </summary>
+                    <p className="text-muted-foreground mt-1.5 text-[13px]">
+                      The parser was unsure about these. Choose one to jump to it.
                     </p>
-                    <ul className="mt-2 space-y-1">
-                      {problems.map((problem) => (
-                        <li key={problem.path}>
+                    <ul className="mt-3 flex flex-wrap gap-1.5">
+                      {flagged.map((field) => (
+                        <li key={field.pointer}>
                           <button
                             type="button"
-                            onClick={() => form.setFocus(problem.path as Path)}
-                            className="text-foreground focus-visible:ring-primary/25 rounded text-left text-sm underline underline-offset-2 focus-visible:ring-4 focus-visible:outline-none"
+                            onClick={() => focusPointer(field.pointer)}
+                            className="border-warning/40 bg-background text-foreground hover:border-warning focus-visible:ring-ring inline-flex h-7 items-center rounded-md border px-2.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
                           >
-                            {describePointer(`/${problem.path.replaceAll(".", "/")}`)}:{" "}
-                            {problem.message}
+                            {field.label} · {formatConfidence(field.confidence)}
                           </button>
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </details>
                 )}
+              </div>
 
-                {/* A disabled fieldset disables every control inside it, so viewers can read but not edit. */}
-                <fieldset disabled={!canEdit || saving} className="min-w-0 border-0 p-0">
-                  <legend className="sr-only">Parsed CV fields</legend>
-                  <ReviewForm />
-                </fieldset>
-
-                {canEdit && (
-                  <div className="glass-strong sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl p-3">
-                    <p
-                      role="status"
-                      aria-live="polite"
-                      className="text-muted-foreground text-footnote"
-                    >
-                      {isDirty
-                        ? "You have unsaved changes."
-                        : reviewedAt
-                          ? `Last reviewed ${formatDate(reviewedAt)}.`
-                          : "Not reviewed yet."}{" "}
-                      <span className="hidden sm:inline">Ctrl+S saves.</span>
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={!isDirty || isSubmitting}
-                        onClick={() => form.reset(toFormValues(saved))}
+              <Form {...form}>
+                <form
+                  aria-label="Parsed fields"
+                  noValidate
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    if (canEdit && !isSubmitting) void submit();
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      canEdit &&
+                      (event.ctrlKey || event.metaKey) &&
+                      event.key.toLowerCase() === "s"
+                    ) {
+                      event.preventDefault();
+                      if (!isSubmitting) void submit();
+                    }
+                  }}
+                >
+                  <div className="space-y-5 px-4 pt-5 sm:px-6 lg:px-8">
+                    {problems.length > 0 && (
+                      <div
+                        role="alert"
+                        className="border-destructive/30 bg-destructive-soft/60 rounded-lg border p-4"
                       >
-                        Reset
-                      </Button>
-                      <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? (
-                          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                        ) : (
-                          !isDirty && <CircleCheck aria-hidden="true" />
-                        )}
-                        {isSubmitting
-                          ? "Saving…"
-                          : isDirty
-                            ? "Save corrections"
-                            : "Confirm as correct"}
-                      </Button>
-                    </div>
+                        <p className="text-destructive flex items-center gap-2 text-sm font-medium">
+                          <CircleAlert className="size-4" aria-hidden="true" />
+                          Fix {problems.length} {problems.length === 1 ? "problem" : "problems"} to
+                          save
+                        </p>
+                        <ul className="mt-2 space-y-1">
+                          {problems.map((problem) => (
+                            <li key={problem.path}>
+                              <button
+                                type="button"
+                                onClick={() => form.setFocus(problem.path as Path)}
+                                className="text-foreground focus-visible:ring-ring rounded-sm text-left text-sm underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
+                              >
+                                {describePointer(`/${problem.path.replaceAll(".", "/")}`)}:{" "}
+                                {problem.message}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* A disabled fieldset disables every control inside it, so viewers can read but not edit. */}
+                    <fieldset disabled={!canEdit || saving} className="min-w-0 border-0 p-0">
+                      <legend className="sr-only">Parsed CV fields</legend>
+                      <ReviewForm />
+                    </fieldset>
                   </div>
-                )}
-              </form>
-            </Form>
+
+                  {canEdit && (
+                    <div className="glass-bar sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-3 border-t border-(--glass-border) px-4 py-3 sm:px-6 lg:px-8">
+                      <p
+                        role="status"
+                        aria-live="polite"
+                        className="text-muted-foreground text-[13px]"
+                      >
+                        {isDirty
+                          ? "You have unsaved changes."
+                          : reviewedAt
+                            ? `Last reviewed ${formatDate(reviewedAt)}.`
+                            : "Not reviewed yet."}{" "}
+                        <span className="hidden font-mono text-[11.5px] 2xl:inline">
+                          Ctrl+S saves.
+                        </span>
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={!isDirty || isSubmitting}
+                          onClick={() => form.reset(toFormValues(saved))}
+                        >
+                          Reset
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                          {isSubmitting ? (
+                            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                          ) : (
+                            !isDirty && <CircleCheck aria-hidden="true" />
+                          )}
+                          {isSubmitting
+                            ? "Saving…"
+                            : isDirty
+                              ? "Save corrections"
+                              : "Confirm as correct"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </form>
+              </Form>
+            </div>
           </div>
         </div>
 

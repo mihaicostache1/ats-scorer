@@ -86,7 +86,7 @@ const FormLabel = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<H
       <label
         ref={ref}
         className={cn(
-          "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+          "text-foreground text-[13px] leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           error && "text-destructive",
           className
         )}

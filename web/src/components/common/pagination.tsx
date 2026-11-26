@@ -34,17 +34,17 @@ export function Pagination({
     <nav
       aria-label="Pagination"
       className={cn(
-        "border-border/60 bg-foreground/[0.02] flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row",
+        "border-border flex flex-col items-center justify-between gap-3 border-t px-5 py-2.5 sm:flex-row",
         className
       )}
     >
-      <p className="text-muted-foreground text-xs">
+      <p className="text-muted-foreground text-xs tabular-nums">
         Showing {first} – {last} of {totalItems} {noun}
       </p>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          size="sm"
+          size="xs"
           onClick={() => onPageChange(page - 1)}
           disabled={disabled || page <= 1}
           aria-label="Previous page"
@@ -52,12 +52,15 @@ export function Pagination({
           <ChevronLeft className="size-3.5" />
           Prev
         </Button>
-        <span className="text-muted-foreground px-1 text-xs" aria-current="page">
+        <span
+          className="text-muted-foreground px-1.5 font-mono text-[11.5px] tabular-nums"
+          aria-current="page"
+        >
           Page {page} of {totalPages}
         </span>
         <Button
           variant="outline"
-          size="sm"
+          size="xs"
           onClick={() => onPageChange(page + 1)}
           disabled={disabled || page >= totalPages}
           aria-label="Next page"

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ExternalLink, FileWarning, Loader2 } from "lucide-react";
+import { ExternalLink, FileText, FileWarning, Loader2 } from "lucide-react";
 
 import { downloadCandidateCV } from "@/api";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -73,56 +73,75 @@ export function PdfPane({
     setAttempt((n) => n + 1);
   };
 
+  const toolbar = (
+    <div className="border-border bg-background/70 flex h-10 shrink-0 items-center justify-between gap-3 border-b px-4">
+      <p className="text-muted-foreground flex min-w-0 items-center gap-2 text-xs">
+        <FileText className="size-3.5 shrink-0" aria-hidden="true" />
+        <span className="truncate font-mono text-[11.5px]">{filename}</span>
+      </p>
+      {state.phase === "ready" && (
+        <a
+          href={state.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonVariants({ variant: "ghost", size: "xs" })}
+        >
+          <ExternalLink aria-hidden="true" />
+          Open the CV in a new tab
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      )}
+    </div>
+  );
+
   if (state.phase === "loading") {
     return (
-      <div
-        role="status"
-        aria-label="Loading the original CV"
-        className="glass flex h-full min-h-80 flex-col gap-3 rounded-2xl p-4"
-      >
-        <Skeleton className="h-6 w-1/3" />
-        <Skeleton className="w-full flex-1" />
-        <span className="text-muted-foreground inline-flex items-center gap-2 text-sm">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-          Loading the original CV…
-        </span>
+      <div className="flex h-full min-h-80 flex-col">
+        {toolbar}
+        <div
+          role="status"
+          aria-label="Loading the original CV"
+          className="flex flex-1 flex-col items-center justify-center gap-4 p-8"
+        >
+          <Skeleton className="aspect-[1/1.32] w-full max-w-[420px] rounded-[3px] bg-white/70 dark:bg-white/5" />
+          <span className="text-muted-foreground inline-flex items-center gap-2 text-[13px]">
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            Loading the original CV…
+          </span>
+        </div>
       </div>
     );
   }
 
   if (state.phase === "error") {
     return (
-      <div
-        role="alert"
-        className="border-destructive/20 bg-destructive/5 flex h-full min-h-80 flex-col items-center justify-center gap-3 rounded-2xl border p-6 text-center"
-      >
-        <FileWarning className="text-destructive size-8" aria-hidden="true" />
-        <p className="text-foreground text-sm font-medium">Couldn&apos;t show the original CV</p>
-        <p className="text-muted-foreground max-w-sm text-sm">{state.message}</p>
-        <Button type="button" variant="outline" size="sm" onClick={retry}>
-          Try again
-        </Button>
+      <div className="flex h-full min-h-80 flex-col">
+        {toolbar}
+        <div
+          role="alert"
+          className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center"
+        >
+          <FileWarning className="text-destructive size-7" aria-hidden="true" />
+          <p className="text-foreground text-sm font-medium">Couldn&apos;t show the original CV</p>
+          <p className="text-muted-foreground max-w-sm text-[13px]">{state.message}</p>
+          <Button type="button" variant="outline" size="sm" onClick={retry}>
+            Try again
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full min-h-80 flex-col gap-2">
-      <iframe
-        src={state.url}
-        title={`Original CV: ${filename}`}
-        className="border-border bg-background min-h-0 w-full flex-1 rounded-2xl border"
-      />
-      <a
-        href={state.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={buttonVariants({ variant: "ghost", size: "xs", className: "self-start" })}
-      >
-        <ExternalLink aria-hidden="true" />
-        Open the CV in a new tab
-        <span className="sr-only"> (opens in a new tab)</span>
-      </a>
+    <div className="flex h-full min-h-80 flex-col">
+      {toolbar}
+      <div className="min-h-0 flex-1 p-3 sm:p-4">
+        <iframe
+          src={state.url}
+          title={`Original CV: ${filename}`}
+          className="h-full w-full rounded-md bg-white shadow-[0_1px_2px_rgb(10_16_34/0.08),0_12px_32px_-12px_rgb(10_16_34/0.3)]"
+        />
+      </div>
     </div>
   );
 }

@@ -196,7 +196,7 @@ export default function DevComponentsPage() {
               row.matchScore >= 90
                 ? "text-success"
                 : row.matchScore >= 75
-                  ? "text-blue-600 dark:text-blue-400"
+                  ? "text-cobalt-600 dark:text-cobalt-300"
                   : "text-warning"
             }`}
           >
@@ -208,7 +208,7 @@ export default function DevComponentsPage() {
                 row.matchScore >= 90
                   ? "bg-success"
                   : row.matchScore >= 75
-                    ? "bg-blue-500"
+                    ? "bg-cobalt-600"
                     : "bg-warning"
               }`}
               style={{ width: `${row.matchScore}%` }}
@@ -263,7 +263,7 @@ export default function DevComponentsPage() {
       <div className="space-y-12 pb-16">
         {/* Page Header */}
         <div className="border-border border-b pb-6">
-          <div className="text-primary text-footnote flex items-center gap-2 font-medium">
+          <div className="text-link text-footnote flex items-center gap-2 font-medium">
             <Sparkles className="size-4" />
             Design System & Component Showcase
           </div>
@@ -280,7 +280,7 @@ export default function DevComponentsPage() {
         {/* Section 1: Buttons & Badges */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               1
             </div>
             <h2 className="text-foreground text-xl font-bold">Buttons & Status Badges</h2>
@@ -291,7 +291,7 @@ export default function DevComponentsPage() {
           </p>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="glass space-y-3 rounded-2xl p-5">
+            <div className="surface space-y-3 rounded-2xl p-5">
               <h3 className="text-sm font-semibold">Button Variants & Sizes</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Button variant="default">Default Button</Button>
@@ -312,7 +312,7 @@ export default function DevComponentsPage() {
               </div>
             </div>
 
-            <div className="glass space-y-3 rounded-2xl p-5">
+            <div className="surface space-y-3 rounded-2xl p-5">
               <h3 className="text-sm font-semibold">Status & Categorization Badges</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="default">Default</Badge>
@@ -329,7 +329,7 @@ export default function DevComponentsPage() {
         {/* Section 2: Modals & Dialogs */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               2
             </div>
             <h2 className="text-foreground text-xl font-bold">
@@ -343,7 +343,7 @@ export default function DevComponentsPage() {
             to close.
           </p>
 
-          <div className="glass flex flex-wrap items-center gap-4 rounded-2xl p-5">
+          <div className="surface flex flex-wrap items-center gap-4 rounded-2xl p-5">
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
               <DialogTrigger render={<Button className="gap-2" />}>
                 <Plus className="size-4" />
@@ -395,7 +395,7 @@ export default function DevComponentsPage() {
         {/* Section 3: Toast System */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               3
             </div>
             <h2 className="text-foreground text-xl font-bold">Toast Notification System</h2>
@@ -404,7 +404,7 @@ export default function DevComponentsPage() {
             Accessible live regions with auto-dismiss timers, dismiss buttons, and variant styling.
           </p>
 
-          <div className="glass flex flex-wrap items-center gap-3 rounded-2xl p-5">
+          <div className="surface flex flex-wrap items-center gap-3 rounded-2xl p-5">
             <Button
               variant="outline"
               onClick={() => toast.success("Job posting successfully published to careers portal.")}
@@ -430,7 +430,7 @@ export default function DevComponentsPage() {
               onClick={() => toast.info("Vector embeddings recalculating in the background.")}
               className="gap-1.5"
             >
-              <Info className="size-4 text-blue-500" />
+              <Info className="text-electric size-4" />
               Info Toast
             </Button>
 
@@ -448,7 +448,7 @@ export default function DevComponentsPage() {
         {/* Section 4: Form Fields with React Hook Form & Zod */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               4
             </div>
             <h2 className="text-foreground text-xl font-bold">
@@ -460,7 +460,7 @@ export default function DevComponentsPage() {
             aria-invalid, aria-describedby, and role=&quot;alert&quot; error messages.
           </p>
 
-          <div className="glass max-w-2xl rounded-2xl p-6">
+          <div className="surface max-w-2xl rounded-2xl p-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -636,7 +636,7 @@ export default function DevComponentsPage() {
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2">
-                <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+                <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
                   5
                 </div>
                 <h2 className="text-foreground text-xl font-bold">
@@ -677,7 +677,7 @@ export default function DevComponentsPage() {
         {/* Section 6: Skeleton Loaders */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               6
             </div>
             <h2 className="text-foreground text-xl font-bold">Skeleton Loaders</h2>
@@ -696,7 +696,7 @@ export default function DevComponentsPage() {
         {/* Section 7: Empty State Component */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+            <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
               7
             </div>
             <h2 className="text-foreground text-xl font-bold">Empty State Component</h2>
@@ -705,7 +705,7 @@ export default function DevComponentsPage() {
             Reusable empty condition display with icon, explanatory copy, and action button.
           </p>
 
-          <div className="glass rounded-2xl p-4">
+          <div className="surface rounded-2xl p-4">
             <EmptyState
               icon={FileSearch}
               title="No resumes uploaded yet"
@@ -725,7 +725,7 @@ export default function DevComponentsPage() {
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2">
-                <div className="bg-primary/10 text-primary flex size-6 items-center justify-center rounded-md text-xs font-bold">
+                <div className="bg-primary/10 text-link flex size-6 items-center justify-center rounded-md text-xs font-bold">
                   8
                 </div>
                 <h2 className="text-foreground text-xl font-bold">Error State Component</h2>
@@ -740,7 +740,7 @@ export default function DevComponentsPage() {
             </Button>
           </div>
 
-          <div className="glass rounded-2xl p-4">
+          <div className="surface rounded-2xl p-4">
             <ErrorState
               title={
                 errorSimulated

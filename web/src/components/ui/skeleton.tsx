@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("bg-muted/70 dark:bg-muted/40 skeleton-shimmer rounded-md", className)}
+      className={cn("bg-secondary skeleton-shimmer rounded-md", className)}
       role="status"
       aria-label="Loading..."
       {...props}
@@ -13,7 +13,7 @@ function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
 
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("glass space-y-3 rounded-2xl p-4", className)}>
+    <div className={cn("surface space-y-3 rounded-xl p-4", className)}>
       <Skeleton className="h-5 w-2/5" />
       <Skeleton className="h-4 w-4/5" />
       <div className="flex gap-2 pt-2">
@@ -26,9 +26,9 @@ function SkeletonCard({ className }: { className?: string }) {
 
 function SkeletonTableRow({ columns = 4 }: { columns?: number }) {
   return (
-    <tr className="border-border/40 border-b">
+    <tr className="border-border border-b">
       {Array.from({ length: columns }).map((_, i) => (
-        <td key={i} className="p-4">
+        <td key={i} className="px-4 py-3.5">
           <Skeleton className={cn("h-4", i === 0 ? "w-32" : i === 1 ? "w-24" : "w-16")} />
         </td>
       ))}

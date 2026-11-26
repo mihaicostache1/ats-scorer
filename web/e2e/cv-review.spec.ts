@@ -93,7 +93,7 @@ test("the saved correction is still there after a reload of the candidate", asyn
   // The mock keeps changes for the browser session, so the profile page shows them too.
   await page.getByRole("link", { name: "Back to candidate" }).first().click();
   await expect(page.getByRole("heading", { name: "Alex Mercer", level: 1 })).toBeVisible();
-  await expect(page.getByText("Principal Engineer")).toBeVisible();
+  await expect(page.getByText("Principal Engineer").first()).toBeVisible();
 });
 
 test("a viewer sees the screen read-only", async ({ page }) => {

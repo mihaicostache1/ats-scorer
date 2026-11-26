@@ -20,17 +20,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "border-border animate-pop-in flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed p-8 text-center",
+        "border-border animate-pop-in flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center",
         className
       )}
       role="status"
       {...props}
     >
-      <div className="glass-subtle text-muted-foreground mb-4 flex size-14 items-center justify-center rounded-full">
-        <Icon className="size-7" aria-hidden="true" />
+      <div className="border-border bg-background-secondary text-muted-foreground mb-4 flex size-11 items-center justify-center rounded-lg border">
+        <Icon className="size-5" aria-hidden="true" />
       </div>
       <h3 className="text-foreground text-headline">{title}</h3>
-      <p className="text-muted-foreground text-callout mt-1 max-w-sm">{description}</p>
+      <p className="text-muted-foreground mt-1 max-w-sm text-sm leading-relaxed">{description}</p>
       {action && <div className="mt-6 flex items-center gap-3">{action}</div>}
     </div>
   );

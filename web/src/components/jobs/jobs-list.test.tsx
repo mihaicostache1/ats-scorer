@@ -61,7 +61,7 @@ describe("JobsList", () => {
       const { container } = render(<JobsList />);
 
       expect(await screen.findByText("No jobs created yet")).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: "Create Your First Job" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "Create your first job" })).toHaveAttribute(
         "href",
         "/jobs/new"
       );

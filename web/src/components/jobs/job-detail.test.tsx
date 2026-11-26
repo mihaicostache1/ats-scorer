@@ -3,9 +3,20 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { mockJobs } from "@/mocks/fixtures/jobs";
 
-const { push, getJob, updateJobStatus, archiveJob, toast, session } = vi.hoisted(() => ({
+const {
+  push,
+  getJob,
+  getJobStages,
+  listApplications,
+  updateJobStatus,
+  archiveJob,
+  toast,
+  session,
+} = vi.hoisted(() => ({
   push: vi.fn(),
   getJob: vi.fn(),
+  getJobStages: vi.fn(),
+  listApplications: vi.fn(),
   updateJobStatus: vi.fn(),
   archiveJob: vi.fn(),
   toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn(), info: vi.fn() }),
@@ -13,7 +24,7 @@ const { push, getJob, updateJobStatus, archiveJob, toast, session } = vi.hoisted
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
-vi.mock("@/api", () => ({ getJob, updateJobStatus, archiveJob }));
+vi.mock("@/api", () => ({ getJob, getJobStages, listApplications, updateJobStatus, archiveJob }));
 vi.mock("@/components/ui/toast", () => ({ toast }));
 vi.mock("@/providers/session-provider", () => ({ useSession: () => session }));
 
@@ -25,6 +36,11 @@ beforeEach(() => {
   vi.clearAllMocks();
   session.can.mockReturnValue(true);
   getJob.mockResolvedValue({ data: open, response: { status: 200 } });
+  getJobStages.mockResolvedValue({ data: [], response: { status: 200 } });
+  listApplications.mockResolvedValue({
+    data: { items: [], pagination: { page: 1, per_page: 100, total_items: 0, total_pages: 0 } },
+    response: { status: 200 },
+  });
 });
 
 describe("JobDetail", () => {

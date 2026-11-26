@@ -33,7 +33,7 @@ describe("motion tokens", () => {
     for (const name of ["fast", "base", "slow"]) {
       expect(css).toMatch(new RegExp(`--motion-${name}:\\s*\\d+ms`));
     }
-    expect(block(css, ":root {")).toContain("--shimmer:");
+    expect(block(css, ":root,")).toContain("--shimmer:");
     expect(block(css, ".dark {")).toContain("--shimmer:");
   });
 
@@ -85,9 +85,9 @@ describe("keyframes and utilities", () => {
 
   it("staggers rows from --i, capped so a long list does not take long", () => {
     const body = block(css, "@utility animate-row-in");
-    expect(body).toMatch(/animation-delay:\s*calc\(min\(var\(--i,\s*0\),\s*10\)\s*\*\s*28ms\)/);
-    // The longest wait: ten steps of 28ms, then the 320ms entrance.
-    expect(10 * 28 + 320).toBeLessThan(700);
+    expect(body).toMatch(/animation-delay:\s*calc\(min\(var\(--i,\s*0\),\s*10\)\s*\*\s*24ms\)/);
+    // The longest wait: ten steps of 24ms, then the 320ms entrance.
+    expect(10 * 24 + 320).toBeLessThan(700);
   });
 
   it("parks the shimmer's highlight out of sight, so it is invisible when motion is reduced", () => {
@@ -121,10 +121,14 @@ describe("reduced motion", () => {
     expect(css.match(/@media \(prefers-reduced-motion: reduce\)/g)).toHaveLength(1);
   });
 
-  it("limits the lift on clickable surfaces to users who have not asked for less motion", () => {
+  it("keeps clickable surfaces still: hover changes the border, nothing moves", () => {
     const interactive = block(css, "@utility interactive");
-    expect(interactive).toMatch(/prefers-reduced-motion:\s*no-preference/);
-    expect(interactive).toMatch(/hover:\s*hover/);
+    expect(interactive).not.toMatch(/transform|translate|scale/);
+  });
+
+  it("only reveals marketing sections on scroll when motion is welcome", () => {
+    const supports = block(css, "@supports (animation-timeline: view())");
+    expect(supports).toMatch(/prefers-reduced-motion:\s*no-preference/);
   });
 });
 

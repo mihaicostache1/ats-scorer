@@ -35,7 +35,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Email").fill(ADMIN.email);
   await page.getByLabel("Password").fill(ADMIN.password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("heading", { name: "Jobs Postings" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Jobs", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "New job" })).toBeVisible();
   // Wait for the jobs list too: its placeholders and rows animate, and must not leak into a test.
   await expect(page.getByText(/Showing 1 – 10 of \d+ jobs/)).toBeVisible();
@@ -201,7 +201,7 @@ test.describe("with motion", () => {
     await expect.poll(() => countOf(page, "fluid-row-in")).toBeGreaterThanOrEqual(10);
 
     const rows = await rowAnimations(page);
-    rows.forEach(({ delay }, index) => expect(seconds(delay)).toBeCloseTo(index * 0.028, 3));
+    rows.forEach(({ delay }, index) => expect(seconds(delay)).toBeCloseTo(index * 0.024, 3));
 
     // And they all end up fully visible.
     await expect
@@ -222,28 +222,27 @@ test.describe("with motion", () => {
     });
   });
 
-  test("a primary button grows a little under the pointer, and settles back", async ({ page }) => {
+  test("a primary button answers the pointer with colour, not movement", async ({ page }) => {
     await signIn(page);
     const button = page.getByRole("link", { name: "New job" });
 
-    expect(await styleOf(button, "scale")).toBe("none");
+    const before = await styleOf(button, "background-color");
     await button.hover();
-    await expect.poll(() => styleOf(button, "scale")).toMatch(/^1\.02/);
+    await expect.poll(() => styleOf(button, "background-color")).not.toBe(before);
+    expect(await styleOf(button, "scale")).toBe("none");
 
     await page.mouse.move(2, 2);
-    await expect.poll(() => styleOf(button, "scale")).toBe("none");
+    await expect.poll(() => styleOf(button, "background-color")).toBe(before);
   });
 
-  test("a sidebar item nudges toward the pointer", async ({ page }) => {
+  test("a sidebar item highlights under the pointer and stays put", async ({ page }) => {
     await signIn(page);
-    const item = page
-      .getByRole("link", { name: "Candidates", exact: true })
-      .first()
-      .locator("div")
-      .first();
+    const item = page.getByRole("link", { name: "Candidates", exact: true }).first();
 
+    const before = await styleOf(item, "background-color");
     await item.hover();
-    await expect.poll(() => styleOf(item, "translate")).not.toBe("none");
+    await expect.poll(() => styleOf(item, "background-color")).not.toBe(before);
+    expect(await styleOf(item, "translate")).toBe("none");
   });
 
   test("the theme menu expands and collapses with its transition hooks", async ({ page }) => {
@@ -291,7 +290,7 @@ test.describe("with motion", () => {
     await page.getByRole("dialog").getByRole("button", { name: "Close job" }).click();
     const toast = page.getByLabel("Notifications").getByRole("alert");
     await expect(toast).toBeVisible();
-    expect(await countOf(page, "enter")).toBeGreaterThanOrEqual(1);
+    await expect.poll(() => countOf(page, "enter")).toBeGreaterThanOrEqual(1);
 
     await toast.getByRole("button", { name: "Dismiss notification" }).click();
     await expect(toast).toHaveAttribute("data-leaving", "");
@@ -338,11 +337,7 @@ test.describe("with reduced motion", () => {
     await page.waitForTimeout(400);
     expect(await styleOf(button, "scale")).toBe("none");
 
-    const item = page
-      .getByRole("link", { name: "Candidates", exact: true })
-      .first()
-      .locator("div")
-      .first();
+    const item = page.getByRole("link", { name: "Candidates", exact: true }).first();
     await item.hover();
     await page.waitForTimeout(400);
     expect(await styleOf(item, "translate")).toBe("none");

@@ -134,7 +134,7 @@ export function DataTable<T>({
       )}
 
       {/* Table container */}
-      <div className="glass overflow-hidden rounded-2xl">
+      <div className="surface overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm" role="table">
             <thead className="border-border/60 bg-foreground/[0.03] text-muted-foreground border-b font-medium">
@@ -162,7 +162,7 @@ export function DataTable<T>({
                         <button
                           type="button"
                           onClick={() => handleSort(col.key)}
-                          className="hover:text-foreground focus-visible:ring-primary/25 flex items-center gap-1.5 rounded py-1 focus-visible:ring-4 focus-visible:outline-none"
+                          className="hover:text-foreground focus-visible:ring-ring flex items-center gap-1.5 rounded py-1 focus-visible:ring-2 focus-visible:outline-none"
                         >
                           {col.header}
                           {isCurrentSort ? (
