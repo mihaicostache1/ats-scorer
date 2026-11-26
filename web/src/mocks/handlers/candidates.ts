@@ -67,6 +67,16 @@ const TERMINAL = ["extracted", "parsed", "needs_review", "failed"];
 let candidatesStore: CandidateResponse[] = [...mockCandidates];
 let cvStore: CvDocumentResponse[] = [...mockCvDocuments];
 
+export function getMockCandidate(id: string) {
+  return candidatesStore.find((candidate) => candidate.id === id);
+}
+
+export function latestMockCv(id: string) {
+  return cvStore
+    .filter((document) => document.candidate_id === id)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id))[0];
+}
+
 function withDuplicates(candidate: CandidateResponse): CandidateResponse {
   return { ...candidate, possible_duplicates: possibleDuplicates(candidate, candidatesStore) };
 }

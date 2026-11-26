@@ -351,8 +351,11 @@ export interface paths {
     /**
      * List Ranked Candidates for a Job
      * @description Admin and recruiter only. Reads stored application scores. The ranked group contains
-     *     scores from the current model. Candidates requiring review have their own group.
-     *     Pending scores and scores from an older model appear in the unranked group.
+     *     scores from the current model and the current scoring inputs. Candidates requiring
+     *     review have their own group. Pending and rescoring applications appear in the unranked
+     *     group. A replacement CV being processed, changed scoring inputs, or an older model
+     *     makes an existing numeric score a rescoring result. Legacy-only scores are pending here
+     *     until the scoring worker publishes a new outcome.
      *     Each group uses the requested page and page size with its own item count.
      *     The stage filter applies to every group. Score, skill, and experience filters require
      *     a score from the current model.
@@ -637,7 +640,9 @@ export interface paths {
     /**
      * Get Score & Explanation Breakdown
      * @description Retrieve the application's current score outcome and L-17 explanation. A pending or
-     *     manual-review application has no numeric score. An older-model result is labelled rescoring.
+     *     manual-review application has no numeric score. An existing numeric result computed with
+     *     superseded inputs or an older model is labelled rescoring. Legacy-only scores are pending
+     *     until the scoring worker publishes a new outcome.
      *     Viewers can read results for applications in the screening, interview, offer or hired stage.
      */
     get: operations["getApplicationScore"];

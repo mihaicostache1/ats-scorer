@@ -8,7 +8,7 @@
  */
 
 import { apiClient } from "@/api/client";
-import type { components } from "@/api/generated/schema";
+import type { components, operations } from "@/api/generated/schema";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 // Sessions are httpOnly cookies set by the API; none of these return a token.
@@ -74,6 +74,13 @@ export function archiveJob(id: string) {
 
 export function getJobStages(id: string) {
   return apiClient.GET("/jobs/{id}/stages", { params: { path: { id } } });
+}
+
+export function getRankedCandidates(
+  id: string,
+  query?: operations["getRankedCandidates"]["parameters"]["query"]
+) {
+  return apiClient.GET("/jobs/{id}/ranked-candidates", { params: { path: { id }, query } });
 }
 
 // ─── Candidates ───────────────────────────────────────────────────────────────

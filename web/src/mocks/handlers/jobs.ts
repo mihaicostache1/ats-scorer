@@ -9,6 +9,10 @@ type JobResponse = components["schemas"]["JobResponse"];
 /** In-memory store — mutations persist for the browser session. */
 let jobsStore: JobResponse[] = [...mockJobs];
 
+export function getMockJob(id: unknown) {
+  return jobsStore.find((job) => job.id === id);
+}
+
 /** FastAPI-style 422: `{ detail: [{ loc, msg, type }] }`. */
 function validationError(problems: { field: string; msg: string }[]): Response {
   return HttpResponse.json(

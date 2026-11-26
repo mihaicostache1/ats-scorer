@@ -1,13 +1,14 @@
 """Read B-18 outcomes without running the scorer."""
 
 import uuid
+from operator import itemgetter
 from typing import Any
 
 from ats_scoring import MODEL_VERSION
 from ats_scoring.explanation import TEMPLATES
 from ats_scoring.skills import normalize_skill
-from sqlalchemy import ColumnElement, Select, and_, case, false, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy import Select, and_, or_, select
+from sqlalchemy.orm import Session, load_only
 
 from app.models.application import Application
 from app.models.application_score import ApplicationScore
@@ -26,14 +27,19 @@ from app.schemas.ranking import (
     ScoreResponse,
     ScoreStatus,
 )
+from app.services.scoring_inputs import (
+    PROCESSING_CV_STATUSES,
+    candidate_inputs,
+    job_inputs,
+    scoring_digest,
+)
 
-_IN_PROGRESS = (CvStatus.QUEUED.value, CvStatus.EXTRACTING.value, CvStatus.EXTRACTED.value)
 _REVIEW = (CvStatus.NEEDS_REVIEW.value, CvStatus.FAILED.value)
 _VIEWER_STAGES = ("screening", "interview", "offer", "hired")
 
 
-def _latest_cv_status(org_id: uuid.UUID) -> ColumnElement[str]:
-    return (
+def _outcomes(org_id: uuid.UUID, *columns: Any) -> Select[Any]:
+    cv_status = (
         select(CvDocument.status)
         .where(CvDocument.org_id == org_id, CvDocument.candidate_id == Application.candidate_id)
         .order_by(CvDocument.created_at.desc(), CvDocument.id.desc())
@@ -41,31 +47,14 @@ def _latest_cv_status(org_id: uuid.UUID) -> ColumnElement[str]:
         .correlate(Application)
         .scalar_subquery()
     )
-
-
-def _outcomes(org_id: uuid.UUID, *columns: Any) -> Select[Any]:
-    cv_status = _latest_cv_status(org_id)
-    outcome_status = case(
-        (cv_status.in_(_REVIEW), ScoreStatus.NEEDS_MANUAL_REVIEW.value),
-        (
-            and_(
-                ApplicationScore.status == "needs_review", cv_status.in_(_IN_PROGRESS).is_not(True)
-            ),
-            ScoreStatus.NEEDS_MANUAL_REVIEW.value,
-        ),
-        (
-            and_(
-                ApplicationScore.status == "scored", ApplicationScore.model_version == MODEL_VERSION
-            ),
-            ScoreStatus.SCORED.value,
-        ),
-        (ApplicationScore.status == "scored", ScoreStatus.RESCORING.value),
-        else_=ScoreStatus.PENDING.value,
-    )
     return (
         select(
             Application.id.label("application_id"),
-            outcome_status.label("status"),
+            Job,
+            Candidate,
+            cv_status.label("cv_status"),
+            ApplicationScore.status.label("stored_status"),
+            ApplicationScore.inputs_hash,
             ApplicationScore.score,
             ApplicationScore.band,
             ApplicationScore.model_version,
@@ -92,23 +81,54 @@ def _outcomes(org_id: uuid.UUID, *columns: Any) -> Select[Any]:
             ),
         )
         .where(Application.org_id == org_id)
+        .options(
+            load_only(
+                Job.id,
+                Job.org_id,
+                Job.title,
+                Job.description,
+                Job.required_skills,
+                Job.preferred_skills,
+                Job.min_experience_years,
+                Job.embedding,
+                Job.embedding_model_version,
+            ),
+            load_only(
+                Candidate.id,
+                Candidate.full_name,
+                Candidate.parsed_data,
+                Candidate.parsed_data_original,
+                Candidate.embedding_name_aliases,
+                Candidate.embedding,
+                Candidate.embedding_model_version,
+            ),
+        )
+        .execution_options(populate_existing=True)
     )
 
 
-def _hide_unavailable_score(values: dict[str, Any]) -> dict[str, Any]:
-    if values["status"] not in (ScoreStatus.SCORED, ScoreStatus.RESCORING):
-        for field in (
-            "id",
-            "score",
-            "band",
-            "model_version",
-            "computed_at",
-            "explanation",
-            "experience_years",
-        ):
-            if field in values:
-                values[field] = None
-    return values
+def _score_status(row: Any, job_hash: str) -> ScoreStatus:
+    if row.cv_status in _REVIEW:
+        return ScoreStatus.NEEDS_MANUAL_REVIEW
+    has_score = row.stored_status == "scored"
+    if row.cv_status in PROCESSING_CV_STATUSES or row.stored_status is None:
+        return ScoreStatus.RESCORING if has_score else ScoreStatus.PENDING
+    if row.model_version != MODEL_VERSION or (
+        candidate_inputs(row.Candidate, row.cv_status, job_hash).inputs_hash != row.inputs_hash
+    ):
+        return ScoreStatus.RESCORING if has_score else ScoreStatus.PENDING
+    return ScoreStatus.SCORED if has_score else ScoreStatus.NEEDS_MANUAL_REVIEW
+
+
+def _summary(row: Any, status: ScoreStatus) -> dict[str, Any]:
+    visible = status in (ScoreStatus.SCORED, ScoreStatus.RESCORING)
+    return {
+        "status": status,
+        "score": row.score if visible else None,
+        "band": row.band if visible else None,
+        "model_version": row.model_version if visible else None,
+        "computed_at": row.computed_at if visible else None,
+    }
 
 
 def get_score_detail(
@@ -119,8 +139,19 @@ def get_score_detail(
     )
     if viewer:
         query = query.where(PipelineStage.stage_type.in_(_VIEWER_STAGES))
-    row = db.execute(query).mappings().one_or_none()
-    return None if row is None else ScoreResponse.model_validate(_hide_unavailable_score(dict(row)))
+    row = db.execute(query).one_or_none()
+    if row is None:
+        return None
+    status = _score_status(row, scoring_digest(*job_inputs(row.Job)))
+    visible = status in (ScoreStatus.SCORED, ScoreStatus.RESCORING)
+    return ScoreResponse.model_validate(
+        {
+            **_summary(row, status),
+            "id": row.id if visible else None,
+            "application_id": row.application_id,
+            "explanation": row.explanation if visible else None,
+        }
+    )
 
 
 def list_ranked_candidates(
@@ -136,13 +167,11 @@ def list_ranked_candidates(
     page: int,
     per_page: int,
 ) -> RankedCandidatesResponse:
-    rows = _outcomes(
+    query = _outcomes(
         job.org_id,
         Application.candidate_id,
-        Candidate.full_name,
         Application.stage_id,
         PipelineStage.name.label("stage_name"),
-        _latest_cv_status(job.org_id).label("cv_status"),
         Application.applied_at,
         ApplicationScore.explanation["experience"]["candidate_years"]
         .as_float()
@@ -150,86 +179,75 @@ def list_ranked_candidates(
         ApplicationScore.explanation["matched_skills"].label("matched_skills"),
     ).where(Application.job_id == job.id)
     if stage_id is not None:
-        rows = rows.where(Application.stage_id == stage_id)
-    outcomes = rows.subquery()
-    status = outcomes.c.status
-    group = case(
-        (status == ScoreStatus.SCORED.value, "ranked"),
-        (status == ScoreStatus.NEEDS_MANUAL_REVIEW.value, "needs_manual_review"),
-        else_="unranked",
-    ).label("score_group")
-    order: ColumnElement[Any]
-    ordering: tuple[ColumnElement[Any], ...]
-    if sort_by == RankingSort.SCORE:
-        order = case((status == ScoreStatus.SCORED.value, outcomes.c.score))
-        direction = order.asc() if sort_order == SortOrder.ASC else order.desc()
-        ordering = (direction.nulls_last(), outcomes.c.applied_at.desc(), outcomes.c.application_id)
-    else:
-        order = outcomes.c.applied_at
-        direction = order.asc() if sort_order == SortOrder.ASC else order.desc()
-        ordering = (direction, outcomes.c.application_id)
-    numbered = select(
-        *(column for column in outcomes.c if column.key != "matched_skills"),
-        group,
-        func.row_number().over(partition_by=group, order_by=ordering).label("position"),
-    )
-    if min_score is not None or min_experience_years is not None or required_skill is not None:
-        numbered = numbered.where(status == ScoreStatus.SCORED.value)
-    if min_score is not None:
-        numbered = numbered.where(outcomes.c.score >= min_score)
-    if min_experience_years is not None:
-        numbered = numbered.where(outcomes.c.experience_years >= min_experience_years)
-    if required_skill is not None:
-        skill = normalize_skill(required_skill)
-        spellings = {
-            name.strip()
-            for name in job.required_skills
-            if skill and isinstance(name, str) and normalize_skill(name) == skill
-        }
-        numbered = numbered.where(
-            or_(
-                false(),
-                *(
-                    outcomes.c.matched_skills.contains([{"skill": name, "requirement": "required"}])
-                    for name in spellings
-                ),
+        query = query.where(Application.stage_id == stage_id)
+
+    # Source inputs and scores come from one snapshot before grouping and pagination.
+    groups: dict[str, list[dict[str, Any]]] = {
+        "ranked": [],
+        "needs_manual_review": [],
+        "unranked": [],
+    }
+    has_fit_filter = any(v is not None for v in (min_score, required_skill, min_experience_years))
+    skill = normalize_skill(required_skill) if required_skill is not None else None
+    job_hash = None
+    for row in db.execute(query):
+        if job_hash is None:
+            job_hash = scoring_digest(*job_inputs(row.Job))
+        status = _score_status(row, job_hash)
+        if has_fit_filter and status != ScoreStatus.SCORED:
+            continue
+        if min_score is not None and row.score < min_score:
+            continue
+        if min_experience_years is not None and (
+            row.experience_years is None or row.experience_years < min_experience_years
+        ):
+            continue
+        if skill is not None and (
+            not skill
+            or not any(
+                match["requirement"] == "required" and normalize_skill(match["skill"]) == skill
+                for match in (row.matched_skills or [])
             )
+        ):
+            continue
+        group = {
+            ScoreStatus.SCORED: "ranked",
+            ScoreStatus.NEEDS_MANUAL_REVIEW: "needs_manual_review",
+        }.get(status, "unranked")
+        summary = _summary(row, status)
+        groups[group].append(
+            {
+                **summary,
+                "application_id": row.application_id,
+                "candidate_id": row.candidate_id,
+                "full_name": row.Candidate.full_name,
+                "stage_id": row.stage_id,
+                "stage_name": row.stage_name,
+                "cv_status": row.cv_status,
+                "applied_at": row.applied_at,
+                "experience_years": row.experience_years if summary["score"] is not None else None,
+            }
         )
 
-    # Count and paginate in one snapshot, including totals for a group beyond its last page.
-    ranked = numbered.cte("ranked_outcomes")
-    totals = (
-        select(ranked.c.score_group, func.count().label("total_items"))
-        .group_by(ranked.c.score_group)
-        .subquery()
-    )
     start = (page - 1) * per_page
-    query = (
-        select(totals.c.score_group.label("page_group"), totals.c.total_items, *ranked.c)
-        .select_from(
-            totals.outerjoin(
-                ranked,
-                and_(
-                    ranked.c.score_group == totals.c.score_group,
-                    ranked.c.position > start,
-                    ranked.c.position <= start + per_page,
-                ),
+    pages = {}
+    for name, rows in groups.items():
+        rows.sort(key=itemgetter("application_id"))
+        if name == "ranked" and sort_by == RankingSort.SCORE:
+            rows.sort(key=itemgetter("applied_at"), reverse=True)
+            rows.sort(key=itemgetter("score"), reverse=sort_order == SortOrder.DESC)
+        else:
+            rows.sort(
+                key=itemgetter("applied_at"),
+                reverse=sort_by == RankingSort.SCORE or sort_order == SortOrder.DESC,
             )
+        pages[name] = RankedCandidatesPage(
+            items=[RankedCandidate.model_validate(row) for row in rows[start : start + per_page]],
+            pagination=PaginationMeta.build(page, per_page, len(rows)),
         )
-        .order_by(ranked.c.position)
-    )
-    groups = {
-        name: RankedCandidatesPage(items=[], pagination=PaginationMeta.build(page, per_page, 0))
-        for name in ("ranked", "needs_manual_review", "unranked")
-    }
-    for row in db.execute(query).mappings():
-        target = groups[row["page_group"]]
-        target.pagination = PaginationMeta.build(page, per_page, row["total_items"])
-        if row["application_id"] is not None:
-            target.items.append(RankedCandidate.model_validate(_hide_unavailable_score(dict(row))))
     return RankedCandidatesResponse(
-        ranked=groups["ranked"],
-        needs_manual_review=groups["needs_manual_review"],
-        unranked=groups["unranked"],
+        ranked=pages["ranked"],
+        needs_manual_review=pages["needs_manual_review"],
+        unranked=pages["unranked"],
         advisory_note=TEMPLATES["advisory"],
     )

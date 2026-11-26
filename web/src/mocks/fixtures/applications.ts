@@ -78,15 +78,16 @@ export const mockApplications: ApplicationResponse[] = [
   },
 ];
 
-/** Local copies of the L-17 examples keep the web build self-contained. */
+/** Saved explanations for the demo application and its own job. */
+export const mockScorerVersion = Object.values(scoreExplanations)[0].model_version;
 export const mockScores: Record<string, ScoreResponse> = Object.fromEntries(
-  Object.values(scoreExplanations).map((data, index) => {
+  Object.entries(scoreExplanations).map(([id, data], index) => {
     const explanation = data as components["schemas"]["ScoreExplanation"];
-    const application = mockApplications[index];
+    const application = mockApplications.find((entry) => entry.id === id)!;
     const outcome: ScoreResponse = {
       id: `d90123e4-f5a6-7b8c-9d0e-1f2a3b4c5d6${index}`,
       application_id: application.id,
-      status: "scored",
+      status: explanation.model_version === mockScorerVersion ? "scored" : "rescoring",
       score: explanation.total,
       band: explanation.band,
       model_version: explanation.model_version,

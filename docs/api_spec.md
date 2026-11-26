@@ -286,10 +286,11 @@ status, stored score and band, and years of experience from the score explanatio
 | `page` | Page number starting at 1 | `1` |
 | `per_page` | Page size from 1 to 100 | `20` |
 
-`ranked` contains scores from the current model. `unranked` contains `pending` and `rescoring`
-applications. Older model scores are visible with their original version and timestamp. Manual
-review rows have null score and band. Score, skill, and experience filters require a current-model
-score. Reads never recompute an outcome. See the [OpenAPI draft](openapi.yaml) for the response schema.
+`ranked` contains scores from the current model and the current inputs. `unranked` contains
+`pending` and `rescoring` applications. A replacement CV being processed, changed scoring inputs,
+or an older model puts a previous numeric result in `rescoring` with its original score, version,
+and timestamp. Manual review rows have null score and band. Score, skill, and experience filters
+require a current score. Reads never recompute an outcome. See the [OpenAPI draft](openapi.yaml).
 
 ### 2.3 Candidates & CV Upload
 
@@ -625,7 +626,9 @@ Returns the application's current outcome with `status`, `score`, `band`, `model
 `computed_at`, and the [L-17 explanation](ml/score-explanation.md). An application awaiting a score
 returns `200` with `status: pending`. Applications requiring manual review return
 `status: needs_manual_review`. Both states carry null score, band, and explanation. An older-model
-result remains visible with `status: rescoring` and its original explanation.
+result or a score with superseded inputs remains visible with `status: rescoring` and its original
+explanation. Applications with only a legacy `scores` row are pending in both ranking endpoints
+until B-18 publishes an `application_scores` outcome. Legacy stage-history snapshots remain readable.
 
 Admins and recruiters can read any application in their organization. A viewer can read score
 details for applications in screening, interview, offer, or hired stages. Out-of-scope applications
