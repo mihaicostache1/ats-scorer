@@ -155,6 +155,10 @@ def main() -> int:
             matrix = np.array(vectors, dtype=np.float32)  # pgvector returns float32 arrays
             loop = timed(args.passes, lambda: rank(batch, job, list(matrix), job_vector))
             batched = timed(args.passes, lambda: rank_batch(batch, job, matrix, job_vector))
+            if rank(batch, job, list(matrix), job_vector) != rank_batch(
+                batch, job, matrix, job_vector
+            ):
+                raise SystemExit("score_batch() and score() disagree with embeddings")
         print(f"  {'load model':34} {load_seconds:7.2f} s  (once per worker)")
         print(
             f"  {'embed CVs and the job':34} {embed_seconds:7.2f} s  "
