@@ -2,6 +2,7 @@
 
 from app.db.base_class import Base
 from app.models.application import Application
+from app.models.application_score import ApplicationScore
 from app.models.application_stage_history import ApplicationStageHistory
 from app.models.audit_event import AuditEvent
 from app.models.candidate import Candidate
@@ -23,6 +24,7 @@ __all__ = [
     "PipelineStage",
     "Candidate",
     "Application",
+    "ApplicationScore",
     "ApplicationStageHistory",
     "Score",
     "AuditEvent",

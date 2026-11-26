@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
+    from app.models.application_score import ApplicationScore
     from app.models.application_stage_history import ApplicationStageHistory
     from app.models.candidate import Candidate
     from app.models.job import Job
@@ -25,6 +26,7 @@ class Application(Base):
 
     __table_args__ = (
         UniqueConstraint("org_id", "job_id", "candidate_id", name="uq_applications_job_candidate"),
+        UniqueConstraint("org_id", "id", name="uq_applications_org_id"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -70,6 +72,9 @@ class Application(Base):
     stage: Mapped["PipelineStage"] = relationship("PipelineStage", back_populates="applications")
     scores: Mapped[list["Score"]] = relationship(
         "Score", back_populates="application", cascade="all, delete-orphan"
+    )
+    score_history: Mapped[list["ApplicationScore"]] = relationship(
+        back_populates="application", passive_deletes="all"
     )
     stage_history: Mapped[list["ApplicationStageHistory"]] = relationship(
         "ApplicationStageHistory", back_populates="application", cascade="all, delete-orphan"

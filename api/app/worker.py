@@ -11,7 +11,8 @@ from app.core.config import settings
 from app.core.logging import logger
 from app.services.cv_extraction import extract_cv_text
 from app.services.embedding_pipeline import embed_pending
-from app.services.job_queue import EXTRACT_CV_TEXT_JOB, redis_settings
+from app.services.job_queue import EXTRACT_CV_TEXT_JOB, SCORE_JOB, redis_settings
+from app.services.scoring_pipeline import score_job
 
 
 async def on_startup(ctx: dict[str, Any]) -> None:
@@ -39,7 +40,8 @@ class WorkerSettings:
             # Results live in cv_documents. Keeping none also frees the job ID, so a
             # failed document can be queued again.
             keep_result=0,
-        )
+        ),
+        func(score_job, name=SCORE_JOB, max_tries=5, keep_result=0),
     ]
     cron_jobs = [
         cron(
