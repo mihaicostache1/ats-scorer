@@ -10,6 +10,8 @@ PREFERRED_WEIGHT = 0.5  # a nice-to-have skill counts half as much as a required
 
 # Abbreviations that plain string comparison cannot resolve. Keys and values are in
 # cleaned form. Background: docs/ml/embedding-model-and-skill-matching.md
+# Changing it fails tests/test_scorer_regression.py until the frozen pairs are updated with a
+# note (docs/ml/scorer-regression.md).
 SKILL_ALIASES = {
     "js": "javascript",
     "ts": "typescript",

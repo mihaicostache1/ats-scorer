@@ -1,0 +1,194 @@
+{
+  "model_version": "hybrid-1.2.0",
+  "tolerance": 2.0,
+  "fingerprint": {
+    "weights_yaml": "bfdbcccb0c63ddb8",
+    "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "skill_taxonomy": "76d50d1e07a58f8f"
+  },
+  "pairs": [
+    {
+      "id": "C021-J01",
+      "candidate_id": "C021",
+      "job_id": "J01",
+      "embeddings": true,
+      "why": "rated 3; the 'strong' explanation example",
+      "frozen_total": 83.76,
+      "total_min": 81.76,
+      "total_max": 85.76,
+      "band": "strong",
+      "matched_skills": [
+        "Microservices",
+        "Python",
+        "Docker",
+        "Java",
+        "FastAPI",
+        "Go",
+        "SQL"
+      ]
+    },
+    {
+      "id": "C031-J01",
+      "candidate_id": "C031",
+      "job_id": "J01",
+      "embeddings": true,
+      "why": "rated 2; the 'moderate' example: under the minimum, skills missing",
+      "frozen_total": 55.2,
+      "total_min": 53.2,
+      "total_max": 57.2,
+      "band": "moderate",
+      "matched_skills": [
+        "Python",
+        "Spring Boot",
+        "SQL"
+      ]
+    },
+    {
+      "id": "C009-J01",
+      "candidate_id": "C009",
+      "job_id": "J01",
+      "embeddings": true,
+      "why": "rated 0; the 'weak' example: a different role",
+      "frozen_total": 21.37,
+      "total_min": 19.37,
+      "total_max": 23.37,
+      "band": "weak",
+      "matched_skills": []
+    },
+    {
+      "id": "C021-J01-no-embeddings",
+      "candidate_id": "C021",
+      "job_id": "J01",
+      "embeddings": false,
+      "why": "the strong pair without embeddings: weights spread over the rest",
+      "frozen_total": 80.3,
+      "total_min": 78.3,
+      "total_max": 82.3,
+      "band": "strong",
+      "matched_skills": [
+        "Microservices",
+        "Python",
+        "Docker",
+        "Java",
+        "FastAPI",
+        "Go",
+        "SQL"
+      ]
+    },
+    {
+      "id": "C008-J07",
+      "candidate_id": "C008",
+      "job_id": "J07",
+      "embeddings": true,
+      "why": "rated 3",
+      "frozen_total": 24.0,
+      "total_min": 22.0,
+      "total_max": 26.0,
+      "band": "weak",
+      "matched_skills": []
+    },
+    {
+      "id": "C006-J07",
+      "candidate_id": "C006",
+      "job_id": "J07",
+      "embeddings": true,
+      "why": "rated 1",
+      "frozen_total": 6.58,
+      "total_min": 4.58,
+      "total_max": 8.58,
+      "band": "weak",
+      "matched_skills": []
+    },
+    {
+      "id": "C010-J10",
+      "candidate_id": "C010",
+      "job_id": "J10",
+      "embeddings": true,
+      "why": "rated 3",
+      "frozen_total": 73.4,
+      "total_min": 71.4,
+      "total_max": 75.4,
+      "band": "strong",
+      "matched_skills": [
+        "SEO",
+        "Brand Strategy",
+        "Market Research",
+        "Marketing Automation",
+        "Google Analytics",
+        "Public Relations"
+      ]
+    },
+    {
+      "id": "C021-J10",
+      "candidate_id": "C021",
+      "job_id": "J10",
+      "embeddings": true,
+      "why": "rated 0; the candidate of the strong J01 pair, wrong job",
+      "frozen_total": 10.54,
+      "total_min": 8.54,
+      "total_max": 12.54,
+      "band": "weak",
+      "matched_skills": []
+    },
+    {
+      "id": "C034-J04",
+      "candidate_id": "C034",
+      "job_id": "J04",
+      "embeddings": true,
+      "why": "rated 2",
+      "frozen_total": 48.47,
+      "total_min": 46.47,
+      "total_max": 50.47,
+      "band": "weak",
+      "matched_skills": [
+        "Networking",
+        "Ansible",
+        "Jenkins"
+      ]
+    },
+    {
+      "id": "C039-J09",
+      "candidate_id": "C039",
+      "job_id": "J09",
+      "embeddings": true,
+      "why": "rated 3",
+      "frozen_total": 69.36,
+      "total_min": 67.36,
+      "total_max": 71.36,
+      "band": "moderate",
+      "matched_skills": [
+        "Interaction Design",
+        "Prototyping",
+        "Accessibility"
+      ]
+    },
+    {
+      "id": "C077-J13",
+      "candidate_id": "C077",
+      "job_id": "J13",
+      "embeddings": true,
+      "why": "rated 1",
+      "frozen_total": 37.97,
+      "total_min": 35.97,
+      "total_max": 39.97,
+      "band": "weak",
+      "matched_skills": [
+        "Statistics",
+        "SQL"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-11-26",
+      "model_version": "hybrid-1.2.0",
+      "fingerprint": {
+        "weights_yaml": "bfdbcccb0c63ddb8",
+        "embedding_model": "intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3",
+        "skill_taxonomy": "76d50d1e07a58f8f"
+      },
+      "results": "05dd19b70707db0b",
+      "note": "Initial freeze of 11 pairs at hybrid-1.2.0 (L-19)"
+    }
+  ]
+}
