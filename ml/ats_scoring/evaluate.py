@@ -300,7 +300,8 @@ def save(report: Mapping[str, Any], results_dir: Path, label: str | None = None)
     """Write the report to <results_dir>/<date>_<model version>[_<label>].json."""
     results_dir.mkdir(parents=True, exist_ok=True)
     name = report["model_version"] + (f"_{label}" if label else "")
-    name = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
+    # "+" stays: it separates the scorer version from the hashes in a model_version (L-21).
+    name = re.sub(r"[^A-Za-z0-9.+_-]+", "-", name).strip("-")
     path = results_dir / f"{report['date']}_{name}.json"
     path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n")
     return path

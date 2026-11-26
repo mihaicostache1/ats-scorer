@@ -1,6 +1,6 @@
 {
   "explanation_version": "1.0",
-  "model_version": "hybrid-1.2.0",
+  "model_version": "hybrid-1.2.0+w.c754da5b.e.4369349b.t.fef65952",
   "total": 21.5,
   "band": "weak",
   "summary": "Weak match. The job lists no skills, so skills are not part of the score. The job gives no minimum experience, so experience is not scored.",

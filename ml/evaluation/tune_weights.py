@@ -32,7 +32,7 @@ from ats_scoring.evaluate import (
     ndcg_at_k,
     spearman,
 )
-from ats_scoring.scoring import score
+from ats_scoring.scoring import MODEL_VERSION, score
 
 TUNE_JOBS = ("J01", "J07", "J09")  # Senior Backend Engineer, Data Analyst, UX Designer
 HELD_OUT_JOBS = ("J04", "J10", "J13")  # Lead Platform Engineer, Marketing Assistant, Senior DS
@@ -309,7 +309,7 @@ def main() -> int:
     if not args.no_save:
         report = {
             "date": date.today().isoformat(),
-            "model_version": DEFAULT_CONFIG.model_version,
+            "model_version": MODEL_VERSION,
             "raters": sorted(load_ratings(DEFAULT_EVAL_DIR / "ratings")),
             "pairs_rated": len(rows),
             "tune_jobs": TUNE_JOBS,

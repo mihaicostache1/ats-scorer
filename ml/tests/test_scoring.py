@@ -3,12 +3,22 @@
 import dataclasses
 import math
 import socket
+from collections import UserDict
+from collections.abc import Callable, Mapping
+from types import MappingProxyType
 from typing import Any
 
 import numpy as np
 import pytest
 
-from ats_scoring import MODEL_VERSION, WEIGHTS, NothingToScoreError, score
+from ats_scoring import (
+    MODEL_VERSION,
+    WEIGHTS,
+    NothingToScoreError,
+    get_model_version,
+    score,
+    score_batch,
+)
 from ats_scoring.config import COMPONENTS, DEFAULT_CONFIG
 from ats_scoring.scoring import embedding_similarity, experience_fit
 
@@ -69,8 +79,9 @@ def full_score(candidate: dict[str, Any], name: str, job: dict[str, Any] = JOB) 
 
 
 def test_model_version_comes_from_weights_yaml_and_is_bumped() -> None:
-    assert MODEL_VERSION == DEFAULT_CONFIG.model_version
-    assert MODEL_VERSION != "tfidf-skills-0.1.0"
+    assert MODEL_VERSION == get_model_version(DEFAULT_CONFIG)
+    assert MODEL_VERSION.startswith(DEFAULT_CONFIG.scorer_version + "+")
+    assert not MODEL_VERSION.startswith("tfidf-skills-0.1.0")
     assert WEIGHTS == dict(DEFAULT_CONFIG.weights)
 
 
@@ -218,7 +229,7 @@ def test_a_required_skill_counts_more_than_a_preferred_one() -> None:
 def test_other_settings_can_be_passed_in() -> None:
     text_only = dataclasses.replace(
         DEFAULT_CONFIG,
-        model_version="test-0",
+        scorer_version="test-0",
         weights={name: float(name == "text_similarity") for name in COMPONENTS},
     )
 
@@ -231,9 +242,27 @@ def test_other_settings_can_be_passed_in() -> None:
         config=text_only,
     )
 
-    assert other["model_version"] == "test-0"
+    assert other["model_version"] == get_model_version(text_only)
+    assert other["model_version"].startswith("test-0+")
+    assert other["explanation"]["model_version"] == other["model_version"]
     assert other["total"] == other["components"]["text_similarity"]
     assert other["components"] == result["components"]
+
+
+@pytest.mark.parametrize(
+    "mapping", [MappingProxyType, UserDict], ids=["MappingProxyType", "UserDict"]
+)
+def test_weights_can_be_any_mapping(
+    mapping: Callable[[dict[str, float]], Mapping[str, float]],
+) -> None:
+    config = dataclasses.replace(DEFAULT_CONFIG, weights=mapping(dict(DEFAULT_CONFIG.weights)))
+    kwargs: dict[str, Any] = {"job_embedding": JOB_VECTOR, "config": config}
+
+    one = score(PARTIAL, JOB, candidate_embedding=EMBEDDINGS["PARTIAL"], **kwargs)
+    batch = score_batch(JOB, [PARTIAL], candidate_embeddings=[EMBEDDINGS["PARTIAL"]], **kwargs)
+
+    assert one == batch[0] == full_score(PARTIAL, "PARTIAL")
+    assert one["model_version"] == MODEL_VERSION  # same weights, same version
 
 
 # --------------------------------------------------------------------------- embedding

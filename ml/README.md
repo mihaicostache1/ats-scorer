@@ -105,7 +105,7 @@ The weights, the model version and the embedding model live in [`ats_scoring/wei
 - **Nothing to score is an error:** `score()` raises `NothingToScoreError`, a `ValueError` subclass, when the candidate or the job has no skills and no text. A CV that failed to parse must not look like a poor candidate.
 - **Deterministic:** the same inputs give the same result. The embedding model is pinned to one revision.
 
-Change `model_version` in `weights.yaml` whenever the same input could get a different score, for example when the weights, the embedding model or the alias table change.
+`model_version` (from `get_model_version()`) is `scorer_version` from `weights.yaml` plus hashes of the other settings, the embedding model and the skill and title vocabularies, for example `hybrid-1.2.0+w.1a2b3c4d.e.5e6f7a8b.t.9c0d1e2f`. A settings or vocabulary change gives a new version by itself; bump `scorer_version` only when a code change can move a score. Rules and rescoring triggers: [docs/ml/model-versioning.md](../docs/ml/model-versioning.md).
 
 ### Limits
 

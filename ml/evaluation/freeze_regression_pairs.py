@@ -6,11 +6,12 @@
 The pairs below are scored and their total (as a range), band and matched skills are written to
 tests/data/scorer_regression/, which tests/test_scorer_regression.py checks in CI. The file also
 records a fingerprint of what should move the scores: weights.yaml (weights, skill weights,
-bands, model version), the embedding model and the skill taxonomy (the scorer's aliases and the
-parser's). Changing any of them fails the test until this script is run again in the same PR,
-and the script refuses to run without a note saying why, which it adds to the file's history
-together with a digest of the expected results it vouches for. Changing those results in any
-other way (by hand, or by rerunning without a new note) fails the test too.
+bands, scorer version), the embedding model and the skill taxonomy (the scorer's aliases and the
+parser's), next to the full model_version (L-21). Changing any of them fails the test until
+this script is run again in the same PR, and the script refuses to run without a note saying
+why, which it adds to the file's history together with a digest of the expected results it
+vouches for. Changing those results in any other way (by hand, or by rerunning without a new
+note) fails the test too.
 
 The inputs are frozen too. Candidates and jobs are copied from evaluation/data the first time a
 pair is frozen and never again, so a change to the evaluation set does not move these tests.
@@ -31,7 +32,7 @@ from typing import Any
 
 import yaml
 
-from ats_scoring import score
+from ats_scoring import MODEL_VERSION, score
 from ats_scoring.config import DEFAULT_CONFIG
 from ats_scoring.evaluate import DEFAULT_EVAL_DIR, EMBEDDINGS_FILE, load_embeddings
 from ats_scoring.skill_normalizer import ALIASES as PARSER_ALIASES
@@ -227,7 +228,7 @@ def build(out_dir: Path, note: str | None) -> dict[str, str]:
     history = _read(path)["history"] if path.is_file() else []
     current = fingerprint()
     expected: dict[str, Any] = {
-        "model_version": DEFAULT_CONFIG.model_version,
+        "model_version": MODEL_VERSION,
         "tolerance": TOLERANCE,
         "fingerprint": current,
         "pairs": expected_values(inputs, vectors),
@@ -236,7 +237,7 @@ def build(out_dir: Path, note: str | None) -> dict[str, str]:
         history.append(
             {
                 "date": date.today().isoformat(),
-                "model_version": DEFAULT_CONFIG.model_version,
+                "model_version": MODEL_VERSION,
                 "fingerprint": current,
                 "results": results_digest(expected),
                 "note": note,
