@@ -99,6 +99,12 @@ const rankingDemoApplications = mockCandidates
       applied_at: appliedAt,
       updated_at: appliedAt,
     };
+  })
+  // Unparsed candidates (Emilia Santos) keep no applications: e2e/candidates.spec.ts relies on
+  // that. Filter after numbering so every other id keeps its saved explanation.
+  .filter((application) => {
+    const candidate = mockCandidates.find((entry) => entry.id === application.candidate_id);
+    return Object.keys(candidate?.parsed_data ?? {}).length > 0;
   });
 mockApplications.push(...rankingDemoApplications);
 

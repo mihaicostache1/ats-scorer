@@ -31,7 +31,7 @@ it("returns grouped ranking pages and filters stored required matches", async ()
       (count, name) => count + all[name].pagination.total_items,
       0
     )
-  ).toBe(28);
+  ).toBe(27);
   expect(new Set(all.ranked.items.map((row: { band: string }) => row.band))).toEqual(
     new Set(["strong", "moderate", "weak"])
   );
