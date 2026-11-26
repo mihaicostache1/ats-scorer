@@ -19,7 +19,6 @@ from ats_scoring.score_explanation import (
     ExperienceStatus,
 )
 from ats_scoring.skills import SkillMatch, normalize_skill
-from ats_scoring.titles import TitleMatch
 
 # Every text the explanation can contain. Keys name the situation; values are str.format
 # templates. A new situation gets a new key here, never text built elsewhere.
@@ -30,6 +29,9 @@ TEMPLATES: Final[Mapping[str, str]] = {
     "skills.none": "The job lists no skills, so skills are not part of the score.",
     "skills.required": "Has {found} of {total} required skill{plural}.",
     "skills.preferred": "Has {found} of {total} nice-to-have skill{plural}.",
+    "skills.unweighted": (
+        "The listed skills carry no weight, so skills are not part of the score."
+    ),
     "embedding.missing": "No embedding is available, so similarity of meaning is not scored.",
     "embedding.score": (
         "Similarity of meaning with the job: {score:.0f}/100 "
@@ -45,7 +47,11 @@ TEMPLATES: Final[Mapping[str, str]] = {
     "experience.meets": "Has {have} of experience; the job asks for at least {need}.",
     "experience.below": "Has {have} of experience, below the {need} the job asks for.",
     "title.missing": "No job title to compare, so title fit is not scored.",
-    "title.closest": ("Closest job title: {title} (title fit {score:.0f}/100, seniority aside)."),
+    # The CV's titles are never quoted: a headline can hold a date of birth or other personal
+    # detail that redaction does not catch, and this text is stored and shown.
+    "title.score": (
+        "Job title fit: {score:.0f}/100, from the closest title in the CV, seniority aside."
+    ),
     "text.score": (
         "Shared words with the job: {score:.0f}/100. It counts shared words, not meaning."
     ),
@@ -96,17 +102,31 @@ def _count(key: str, found: int, total: int) -> str:
 
 
 def skill_lines(skills: SkillMatch) -> list[str]:
-    """One sentence for required skills and one for nice-to-have skills, when the job has them."""
-    if skills.overlap is None:
+    """One sentence for required skills and one for nice-to-have skills, when the job has them.
+
+    Whether the job lists skills is read from the skill lists, not from the overlap: with
+    `preferred_weight: 0` a job listing only nice-to-have skills has no overlap, yet its skills
+    are listed and can match. That case gets the counts and then a sentence saying so.
+    """
+    required = len(skills.matched_required) + len(skills.missing_required)
+    preferred = len(skills.matched_preferred) + len(skills.missing_preferred)
+    if not required and not preferred:
         return [TEMPLATES["skills.none"]]
     lines = []
-    required = len(skills.matched_required) + len(skills.missing_required)
     if required:
         lines.append(_count("skills.required", len(skills.matched_required), required))
-    preferred = len(skills.matched_preferred) + len(skills.missing_preferred)
     if preferred:
         lines.append(_count("skills.preferred", len(skills.matched_preferred), preferred))
+    if skills.overlap is None:
+        lines.append(TEMPLATES["skills.unweighted"])
     return lines
+
+
+def summary_skill_lines(skills: SkillMatch) -> list[str]:
+    """The skills sentences of the summary: the first one, or all of them when the skills
+    carry no weight, so the summary never shows a count without saying it is not scored."""
+    lines = skill_lines(skills)
+    return lines if skills.overlap is None else lines[:1]
 
 
 def experience_status(candidate_years: object, min_years: object) -> tuple[ExperienceStatus, str]:
@@ -130,7 +150,6 @@ def component_statements(
     components: ScoreComponents,
     candidate_years: object,
     min_years: object,
-    title: TitleMatch,
 ) -> dict[ComponentName, str]:
     """The sentence shown with each component."""
     embedding = components["embedding_similarity"]
@@ -145,8 +164,8 @@ def component_statements(
         "experience_fit": experience_status(candidate_years, min_years)[1],
         "title_similarity": (
             TEMPLATES["title.missing"]
-            if title_score is None or title.closest_title is None
-            else TEMPLATES["title.closest"].format(title=title.closest_title, score=title_score)
+            if title_score is None
+            else TEMPLATES["title.score"].format(score=title_score)
         ),
         "text_similarity": TEMPLATES["text.score"].format(score=components["text_similarity"]),
     }
@@ -182,7 +201,6 @@ def build_explanation(
     cv_skills: Sequence[str],
     candidate_years: object,
     min_years: object,
-    title: TitleMatch,
     bands: BandSettings,
     model_version: str,
 ) -> dict[str, Any]:
@@ -192,13 +210,13 @@ def build_explanation(
     `candidate_years` its total years. `total`, `components` and `weights` are the rounded
     values of the score.
     """
-    statements = component_statements(skills, components, candidate_years, min_years, title)
+    statements = component_statements(skills, components, candidate_years, min_years)
     status, experience_text = experience_status(candidate_years, min_years)
     level = band(total, bands)
 
     # Band, then the first skills sentence (required skills when the job lists any), then
     # experience: what a recruiter checks first.
-    summary = [TEMPLATES[f"band.{level}"], skill_lines(skills)[0], experience_text]
+    summary = [TEMPLATES[f"band.{level}"], *summary_skill_lines(skills), experience_text]
 
     parts = []
     for name in COMPONENT_NAMES:

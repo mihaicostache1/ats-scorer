@@ -203,7 +203,6 @@ def _score_one(
         cv_skills=cv_skills,
         candidate_years=candidate.get("experience_years"),
         min_years=fields.get("min_experience_years"),
-        title=title,
         bands=config.bands,
         model_version=config.model_version,
     )

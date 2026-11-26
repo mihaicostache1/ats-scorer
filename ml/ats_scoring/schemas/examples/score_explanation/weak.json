@@ -35,7 +35,7 @@
       "score": 0.0,
       "weight": 0.15,
       "contribution": 0.0,
-      "statement": "Closest job title: Senior UX Designer (title fit 0/100, seniority aside)."
+      "statement": "Job title fit: 0/100, from the closest title in the CV, seniority aside."
     },
     {
       "name": "text_similarity",

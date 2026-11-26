@@ -63,7 +63,7 @@ Shortened from [no_embedding_cv_phrases.json](../../ml/ats_scoring/schemas/examp
 |---|---|
 | `total`, `model_version` | The same as the score's. Compare scores only within one `model_version` |
 | `band` | From the thresholds in `weights.yaml` (see [Bands](#bands)) |
-| `summary` | Band, then the first skills sentence (required skills when the job lists any), then experience |
+| `summary` | Band, then the first skills sentence (required skills when the job lists any), then experience. When the listed skills carry no weight (only nice-to-have skills, with `preferred_weight: 0`), every skills sentence is included, ending with the one that says so |
 | `components` | Always the five components, in the scorer's order. `score` is `null` when the part could not be computed, never 0 for that reason. `weight` is the share actually applied: 0 for a missing part, whose share goes to the others. `contribution` is `score × weight`, the points it added; the five add up to `total`, give or take 0.05 of rounding |
 | `matched_skills` | Required skills first, then nice-to-have ones, each in the job's order. `skill` is the job's spelling, `cv_phrase` the CV's (the first one, when the CV lists the same skill twice) |
 | `missing_skills` | `required` and `preferred` (nice-to-have), in the job's spelling |
@@ -136,11 +136,11 @@ Per band, if the UI explains each one:
 
 ## Templates only
 
-Every text is a `str.format` template in `TEMPLATES` (`explanation.py`), filled in with numbers, skill names and the closest job title from the redacted CV. A new situation gets a new template there. A test checks that every text in the 270 explanations of the evaluation set and in the examples is made of these templates and nothing else.
+Every text is a `str.format` template in `TEMPLATES` (`explanation.py`), filled in with numbers and skill names from the redacted CV. A new situation gets a new template there. A test checks that every text in the 270 explanations of the evaluation set and in the examples is made of these templates and nothing else.
 
 ## Never a redacted field
 
-The explanation is built after `redact()`, from the same redacted record the scorer reads: skill phrases, the closest job title and the total years of experience. The tests check this with a CV that has identity details in every field, including inside a matched skill entry. The schema is closed (`additionalProperties: false`), so a field such as `contact` cannot be added without a new version.
+The explanation is built after `redact()`, from the same redacted record the scorer reads: skill phrases and the total years of experience. It never quotes a job title from the CV, only the title fit score: a headline such as "Backend Engineer (DOB 04/21/92)" can carry a birth date in a form redaction does not catch, and this text is stored in `scores.component_breakdown` and shown. The tests check this with a CV that has identity details in every field, including inside a matched skill entry, and with birth dates written into the headline. The schema is closed (`additionalProperties: false`), so a field such as `contact` cannot be added without a new version.
 
 ## Example payloads for the frontend (F-15)
 

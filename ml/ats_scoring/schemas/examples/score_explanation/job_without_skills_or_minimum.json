@@ -35,7 +35,7 @@
       "score": 33.33,
       "weight": 0.6,
       "contribution": 20.0,
-      "statement": "Closest job title: Backend Developer (title fit 33/100, seniority aside)."
+      "statement": "Job title fit: 33/100, from the closest title in the CV, seniority aside."
     },
     {
       "name": "text_similarity",

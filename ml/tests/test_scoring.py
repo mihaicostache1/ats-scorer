@@ -326,8 +326,8 @@ def test_seniority_words_do_not_change_the_title_fit() -> None:
     result = score(PARTIAL, job)  # headline "Backend Developer"
 
     assert result["components"]["title_similarity"] == 100.0
-    assert any(
-        "Closest job title: Backend Developer" in line for line in result["score_explanations"]
+    assert "Job title fit: 100/100, from the closest title in the CV, seniority aside." in (
+        result["score_explanations"]
     )
 
 
@@ -358,7 +358,7 @@ def test_partial_pair_is_explained() -> None:
     assert explanations[:2] == ["Has 2 of 4 required skills.", "Has 0 of 2 nice-to-have skills."]
     assert explanations[2].startswith("Similarity of meaning with the job: ")
     assert explanations[3].startswith("Has 1.5 years of experience")
-    assert explanations[4].startswith("Closest job title: ")
+    assert explanations[4].startswith("Job title fit: ")
     assert explanations[5].startswith("Shared words with the job: ")
     assert len(explanations) == 6
 

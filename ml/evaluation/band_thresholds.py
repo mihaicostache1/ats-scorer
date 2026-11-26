@@ -162,8 +162,26 @@ def bootstrap_kappa(rows: Sequence[Row], bands: BandSettings, samples: int) -> l
     ]
 
 
+def require_embedding(embeddings: Mapping[str, Any], kind: str, record_id: str) -> Any:
+    """The stored embedding of a candidate or job. The thresholds are picked on the scorer as it
+    runs in production, with embeddings, so a missing vector stops the run instead of quietly
+    scoring that pair without one."""
+    vector = embeddings[kind].get(record_id)
+    if vector is None:
+        noun = {"candidates": "candidate", "jobs": "job"}[kind]
+        raise SystemExit(
+            f"No embedding for {noun} {record_id} in {EMBEDDINGS_FILE}. "
+            "Rebuild it with embed_eval_set.py."
+        )
+    return vector
+
+
 def load_pairs(embeddings: Mapping[str, Any]) -> list[Row]:
-    """Every rated pair with its mean rating and its total, with and without embeddings."""
+    """Every rated pair with its mean rating and its total, with and without embeddings.
+
+    `total` always uses both embeddings (see `require_embedding`); `total_without_embeddings`
+    is the separate comparison run, scored with no embeddings on purpose.
+    """
     jobs = load_records(DEFAULT_EVAL_DIR / "data" / "jobs")
     candidates = load_records(DEFAULT_EVAL_DIR / "data" / "candidates")
     collected: dict[tuple[str, str], list[int]] = defaultdict(list)
@@ -176,16 +194,17 @@ def load_pairs(embeddings: Mapping[str, Any]) -> list[Row]:
         with_embeddings = score(
             candidate,
             job,
-            candidate_embedding=embeddings["candidates"].get(candidate_id),
-            job_embedding=embeddings["jobs"].get(job_id),
+            candidate_embedding=require_embedding(embeddings, "candidates", candidate_id),
+            job_embedding=require_embedding(embeddings, "jobs", job_id),
         )
+        without_embeddings = score(candidate, job, candidate_embedding=None, job_embedding=None)
         rows.append(
             {
                 "candidate_id": candidate_id,
                 "job_id": job_id,
                 "rating": statistics.fmean(values),
                 "total": with_embeddings["total"],
-                "total_without_embeddings": score(candidate, job)["total"],
+                "total_without_embeddings": without_embeddings["total"],
             }
         )
     return rows

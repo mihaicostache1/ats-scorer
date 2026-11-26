@@ -68,6 +68,18 @@ def test_search_finds_a_clean_split_and_takes_the_middle_of_ties() -> None:
     assert picked == BandSettings(strong=75, moderate=50)  # lower medians
 
 
+@pytest.mark.parametrize(("kind", "record_id"), [("jobs", "J07"), ("candidates", "C021")])
+def test_a_missing_embedding_stops_the_calibration(kind: str, record_id: str) -> None:
+    """Without this, a pair quietly falls back to scoring without embeddings: dropping J07 alone
+    moved the strong cutoff from 70 to 65 while the report still called it the embedded run."""
+    embeddings = bt.load_embeddings(bt.DEFAULT_EVAL_DIR / bt.EMBEDDINGS_FILE)
+    embeddings[kind] = {k: v for k, v in embeddings[kind].items() if k != record_id}
+    noun = {"jobs": "job", "candidates": "candidate"}[kind]
+
+    with pytest.raises(SystemExit, match=f"No embedding for {noun} {record_id} "):
+        bt.load_pairs(embeddings)
+
+
 def test_table_counts_ratings_per_band() -> None:
     result = bt.table(rows((80, 3), (75, 1), (60, 3), (30, 0)), BandSettings(70, 50))
 

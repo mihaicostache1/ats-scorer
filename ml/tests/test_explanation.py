@@ -6,6 +6,7 @@ are checked against both, so a change to one that is not made to the other fails
 """
 
 import copy
+import dataclasses
 import importlib.util
 import json
 import re
@@ -279,6 +280,48 @@ def test_a_job_without_skills_or_minimum_says_so() -> None:
     assert explanation["summary"].endswith(
         f"{TEMPLATES['skills.none']} {TEMPLATES['experience.not_required']}"
     )
+
+
+def test_unweighted_nice_to_have_skills_are_listed_and_said_to_carry_no_weight() -> None:
+    """With preferred_weight 0, a job listing only nice-to-have skills still lists skills."""
+    config = dataclasses.replace(DEFAULT_CONFIG, preferred_skill_weight=0.0)
+    job = {**JOB, "required_skills": [], "preferred_skills": ["FastAPI", "Redis"]}
+
+    explanation = score(CV, job, config=config)["explanation"]
+    skills = next(part for part in explanation["components"] if part["name"] == "skill_overlap")
+
+    assert skills["score"] is None
+    assert [s["skill"] for s in explanation["matched_skills"]] == ["FastAPI"]
+    assert TEMPLATES["skills.none"] not in explanation["summary"]
+    expected = f"Has 1 of 2 nice-to-have skills. {TEMPLATES['skills.unweighted']}"
+    assert skills["statement"] == expected
+    assert expected in explanation["summary"]
+
+
+@pytest.mark.parametrize(
+    "headline",
+    [
+        "Backend Engineer (DOB 04/21/92)",
+        "Backend Engineer, born 21.04.1992",
+        "Backend Engineer - 1992-04-21",
+    ],
+)
+def test_the_title_statement_never_quotes_the_cv(
+    validator: Draft202012Validator, headline: str
+) -> None:
+    """A headline can carry a birth date that redaction misses; it must not reach the payload."""
+    cv = {**CV, "headline": headline}
+
+    explanation = score(cv, {**JOB, "title": "Backend Engineer"})["explanation"]
+
+    assert_valid(validator, explanation)
+    title = next(p for p in explanation["components"] if p["name"] == "title_similarity")
+    assert title["score"] is not None
+    assert title["statement"] == TEMPLATES["title.score"].format(score=title["score"])
+    stored = json.dumps(explanation)
+    assert headline not in stored
+    for fragment in ("DOB", "04/21/92", "21.04.1992", "1992-04-21", "1992"):
+        assert not re.search(rf"\b{re.escape(fragment)}\b", stored), fragment
 
 
 @pytest.mark.parametrize(
